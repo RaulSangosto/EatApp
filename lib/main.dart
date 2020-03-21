@@ -1,7 +1,7 @@
-import 'package:eatapp/home.dart';
-import 'package:eatapp/descubrir.dart';
-import 'package:eatapp/crear.dart';
-import 'package:eatapp/perfil.dart';
+import 'package:eatapp/pages/home.dart';
+import 'package:eatapp/pages/descubrir.dart';
+import 'package:eatapp/pages/crear.dart';
+import 'package:eatapp/pages/perfil.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -67,9 +67,13 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text('Profile'),
           ),
         ],
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        iconSize: 28,
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.blueGrey,
+        selectedItemColor: Colors.deepPurpleAccent,
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
     );

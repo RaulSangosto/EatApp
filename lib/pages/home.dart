@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class Descubrir extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _DescubrirState();
+    return _HomeState();
   }
 }
 
-class _DescubrirState extends State<Descubrir> {
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -26,17 +26,17 @@ class _DescubrirState extends State<Descubrir> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  Text("Descubrir",
+                  Text("Para hoy",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 40),
                     ),
-                  Text("Por Platos y Lugares"),
+                  Text("Hidratos de Carbono"),
                 ]
               ),
               CircleAvatar(
                 backgroundColor: Colors.blueGrey,
-                radius: 30.0,
+                radius: 28.0,
                 child: Text("R",
                 style: TextStyle(
                       fontSize: 20
@@ -44,6 +44,10 @@ class _DescubrirState extends State<Descubrir> {
               ),
             ],
           ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          height: 30.0,
         ),
       ],
     );
