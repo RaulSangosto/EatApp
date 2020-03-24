@@ -13,7 +13,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EatApp',
       theme: ThemeData(
+        brightness: Brightness.light,
         primarySwatch: Colors.blue,
+        primaryColor: Colors.white,
+        accentColor: Color(0xff62CAE5),
+        
+        textTheme: TextTheme(
+          body1: TextStyle(fontSize: 14.0, color: Color(0xff363B4B)),
+    ),
       ),
       home: MyHomePage(title: 'EatApp'),
     );
@@ -47,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffECECEC),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
