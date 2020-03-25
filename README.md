@@ -1,5 +1,5 @@
 # Eatapp
-![Pantalla de inicio](/images/inicio.pdf)
+![Pantalla de inicio](/images/inicio.png)
 
 A new Flutter project.
 
