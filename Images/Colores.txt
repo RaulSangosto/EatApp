@@ -1,0 +1,7 @@
+Cian oscuro: #48A299
+Fondo: #ECECEC
+Acento Rojo: #EC3271
+Gris medio: #C5C5C5
+Acento Azul: #62CAE5
+Azul Oscuro: #000048
+Gris Oscuro #363B4B
