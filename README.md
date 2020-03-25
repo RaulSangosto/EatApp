@@ -1,5 +1,5 @@
 # Eatapp
-![Pantalla de inicio](images/Prueba Registro-4.pdf)
+![Pantalla de inicio](images/inicio.pdf)
 
 A new Flutter project.
 
