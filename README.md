@@ -23,12 +23,12 @@ Está aplicación proporciona una dieta equilibrada para el usuario en base a un
 ## Páginas
 
 1. Home
-  1. Lalala
-  1. lelele
+   1. Lalala
+   1. lelele
 1. Descubrir
 1. Crear
-  1. asjdkas
-  1. 
+   1. asjdkas
+   1. 
 1. Perfil
 
 ## Proyecto
