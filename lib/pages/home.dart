@@ -1,5 +1,5 @@
-import 'package:eatapp/models/receta.dart';
-import 'package:eatapp/test/data.dart';
+import 'package:eatapp/widgets/profile_avatar.dart';
+import 'package:eatapp/widgets/recetas_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -18,6 +18,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    int _selectedIndex = 0;
+    int _numSugerencias = 5;
+
     return SafeArea(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -60,19 +63,33 @@ class _HomeState extends State<Home> {
                           children: <Widget>[
                             SizedBox(
                               height: 250.0,
-                              child: _RecetasList(),
+                              child: RecetaList(_numSugerencias),
                               ),
                             Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
-                                  Row(),
-                                  OutlineButton(
-                                    borderSide: BorderSide(
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Dot(0, _selectedIndex),
+                                      Dot(1, _selectedIndex),
+                                      Dot(2, _selectedIndex),
+                                      Dot(3, _selectedIndex),
+                                      Dot(4, _selectedIndex),
+                                    ],
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 70.0),
+                                    child: OutlineButton(
+                                      
+                                      borderSide: BorderSide(
 
+                                      ),
+                                      onPressed: _onPressed,
+                                      child: Text("Ver todas"),
                                     ),
-                                    onPressed: _onPressed,
-                                    child: Text("Ver todas"),
                                   ),
                                 ],
                               ),
@@ -92,12 +109,33 @@ class _HomeState extends State<Home> {
   }
 }
 
+class Dot extends StatelessWidget {
+  Dot(this._index, this.selectedIndex);
 
+  int selectedIndex;
+  final int _index;
+
+  bool isSelected(){
+    return (_index == selectedIndex);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(right: isSelected() ? 10.0 : 7.0,),
+      width: isSelected() ? 13.0 : 10.0,
+      height: isSelected() ? 13.0 : 10.0,
+      decoration: BoxDecoration(
+        color: isSelected() ? Color(0xff363B4B) : Color(0xffC5C5C5),
+        borderRadius: BorderRadius.circular(50.0),
+      ),
+    );
+  }
+}
 
 class _TopCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     return Container(
       height: h * 0.8,
@@ -113,7 +151,7 @@ class _TopCard extends StatelessWidget {
           gradient: LinearGradient(
           begin: Alignment(0, -1.3),
           end: Alignment(0, 0),
-          colors: [Colors.deepPurple, const Color.fromARGB(0, 0, 0, 0)], // whitish to gray
+          colors: [Color(0xff000048), const Color.fromARGB(0, 0, 0, 0)], // whitish to gray
         ),
         ),
         child: Padding(
@@ -140,79 +178,9 @@ class _TopCard extends StatelessWidget {
                       ),
                   ]
                 ),
-                CircleAvatar(
-                  backgroundColor: Colors.blueGrey,
-                  radius: 30.0,
-                  child: Text("R",
-                  style: TextStyle(
-                        fontSize: 20
-                      ),),
-                ),
+                PerfilAvatar(),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RecetasList extends StatelessWidget { 
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: 5,
-      itemBuilder: (BuildContext context, int index) {
-        Receta receta = recetas[index % recetas.length];
-        if (index == 0) {
-          return Padding(
-            padding: EdgeInsets.only(left: 70.0),
-            child: _RecetasTile(receta));
-        }
-        return _RecetasTile(receta);
-      }
-    );
-  }
-}
-
-class _RecetasTile extends StatelessWidget {
-  _RecetasTile(this.receta);
-
-  final Receta receta;
-
-  @override
-  Widget build(BuildContext context) {
-    double w = MediaQuery.of(context).size.width;
-    double h = MediaQuery.of(context).size.height;
-
-    return Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Container(
-        height: 250.0,
-        width: 160.0,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          color: Colors.blueGrey,
-          image: new DecorationImage(
-            image: new ExactAssetImage(receta.imgUrl),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child:Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Icon(Icons.favorite, color: Colors.redAccent),
-              Text(receta.titulo, style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                ),
-              ),
-            ],
           ),
         ),
       ),
