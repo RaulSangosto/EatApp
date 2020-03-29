@@ -17,7 +17,6 @@ class _DescubrirState extends State<Descubrir> {
       child: Stack(  
         //mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-        
           Column(
             children: <Widget>[
               Expanded(
