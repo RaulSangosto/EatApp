@@ -2,9 +2,18 @@ import 'package:eatapp/pages/home.dart';
 import 'package:eatapp/pages/descubrir.dart';
 import 'package:eatapp/pages/crear.dart';
 import 'package:eatapp/pages/perfil.dart';
+import 'package:eatapp/receta_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
-void main() => runApp(MyApp());
+void setupLocator(){
+  GetIt.I.registerLazySingleton(() => RecetasService());
+}
+
+void main() {
+  setupLocator();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -78,9 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        iconSize: 28,
+        iconSize: 32,
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.deepPurpleAccent,
+        selectedItemColor: Theme.of(context).accentColor,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),

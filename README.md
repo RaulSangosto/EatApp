@@ -1,5 +1,5 @@
 # Eatapp
-![Pantalla de inicio](https://github.com/RaulSangosto/EatApp/blob/master/Images/inicio.png)
+![Pantalla de inicio](https://github.com/RaulSangosto/EatApp/blob/master/Images/DemoSplash.png)
 
 A new Flutter project.
 

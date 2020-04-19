@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+/backend/venv
 
 # IntelliJ related
 *.iml

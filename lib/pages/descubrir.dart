@@ -1,7 +1,9 @@
+import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/models/receta.dart';
+import 'package:eatapp/receta_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:eatapp/test/data.dart';
+import 'package:get_it/get_it.dart';
 
 class Descubrir extends StatefulWidget {
   @override
@@ -11,26 +13,58 @@ class Descubrir extends StatefulWidget {
 }
 
 class _DescubrirState extends State<Descubrir> {
+  RecetasService get service => GetIt.I<RecetasService>();
+  APIResponse<List<Receta>> _apiResponse;
+  List<Receta> recetas;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    _fetchRecetas();
+    super.initState();
+  }
+
+  _fetchRecetas() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    _apiResponse = await service.getRecetas();
+    recetas = _apiResponse.data;
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Stack(  
-        //mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-        
-          Column(
-            children: <Widget>[
-              Expanded(
+      child: Builder(builder: (_) {
+        if (_isLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (_apiResponse.error) {
+          return Center(child: Text(_apiResponse.errorMessage));
+        }
+
+        return Stack(
+          //mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                Expanded(
                   child: SizedBox(
-                  height: 472.0,
-                  child: _RecetasList(),
+                    height: 472.0,
+                    child: _RecetasList(recetas: recetas),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          _TopCard(),
-        ],
-      ),
+              ],
+            ),
+            _TopCard(),
+          ],
+        );
+      }),
     );
   }
 }
@@ -55,30 +89,38 @@ class _TopCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal:10.0,vertical: 20.0,),
+        padding: EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 20.0,
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Row (
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text("Descubrir",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      "Descubrir",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
                     ),
-                  Text("Por Platos y Lugares"),
-                ]
-              ),
+                    Text("Por Platos y Lugares"),
+                  ]),
               SizedBox(
                 width: 70.0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Icon(Icons.search, size: 28.0,),
-                    Icon(Icons.list, size: 28.0,),
+                    Icon(
+                      Icons.search,
+                      size: 28.0,
+                    ),
+                    Icon(
+                      Icons.list,
+                      size: 28.0,
+                    ),
                   ],
                 ),
               ),
@@ -90,50 +132,58 @@ class _TopCard extends StatelessWidget {
   }
 }
 
-class _RecetasList extends StatelessWidget { 
+class _RecetasList extends StatelessWidget {
+  List<Receta> recetas;
+
+  _RecetasList({this.recetas});
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: 20,
-      itemBuilder: (BuildContext context, int index) {
-        Receta receta1 = recetas[index % recetas.length];
-        Receta receta2 = recetas[(index + 1) % recetas.length];
-        if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 15.0, top: 15.0, right: 15),
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 115.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Icon(Icons.grid_on),
-                    SizedBox(width: 10.0,),
-                    Icon(Icons.grid_off),
-                    SizedBox(width: 10.0,),
-                    Icon(Icons.group),
-                  ],
+        scrollDirection: Axis.vertical,
+        itemCount: recetas.length + 1,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return Padding(
+              padding:
+                  const EdgeInsets.only(bottom: 15.0, top: 15.0, right: 15),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 115.0,
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Icon(Icons.grid_on),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      Icon(Icons.grid_off),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      Icon(Icons.group),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }
+          Receta receta1 = recetas[index - 1];
+          Receta receta2 = recetas[index - 1];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _RecetasTile(receta1),
+                _RecetasTile(receta2),
               ],
             ),
           );
-        }
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              _RecetasTile(receta1),
-              _RecetasTile(receta2),
-            ],
-          ),
-        );
-      }
-    );
+        });
   }
 }
 
@@ -154,21 +204,23 @@ class _RecetasTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.0),
         color: Colors.blueGrey,
         image: new DecorationImage(
-          image: new ExactAssetImage(receta.imgUrl),
+          image: new NetworkImage(receta.imgUrl),
           fit: BoxFit.cover,
         ),
       ),
-      child:Padding(
+      child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             Icon(Icons.favorite, color: Colors.redAccent),
-            Text(receta.titulo, style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+            Text(
+              receta.titulo,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
           ],
@@ -203,5 +255,3 @@ class _RecetasTile extends StatelessWidget {
 //     );
 //   }
 // }
-
-

@@ -29,14 +29,16 @@ class _HomeState extends State<Home> {
             child: ListView(
               scrollDirection: Axis.vertical,
               children: <Widget>[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height,
+
+
+                    SizedBox(
+                  height: 470.0,
                   child: Stack(children: <Widget>[
                     _TopCard(),
                     Align(
                       alignment: Alignment.bottomCenter,
-                      child: FractionallySizedBox(
-                        heightFactor: 0.65,
+                      child: SizedBox(
+                        height: 200.0,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -56,14 +58,14 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     Align(
-                      alignment: Alignment(0, -0.4),
+                      alignment: Alignment(0, 1),
                       child: SizedBox(
                         height: 338.0,
                         child: Column(
                           children: <Widget>[
                             SizedBox(
                               height: 250.0,
-                              child: RecetaList(_numSugerencias),
+                              child: new RecetaList(_numSugerencias, 250.0, 160.0),
                               ),
                             Padding(
                               padding: const EdgeInsets.all(20.0),
@@ -83,12 +85,17 @@ class _HomeState extends State<Home> {
                                   Container(
                                     margin: const EdgeInsets.only(left: 70.0),
                                     child: OutlineButton(
-                                      
+                                      shape: new RoundedRectangleBorder(
+                                        borderRadius: new BorderRadius.circular(18.0),
+                                      ),
                                       borderSide: BorderSide(
-
+                                        color: Color(0xff48A299),
                                       ),
                                       onPressed: _onPressed,
-                                      child: Text("Ver todas"),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text("Ver todas", style: TextStyle(color: Color(0xff48A299)),),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -100,7 +107,29 @@ class _HomeState extends State<Home> {
                     ),
                     ],
                   ),
-                )
+                ),
+                Container(
+                  color: Colors.white,
+                  height: 250.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 25.0),
+                        child: Text("Nuevas Recetas", style: TextStyle(
+                          color: Color(0xff363B4B),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24.0),
+                          ),
+                      ),
+                      SizedBox(
+                        height: 160.0,
+                        child: new RecetaList(10, 150.0, 140.0)
+                        ),
+                    ],
+                  )
+                ),
             ],),
           ),
         ],
@@ -178,7 +207,7 @@ class _TopCard extends StatelessWidget {
                       ),
                   ]
                 ),
-                PerfilAvatar(),
+                PerfilAvatar(30),
               ],
             ),
           ),
