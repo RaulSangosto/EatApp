@@ -9,6 +9,9 @@
 .history
 .svn/
 /backend/venv
+#backend/eatapp_api/media/  #medias
+#backend/eatapp_api/db.sqlite3  #bbdd
+
 
 # IntelliJ related
 *.iml
