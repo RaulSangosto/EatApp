@@ -7,12 +7,19 @@ class Receta(models.Model):
     minutos_preparacion = models.SmallIntegerField(blank=True, null=True)
     kcal = models.SmallIntegerField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
-    ingredientes = models.ManyToManyField("Ingrediente")
     categorias = models.ManyToManyField("Categoria")
 
     def __str__(self):
         return self.titulo
 
+
+class Instruccion(models.Model):
+    ingrediente = models.ForeignKey("Ingrediente", on_delete=models.CASCADE)
+    cantidad = models.CharField(blank=True, null=True, max_length=100)
+    receta = models.ForeignKey("Receta", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} {}'.format(self.receta, self.ingrediente)
 
 class Ingrediente(models.Model):
     nombre = models.CharField(blank=True, null=True, max_length=100)

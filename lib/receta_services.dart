@@ -40,16 +40,16 @@ class RecetasService {
 
   }
 
-  Future<APIResponse<bool>> createReceta(Receta receta) {
+  Future<APIResponse<Receta>> createReceta(Receta receta) {
     return http.post(API + "recetas", headers: {"Content-Type": "application/json",}, body: jsonEncode(receta.toJson()))
     .then((data) {
       print(data.statusCode);
       if(data.statusCode == 201) {
-        return APIResponse<bool>(data: true);
+        return APIResponse<Receta>(data: Receta.fromJson(jsonDecode(data.body)));
       }
-      return APIResponse<bool>(data: false, error: true, errorMessage: "ERROR " + data.statusCode.toString() + ': An error occurred');
+      return APIResponse<Receta>(data: null, error: true, errorMessage: "ERROR " + data.statusCode.toString() + ': An error occurred');
     })
-    .catchError((_) => APIResponse<bool>(data: false, error: true, errorMessage: 'An error occurred'));
+    .catchError((_) => APIResponse<Receta>(data: null, error: true, errorMessage: 'An error occurred'));
 
   }
 
@@ -92,5 +92,51 @@ class RecetasService {
       return APIResponse<List<Categoria>>(error: true, errorMessage: data.statusCode.toString() + ': An error occurred');
     })
     .catchError((_) => APIResponse<List<Categoria>>(error: true, errorMessage: 'An error occurred'));
+  }
+
+  Future<APIResponse<List<Ingrediente>>> getIngredientes(List<Alergeno> _alergenos){
+    return http.get(API + "ingredientes", headers: {"Accept": "application/json"})
+    .then((data) {
+      if(data.statusCode == 200) {
+        final jsonData = json.decode(data.body);
+        final ingredientes = <Ingrediente>[];
+        for(var item in jsonData) {
+          ingredientes.add(Ingrediente.fromJson(item, _alergenos));
+        }
+        return APIResponse<List<Ingrediente>>(data: ingredientes);
+      }
+      return APIResponse<List<Ingrediente>>(error: true, errorMessage: data.statusCode.toString() + ': An error occurred');
+    })
+    .catchError((_) => APIResponse<List<Ingrediente>>(error: true, errorMessage: 'An error occurred'));
+
+  }
+
+  Future<APIResponse<List<Alergeno>>> getAlergenos(){
+    return http.get(API + "alergenos", headers: {"Accept": "application/json"})
+    .then((data) {
+      if(data.statusCode == 200) {
+        final jsonData = json.decode(data.body);
+        final alergenos = <Alergeno>[];
+        for(var item in jsonData){
+          alergenos.add(Alergeno.fromJson(item));
+        }
+        return APIResponse<List<Alergeno>>(data: alergenos);
+      }
+      return APIResponse<List<Alergeno>>(error: true, errorMessage: data.statusCode.toString() + ': An error occurred');
+    })
+    .catchError((_) => APIResponse<List<Alergeno>>(error: true, errorMessage: 'An error occurred'));
+  }
+
+  Future<APIResponse<bool>> createInstruccion(Instruccion instruccion) {
+    return http.post(API + "instrucciones", headers: {"Content-Type": "application/json",}, body: jsonEncode(instruccion.toJson()))
+    .then((data) {
+      print(data.statusCode);
+      if(data.statusCode == 201) {
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(data: false, error: true, errorMessage: "ERROR " + data.statusCode.toString() + ': An error occurred');
+    })
+    .catchError((_) => APIResponse<bool>(data: false, error: true, errorMessage: 'An error occurred'));
+
   }
 }
