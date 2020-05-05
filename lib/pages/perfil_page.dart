@@ -2,14 +2,14 @@ import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class Perfil extends StatefulWidget {
+class Perfil_Page extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _PerfilState();
   }
 }
 
-class _PerfilState extends State<Perfil> {
+class _PerfilState extends State<Perfil_Page> {
   void _onPressed() {}
 
   @override

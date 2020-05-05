@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from rest_framework import routers
 
+from perfil.viewsets.perfil import PerfilViewSet
 from receta.viewsets.receta import RecetaViewSet
 from receta.viewsets.ingrediente import IngredienteViewSet
 from receta.viewsets.alergeno import AlergenoViewSet
@@ -9,11 +10,12 @@ from receta.viewsets.instruccion import InstruccionViewSet
 
 router = routers.DefaultRouter(trailing_slash=False)
 
-router.register("recetas", RecetaViewSet)
-router.register("ingredientes", IngredienteViewSet)
-router.register("alergenos", AlergenoViewSet)
-router.register("categorias", CategoriaViewSet)
-router.register("instrucciones", InstruccionViewSet)
+router.register("recetas", RecetaViewSet, basename='recetas')
+router.register("ingredientes", IngredienteViewSet, basename='ingredientes')
+router.register("alergenos", AlergenoViewSet, basename='alergenos')
+router.register("categorias", CategoriaViewSet, basename='categorias')
+router.register("instrucciones", InstruccionViewSet, basename='instrucciones')
+router.register("perfil", PerfilViewSet, basename='perfil')
 
 
 urlpatterns = [

@@ -1,12 +1,11 @@
 import 'dart:convert';
+import 'package:eatapp/services_conf.dart';
 import 'package:http/http.dart' as http;
 import 'models/receta.dart';
 import 'models/api_response.dart';
 
 class RecetasService {
-  static const port = '8000';
-  static const localhost = '10.0.2.2:' + port;
-  static const API = 'http://' + localhost + '/api/v1/';
+  static const API = Configuration.API;
 
   Future<APIResponse<List<Receta>>> getRecetas(){
     return http.get(API + "recetas", headers: {"Accept": "application/json"})
@@ -26,7 +25,7 @@ class RecetasService {
   }
 
   Future<APIResponse<Receta>> getRecetaDetalle(int recetaId) {
-    return http.get(API + "notas/" + recetaId.toString(), headers: {"Accept": "application/json"})
+    return http.get(API + "recetas/" + recetaId.toString(), headers: {"Accept": "application/json"})
     .then((data) {
       if(data.statusCode == 200) {
         final jsonData = json.decode(data.body);
@@ -54,7 +53,7 @@ class RecetasService {
   }
 
   Future<APIResponse<bool>> updateReceta(Receta receta) {
-    return http.put(API + "notas/" + receta.id.toString(), headers: {"Content-Type": "application/json",}, body: jsonEncode(receta.toJson()))
+    return http.put(API + "recetas/" + receta.id.toString(), headers: {"Content-Type": "application/json",}, body: jsonEncode(receta.toJson()))
     .then((data) {
       print(data.statusCode);
       if(data.statusCode == 200) {
@@ -67,7 +66,7 @@ class RecetasService {
   }
 
   Future<APIResponse<bool>> deleteReceta(int recetaId) {
-    return http.put(API + "notas/" + recetaId.toString(), headers: {"Content-Type": "application/json",})
+    return http.put(API + "recetas/" + recetaId.toString(), headers: {"Content-Type": "application/json",})
     .then((data) {
       print(data.statusCode);
       if(data.statusCode == 200) {

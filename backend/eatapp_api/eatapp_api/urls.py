@@ -22,7 +22,7 @@ import local_settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls')),
-    path('', include('receta.urls'))
+    path('', include('api.urls')),
 ]
 
 urlpatterns += static(local_settings.MEDIA_URL, document_root=local_settings.MEDIA_ROOT)

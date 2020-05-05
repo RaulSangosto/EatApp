@@ -10,14 +10,14 @@ import 'package:image_picker/image_picker.dart';
 
 import '../receta_services.dart';
 
-class Crear extends StatefulWidget {
+class Crear_Page extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _CrearState();
   }
 }
 
-class _CrearState extends State<Crear> {
+class _CrearState extends State<Crear_Page> {
   //bool get _isEditing => widget.recetaId != null;
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Ingrediente>> _apiResponse;

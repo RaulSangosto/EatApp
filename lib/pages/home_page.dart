@@ -1,17 +1,18 @@
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:eatapp/widgets/recetas_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class Home extends StatefulWidget {
+class Home_Page extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     return _HomeState();
   }
 }
 
-class _HomeState extends State<Home> {
-
+class _HomeState extends State<Home_Page> {
   void _onPressed(){
     print("pressed!!");
   }

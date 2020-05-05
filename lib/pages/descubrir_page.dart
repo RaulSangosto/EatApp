@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
 
-class Descubrir extends StatefulWidget {
+class Descubrir_Page extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _DescubrirState();
   }
 }
 
-class _DescubrirState extends State<Descubrir> {
+class _DescubrirState extends State<Descubrir_Page> {
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Receta>> _apiResponse;
   List<Receta> recetas;
@@ -102,7 +102,7 @@ class _TopCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      "Descubrir",
+                      "Descubrir_Page",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
                     ),
