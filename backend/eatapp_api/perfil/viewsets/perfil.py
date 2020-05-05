@@ -54,7 +54,7 @@ class PerfilViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["GET", "POST", "DELETE", "PATCH"])
     def me(self, request):
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         if not request.user.is_authenticated:
             return Response({})
 
@@ -87,7 +87,7 @@ class PerfilViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["POST"])
     def login(self, request):
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         logout(request)
         form = AuthenticationForm(request, data=request.data)
 
