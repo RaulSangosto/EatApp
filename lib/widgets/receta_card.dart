@@ -13,24 +13,28 @@ class RecetaTile extends StatefulWidget {
 }
 
 class _RecetaTile extends State<RecetaTile> {
-  _RecetaTile(this.receta, this.height, this.width);
+  _RecetaTile(this.receta, this.height, this.width, {this.margin = 0});
 
   final Receta receta;
   final double height;
   final double width;
+  final double margin;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: Container(
+        margin: new EdgeInsets.only(top: margin),
         height: height,
         width: width,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
           color: Colors.blueGrey,
-          image: new DecorationImage(
-            image: new ExactAssetImage(receta.imgUrl),
+          image: receta.imgUrl == null 
+          ? null
+          : new DecorationImage(
+            image: new NetworkImage(receta.imgUrl),
             fit: BoxFit.cover,
           ),
         ),

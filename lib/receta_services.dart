@@ -7,8 +7,19 @@ import 'models/api_response.dart';
 class RecetasService {
   static const API = Configuration.API;
 
-  Future<APIResponse<List<Receta>>> getRecetas(){
-    return http.get(API + "recetas", headers: {"Accept": "application/json"})
+  Future<APIResponse<List<Receta>>> getRecetas({Categoria categoria}){
+    var uri;
+    Map<String,String> headers = {"Accept": "application/json"};
+    if(categoria == null){
+      uri =  Uri.http(Configuration.localhost, Configuration.baseUrl + "recetas");
+    }
+    else{
+      var queryParameters = {
+        'categorias': categoria.id.toString(),
+      };
+      uri =  Uri.http(Configuration.localhost, Configuration.baseUrl + "recetas", queryParameters);
+    }
+    return http.get(uri, headers: headers)
     .then((data) {
       if(data.statusCode == 200) {
         final jsonData = json.decode(data.body);

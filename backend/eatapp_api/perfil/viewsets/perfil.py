@@ -56,7 +56,7 @@ class PerfilViewSet(viewsets.ViewSet):
     def me(self, request):
         #import ipdb; ipdb.set_trace()
         if not request.user.is_authenticated:
-            return Response({})
+            return Response({}, status=400)
 
         perfil = request.user.perfil
 

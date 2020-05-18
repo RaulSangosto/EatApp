@@ -1,10 +1,16 @@
+import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/models/perfil.dart';
+import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:eatapp/widgets/recetas_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get_it/get_it.dart';
+
+import '../receta_services.dart';
 
 class Home_Page extends StatefulWidget {
+  //Home_Page();
 
   @override
   State<StatefulWidget> createState() {
@@ -13,6 +19,36 @@ class Home_Page extends StatefulWidget {
 }
 
 class _HomeState extends State<Home_Page> {
+  RecetasService get service => GetIt.I<RecetasService>();
+  APIResponse<List<Categoria>> _apiResponseCategorias;
+  APIResponse<List<Receta>> _apiResponseRecetas;
+  List<Categoria> categorias;
+  Categoria categoriaHoy;
+  List<Receta> recetas;
+  bool _isLoading = false;
+  
+    @override
+  void initState() {
+    _fetchRecetasDias();
+    super.initState();
+  }
+
+  _fetchRecetasDias() async{
+    setState(() {
+      _isLoading = true;
+    });
+
+    _apiResponseCategorias = await service.getCategorias();
+    categorias = _apiResponseCategorias.data;
+    categoriaHoy = categorias[1];
+    _apiResponseRecetas = await service.getRecetas(categoria: categoriaHoy);
+    recetas = _apiResponseRecetas.data;
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   void _onPressed(){
     print("pressed!!");
   }
@@ -20,120 +56,131 @@ class _HomeState extends State<Home_Page> {
   @override
   Widget build(BuildContext context) {
     int _selectedIndex = 0;
-    int _numSugerencias = 5;
 
     return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Expanded(
-            child: ListView(
-              scrollDirection: Axis.vertical,
-              children: <Widget>[
+      child: Builder(builder: (_){
+        if(_isLoading){
+          return Center(child: CircularProgressIndicator());
+        }
+        if(_apiResponseRecetas.error) {
+          return Center(child: Text("Receta Error: " + _apiResponseRecetas.errorMessage));
+        }
+        if(_apiResponseCategorias.error) {
+          return Center(child: Text("Categoria Error: " + _apiResponseCategorias.errorMessage));
+        }
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: ListView(
+                scrollDirection: Axis.vertical,
+                children: <Widget>[
 
 
-                    SizedBox(
-                  height: 470.0,
-                  child: Stack(children: <Widget>[
-                    _TopCard(),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: SizedBox(
-                        height: 200.0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color.fromRGBO(0, 0, 0, 0.16),
-                                blurRadius: 6.0, // has the effect of softening the shadow
-                                offset: Offset(
-                                  0.0, // horizontal, move right 10
-                                  -3.0, // vertical, move down 10
+                      SizedBox(
+                    height: 470.0,
+                    child: Stack(children: <Widget>[
+                      _TopCard(categoriaHoy),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          height: 200.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.16),
+                                  blurRadius: 6.0, // has the effect of softening the shadow
+                                  offset: Offset(
+                                    0.0, // horizontal, move right 10
+                                    -3.0, // vertical, move down 10
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment(0, 1),
+                        child: SizedBox(
+                          height: 338.0,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 250.0,
+                                child: new RecetaList(250.0, 160.0, recetas),
                                 ),
-                              )
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Dot(0, _selectedIndex),
+                                        Dot(1, _selectedIndex),
+                                        Dot(2, _selectedIndex),
+                                        Dot(3, _selectedIndex),
+                                        Dot(4, _selectedIndex),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 70.0),
+                                      child: OutlineButton(
+                                        shape: new RoundedRectangleBorder(
+                                          borderRadius: new BorderRadius.circular(18.0),
+                                        ),
+                                        borderSide: BorderSide(
+                                          color: Color(0xff48A299),
+                                        ),
+                                        onPressed: _onPressed,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text("Ver todas", style: TextStyle(color: Color(0xff48A299)),),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
+                      ],
                     ),
-                    Align(
-                      alignment: Alignment(0, 1),
-                      child: SizedBox(
-                        height: 338.0,
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(
-                              height: 250.0,
-                              child: new RecetaList(_numSugerencias, 250.0, 160.0),
-                              ),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Dot(0, _selectedIndex),
-                                      Dot(1, _selectedIndex),
-                                      Dot(2, _selectedIndex),
-                                      Dot(3, _selectedIndex),
-                                      Dot(4, _selectedIndex),
-                                    ],
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 70.0),
-                                    child: OutlineButton(
-                                      shape: new RoundedRectangleBorder(
-                                        borderRadius: new BorderRadius.circular(18.0),
-                                      ),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff48A299),
-                                      ),
-                                      onPressed: _onPressed,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text("Ver todas", style: TextStyle(color: Color(0xff48A299)),),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ],
                   ),
-                ),
-                Container(
-                  color: Colors.white,
-                  height: 250.0,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 25.0),
-                        child: Text("Nuevas Recetas", style: TextStyle(
-                          color: Color(0xff363B4B),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24.0),
-                          ),
-                      ),
-                      SizedBox(
-                        height: 160.0,
-                        child: new RecetaList(10, 150.0, 140.0)
+                  Container(
+                    color: Colors.white,
+                    height: 250.0,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 25.0),
+                          child: Text("Nuevas Recetas", style: TextStyle(
+                            color: Color(0xff363B4B),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24.0),
+                            ),
                         ),
-                    ],
-                  )
-                ),
-            ],),
-          ),
-        ],
+                        SizedBox(
+                          height: 160.0,
+                          child: new RecetaList(150.0, 140.0, recetas)
+                          ),
+                      ],
+                    )
+                  ),
+              ],),
+            ),
+          ],
+        );
+      }   
       ),
     );
   }
@@ -164,6 +211,10 @@ class Dot extends StatelessWidget {
 }
 
 class _TopCard extends StatelessWidget {
+  _TopCard(this.categoria);
+
+  Categoria categoria;
+
   @override
   Widget build(BuildContext context) {
     double h = MediaQuery.of(context).size.height;
@@ -172,7 +223,7 @@ class _TopCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         image: new DecorationImage(
-          image: new ExactAssetImage("assets/images/guacamole.jpg"),
+          image: new NetworkImage(categoria.imgUrl),
           fit: BoxFit.cover,
         ),
       ),
@@ -200,7 +251,7 @@ class _TopCard extends StatelessWidget {
                         color: Colors.white),
                         textAlign: TextAlign.left,
                       ),
-                    Text("Pasta Fresca", style: TextStyle(
+                    Text(categoria.titulo, style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 40,),

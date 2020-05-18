@@ -6,12 +6,14 @@ import 'models/api_response.dart';
 
 class PerfilService {
   static const API = Configuration.API;
+  static var Token = "";
 
   Future<APIResponse<Perfil>> getPerfil() {
     return http.get(API + "perfil/me",
         headers: {"Accept": "application/json"}).then((data) {
       print(data.statusCode);
       if (data.statusCode == 200) {
+        Token = json.decode(data.body)['token'];
         print("getPerfil data " + data.body);
         Perfil perfil;
         perfil = Perfil.fromJson(json.decode(data.body));
@@ -29,11 +31,13 @@ class PerfilService {
         .post(API + "perfil/login",
             headers: {
               "Content-Type": "application/json",
+              'Authorization': Token
             },
             body: jsonEncode({"username": username, "password": password}))
         .then((data) {
       print(data.statusCode);
       if (data.statusCode == 200) {
+        Token = json.decode(data.body)['token'];
         final perfil = Perfil.fromJson(json.decode(data.body));
         print("login nombre" + perfil.nombre);
         return APIResponse<Perfil>(data: perfil);

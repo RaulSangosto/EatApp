@@ -1,6 +1,7 @@
 import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/receta_services.dart';
+import 'package:eatapp/widgets/receta_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
@@ -56,7 +57,7 @@ class _DescubrirState extends State<Descubrir_Page> {
                 Expanded(
                   child: SizedBox(
                     height: 472.0,
-                    child: _RecetasList(recetas: recetas),
+                    child: _RecetasGrid(recetas: recetas),
                   ),
                 ),
               ],
@@ -102,7 +103,7 @@ class _TopCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      "Descubrir_Page",
+                      "Explorar",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
                     ),
@@ -132,103 +133,73 @@ class _TopCard extends StatelessWidget {
   }
 }
 
-class _RecetasList extends StatelessWidget {
+class _RecetasGrid extends StatelessWidget {
   List<Receta> recetas;
 
-  _RecetasList({this.recetas});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: recetas.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return Padding(
-              padding:
-                  const EdgeInsets.only(bottom: 15.0, top: 15.0, right: 15),
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 115.0,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Icon(Icons.grid_on),
-                      SizedBox(
-                        width: 10.0,
-                      ),
-                      Icon(Icons.grid_off),
-                      SizedBox(
-                        width: 10.0,
-                      ),
-                      Icon(Icons.group),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          }
-          Receta receta1 = recetas[index - 1];
-          Receta receta2 = recetas[index - 1];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 15.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _RecetasTile(receta1),
-                _RecetasTile(receta2),
-              ],
-            ),
-          );
-        });
-  }
-}
-
-class _RecetasTile extends StatelessWidget {
-  _RecetasTile(this.receta);
-
-  final Receta receta;
+  _RecetasGrid({this.recetas});
 
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
 
-    return Container(
-      height: h / 3,
-      width: (w - 40) / 2,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: Colors.blueGrey,
-        image: new DecorationImage(
-          image: new NetworkImage(receta.imgUrl),
-          fit: BoxFit.cover,
-        ),
+    return GridView.builder(
+      scrollDirection: Axis.vertical,
+      itemCount: recetas.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: (2 / 3),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Icon(Icons.favorite, color: Colors.redAccent),
-            Text(
-              receta.titulo,
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
+      itemBuilder: (BuildContext context, int index) {
+        Receta receta = recetas[index];
+        return RecetaTile(receta, h / 3, (w - 40) / 2);
+      },
     );
   }
 }
+
+// class _RecetasTile extends StatelessWidget {
+//   _RecetasTile(this.receta);
+
+//   final Receta receta;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     double w = MediaQuery.of(context).size.width;
+//     double h = MediaQuery.of(context).size.height;
+
+//     return Container(
+//       height: h / 3,
+//       width: (w - 40) / 2,
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(20.0),
+//         color: Colors.blueGrey,
+//         image: new DecorationImage(
+//           image: new NetworkImage(receta.imgUrl),
+//           fit: BoxFit.cover,
+//         ),
+//       ),
+//       child: Padding(
+//         padding: const EdgeInsets.all(15.0),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           crossAxisAlignment: CrossAxisAlignment.end,
+//           children: <Widget>[
+//             Icon(Icons.favorite, color: Colors.redAccent),
+//             Text(
+//               receta.titulo,
+//               style: TextStyle(
+//                 fontSize: 18.0,
+//                 fontWeight: FontWeight.w600,
+//                 color: Colors.white,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // class _RecetasGrid extends StatelessWidget {
 //    @override

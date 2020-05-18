@@ -10,11 +10,9 @@ DATABASES = {
 ALLOWED_HOSTS = ['10.0.2.2', 'localhost', '127.0.0.1', '*']
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
-    ]
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # <-- And here
+    ],
 }
 
 STATIC_URL = '/static/'

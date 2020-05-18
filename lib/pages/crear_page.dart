@@ -21,7 +21,9 @@ class _CrearState extends State<Crear_Page> {
   //bool get _isEditing => widget.recetaId != null;
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Ingrediente>> _apiResponse;
+  APIResponse<List<Categoria>> _apiResponseCategoria;
   String errorMessage;
+  String formErrors;
 
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _prepController = TextEditingController();
@@ -33,18 +35,20 @@ class _CrearState extends State<Crear_Page> {
   List<Ingrediente> _ingredientes;
   List<Instruccion> _instrucciones = [];
   List<Alergeno> _alergenos;
+  List<Categoria> categorias;
+  Categoria categoriaSelected;
   Ingrediente ingredienteSelected;
   bool _isLoading = false;
   File _image;
 
   @override
   void initState() {
-    _fetchAlergenos();
+    _fetchDatos();
     _personasController.text = "1";
     super.initState();
   }
 
-  _fetchAlergenos() async {
+  _fetchDatos() async {
     setState(() {
       _isLoading = true;
     });
@@ -55,6 +59,8 @@ class _CrearState extends State<Crear_Page> {
     _apiResponse = await service.getIngredientes(_alergenos);
     _ingredientes = _apiResponse.data;
     ingredienteSelected = _ingredientes[0];
+    _apiResponseCategoria = await service.getCategorias();
+    categorias = _apiResponseCategoria.data;
 
     setState(() {
       _isLoading = false;
@@ -85,63 +91,146 @@ class _CrearState extends State<Crear_Page> {
     setState(() {
       _isLoading = true;
     });
-    final receta = Receta(
-      titulo: _tituloController.text ?? "titulo",
-      imgUrl: _image != null
-          ? 'data:image/png;base64,' + base64Encode(_image.readAsBytesSync())
-          : '',
-      minutes: int.parse(_prepController.text ?? "20"),
-      kcal: int.parse(_kcalController.text ?? "120"),
-      descripcion: _descrController.text ?? "descripcion",
-      categorias: null,
-    );
-    
+    if (categoriaSelected == null ||
+        _prepController.text == null ||
+        _prepController.text == "" ||
+        _kcalController.text == null ||
+        _kcalController.text == "" ||
+        _tituloController.text == null ||
+        _tituloController.text == "" ||
+        _descrController.text == null ||
+        _descrController.text == "" ||
+        _instrucciones.length <= 0) {
+      formErrors = "Errores: ";
+      if (categoriaSelected == null) {
+        formErrors += "Debes Seleccionar una Categoria\n";
+      }
+      if (_prepController.text == null || _prepController.text == "") {
+        formErrors += "Debes Indicar un Tiempo de Preparacion\n";
+      }
+      if (_kcalController.text == null || _kcalController.text == "") {
+        formErrors += "Debes Indicar las Kilocalorías\n";
+      }
+      if (_tituloController.text == null || _tituloController.text == "") {
+        formErrors += "Debes Indicar un Título\n";
+      }
+      if (_descrController.text == null || _descrController.text == "") {
+        formErrors += "Debes Indicar una Descripción\n";
+      }
+      if (_instrucciones.length <= 0) {
+        formErrors += "Debes Añadir algún Ingrediente\n";
+      }
+    } else {
+      formErrors = "";
+      List<Categoria> _categoriasSelected = new List<Categoria>();
+      _categoriasSelected.add(categoriaSelected);
+      final receta = Receta(
+        titulo: _tituloController.text ?? "titulo",
+        imgUrl: _image != null
+            ? 'data:image/png;base64,' + base64Encode(_image.readAsBytesSync())
+            : '',
+        minutes: int.parse(_prepController.text ?? "20"),
+        kcal: int.parse(_kcalController.text ?? "120"),
+        descripcion: _descrController.text ?? "descripcion",
+        categorias: _categoriasSelected,
+      );
 
-    final result = await service.createReceta(receta);
+      final result = await service.createReceta(receta);
 
-    if(result.data != null){
-      Receta _receta = result.data;
-      for (var item in _instrucciones) {
-        item.receta = _receta;
-        print(item.receta);
-        await service.createInstruccion(item);  
+      if (result.data != null) {
+        Receta _receta = result.data;
+        for (var item in _instrucciones) {
+          item.receta = _receta;
+          print(item.receta);
+          await service.createInstruccion(item);
+        }
+
+        final titulo = "Hecho";
+        final text = result.error
+            ? (result.errorMessage ?? "Ha ocurrido un error")
+            : "Receta Publicada";
+
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  title: Text(titulo),
+                  content: Text(text),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Ok"))
+                  ],
+                )).then((data) {
+          if (result.data != null) {
+            //Go to Home
+
+          }
+        });
       }
     }
 
     setState(() {
       _isLoading = false;
     });
+  }
 
-    final titulo = "Hecho";
-    final text = result.error
-        ? (result.errorMessage ?? "Ha ocurrido un error")
-        : "Receta Publicada";
-
+  _seleccionarCategoria() {
     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              title: Text(titulo),
-              content: Text(text),
+      context: context,
+      builder: (context) {
+        String contentText = "Seleccionar Categoría";
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(contentText),
+              content: DropdownButton<Categoria>(
+                value: categoriaSelected,
+                icon: Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                //style: TextStyle(color: Theme.of(context).accentColor),
+                underline: Container(
+                  height: 2,
+                  color: Theme.of(context).accentColor,
+                ),
+                onChanged: (newValue) {
+                  setState(() => categoriaSelected = newValue);
+                },
+                items: categorias
+                    .map<DropdownMenuItem<Categoria>>((Categoria value) {
+                  return DropdownMenuItem<Categoria>(
+                    value: value,
+                    child: Text(value.titulo),
+                  );
+                }).toList(),
+              ),
               actions: <Widget>[
                 FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Ok"))
+                  child: new Text("Aceptar"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
               ],
-            )).then((data) {
-      // if (result.data) {
-      //   Navigator.of(context).pop();
-      // }
-    });
+            );
+          },
+        );
+      },
+    );
   }
 
   _addInstruccion() {
     Instruccion _instruccion;
     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              title: Text("Añadir Instrucción"),
+      context: context,
+      builder: (context) {
+        String contentText = "Añadir Instrucción";
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(contentText),
               content: Container(
                 height: 120.0,
                 child: Column(
@@ -186,18 +275,23 @@ class _CrearState extends State<Crear_Page> {
               ),
               actions: <Widget>[
                 FlatButton(
-                    onPressed: () {
-                      _instruccion = new Instruccion(
-                          ingrediente: ingredienteSelected,
-                          cantidad: _cantidadController.text);
-                      setState(() {
-                        _instrucciones.add(_instruccion);
-                      });
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Añadir"))
+                  child: Text("Añadir"),
+                  onPressed: () {
+                    _instruccion = new Instruccion(
+                        ingrediente: ingredienteSelected,
+                        cantidad: _cantidadController.text);
+                    setState(() {
+                      _instrucciones.add(_instruccion);
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
               ],
-            )).then((data) {
+            );
+          },
+        );
+      },
+    ).then((data) {
       // if (result.data) {
       //   Navigator.of(context).pop();
       // }
@@ -291,6 +385,48 @@ class _CrearState extends State<Crear_Page> {
                   padding: EdgeInsets.all(30.0),
                   child: Column(
                     children: <Widget>[
+                      formErrors == null || formErrors == ""
+                          ? SizedBox.shrink()
+                          : Text(formErrors,
+                              style: TextStyle(color: Colors.redAccent)),
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            "Categoria:",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16.0),
+                          ),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          GestureDetector(
+                              onTap: _seleccionarCategoria,
+                              child: categoriaSelected != null
+                                  ? Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5.0, horizontal: 10.0),
+                                      child: Text(
+                                        categoriaSelected.titulo,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context).accentColor,
+                                          borderRadius:
+                                              BorderRadius.circular(20.0)),
+                                    )
+                                  : Text(
+                                      "Seleccionar Categoria.",
+                                      style: TextStyle(
+                                          color: Theme.of(context).accentColor),
+                                    )),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
                       TextField(
                         controller: _tituloController,
                         maxLength: 100,
@@ -352,9 +488,15 @@ class _CrearState extends State<Crear_Page> {
                       ),
                       SizedBox(
                         width: double.infinity,
-                        height: 200.0,
+                        height: _instrucciones.length <= 0
+                            ? 50.0
+                            : _instrucciones.length * 60.0,
                         child: _instrucciones.length <= 0
-                            ? Text("Añade ingredientes.")
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 24.0),
+                                child: Text("Ningún ingrediente Seleccionado."),
+                              )
                             : ListView(
                                 //physics: NeverScrollableScrollPhysics(),
                                 padding: EdgeInsets.all(10.0),
@@ -364,7 +506,9 @@ class _CrearState extends State<Crear_Page> {
                                     child: InstruccionItem(
                                         icono:
                                             data.ingrediente.alergeno.iconoUrl,
-                                        texto: data.cantidad + " de " + data.ingrediente.nombre),
+                                        texto: data.cantidad +
+                                            " de " +
+                                            data.ingrediente.nombre),
                                   );
                                 }).toList(),
                               ),

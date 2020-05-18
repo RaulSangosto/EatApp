@@ -57,13 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = false;
   bool _isLoged = false;
 
-  final List<Widget> _pages = [
-    Home_Page(),
-    Descubrir_Page(),
-    Crear_Page(),
-    Perfil_Page(),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -75,6 +68,19 @@ class _MyHomePageState extends State<MyHomePage> {
       _isLoged = _loged;
     });
   }
+
+  void pageId_callback(int _page) {
+    setState(() {
+      _selectedIndex = _page;
+    });
+  }
+
+  List<Widget> _pages = [
+    new Home_Page(),
+    Descubrir_Page(),
+    Crear_Page(),
+    Perfil_Page(),
+  ];
 
   @override
   void initState() {
@@ -112,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return _pages[_selectedIndex];
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: (!_isLoged) ? null : BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

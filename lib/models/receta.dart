@@ -16,14 +16,19 @@ class Receta {
       this.descripcion,
       this.categorias});
 
-  factory Receta.fromJson(Map<String, dynamic> json) {
+  factory Receta.fromJson(Map<String, dynamic> json, {Categoria categoria}) {
     List<dynamic> categorias_json = json['categorias'];
     List<Categoria> categorias = new List<Categoria>();
     List<Ingrediente> ingredientes = new List<Ingrediente>();
 
-    for (var cat in categorias_json) {
-      //categorias.add(Categoria.fromJson(cat));
-      categorias.add(new Categoria(id: cat, titulo: "titulo", imgUrl: "", descripcion: "descripcion"));
+    if (categoria != null) {
+      categorias.add(categoria);
+    } else {
+      for (var cat in categorias_json) {
+        //categorias.add(Categoria.fromJson(cat));
+        categorias.add(new Categoria(
+            id: cat, titulo: "titulo", imgUrl: "", descripcion: "descripcion"));
+      }
     }
 
     return Receta(
@@ -40,13 +45,10 @@ class Receta {
   Map<String, dynamic> toJson() {
     List<int> categorias_id = new List<int>();
 
-    categorias_id.add(1);
-    // for (var cat in categorias) {
-    //   categorias_id.add(cat.id);
-    // }
-    // for (var ing in ingredientes) {
-    //   ingredientes_id.add(ing.id);
-    // }
+    //categorias_id.add(1);
+    for (var cat in categorias) {
+      categorias_id.add(cat.id);
+    }
     return {
       "titulo": titulo,
       "imagen": imgUrl,
@@ -117,10 +119,11 @@ class Ingrediente {
 
   Ingrediente({this.id, this.nombre, this.alergeno});
 
-  factory Ingrediente.fromJson(Map<String, dynamic> json, List<Alergeno> _alergenos) {
+  factory Ingrediente.fromJson(
+      Map<String, dynamic> json, List<Alergeno> _alergenos) {
     Alergeno _alergeno;
     for (var al in _alergenos) {
-      if(al.id == json['alergeno']){
+      if (al.id == json['alergeno']) {
         _alergeno = al;
       }
     }
