@@ -11,6 +11,19 @@ import 'package:image_picker/image_picker.dart';
 import '../receta_services.dart';
 
 class Crear_Page extends StatefulWidget {
+  const Crear_Page(
+      {Key key,
+      bool loged,
+      Function(bool) login_callback,
+      Function(int) pageId_callback})
+      : _isLoged = loged,
+        _login_callback = login_callback,
+        _pageId_callback = pageId_callback,
+        super(key: key);
+  final bool _isLoged;
+  final Function(bool) _login_callback;
+  final Function(int) _pageId_callback;
+
   @override
   State<StatefulWidget> createState() {
     return _CrearState();
@@ -163,9 +176,8 @@ class _CrearState extends State<Crear_Page> {
                         child: Text("Ok"))
                   ],
                 )).then((data) {
-          if (result.data != null) {
-            //Go to Home
-
+          if (data != null) {
+            widget._pageId_callback(1);
           }
         });
       }
@@ -359,7 +371,13 @@ class _CrearState extends State<Crear_Page> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        BackButton(),
+                        BackButton(
+                          onPressed: () {
+                            setState(() {
+                              widget._pageId_callback(0);
+                            });
+                          },
+                        ),
                         Text(
                           "Añadir Detalles",
                           style: TextStyle(

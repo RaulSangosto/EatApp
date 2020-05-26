@@ -7,6 +7,15 @@ import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
 
 class Descubrir_Page extends StatefulWidget {
+  const Descubrir_Page({Key key, bool loged, Function(bool) login_callback, Function(int) pageId_callback})
+      : _isLoged = loged,
+        _login_callback = login_callback,
+        _pageId_callback = pageId_callback,
+        super(key: key);
+  final bool _isLoged;
+  final Function(bool) _login_callback;
+  final Function(int) _pageId_callback;
+
   @override
   State<StatefulWidget> createState() {
     return _DescubrirState();

@@ -10,7 +10,14 @@ import 'package:get_it/get_it.dart';
 import '../receta_services.dart';
 
 class Home_Page extends StatefulWidget {
-  //Home_Page();
+  const Home_Page({Key key, bool loged, Function(bool) login_callback, Function(int) pageId_callback})
+      : _isLoged = loged,
+        _login_callback = login_callback,
+        _pageId_callback = pageId_callback,
+        super(key: key);
+  final bool _isLoged;
+  final Function(bool) _login_callback;
+  final Function(int) _pageId_callback;
 
   @override
   State<StatefulWidget> createState() {

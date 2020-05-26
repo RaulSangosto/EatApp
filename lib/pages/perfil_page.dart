@@ -1,8 +1,21 @@
 import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../perfil_services.dart';
 
 class Perfil_Page extends StatefulWidget {
+  const Perfil_Page({Key key, bool loged, Function(bool) login_callback, Function(int) pageId_callback})
+      : _isLoged = loged,
+        _login_callback = login_callback,
+        _pageId_callback = pageId_callback,
+        super(key: key);
+  final bool _isLoged;
+  final Function(bool) _login_callback;
+  final Function(int) _pageId_callback;
+
   @override
   State<StatefulWidget> createState() {
     return _PerfilState();
@@ -10,12 +23,38 @@ class Perfil_Page extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil_Page> {
-  void _onPressed() {}
+  PerfilService get service => GetIt.I<PerfilService>();
+  SharedPreferences prefs;
+  bool _isLoged;
+
+  @override
+  initState(){
+    super.initState();
+    _isLoged = widget._isLoged;
+  }
+
+  getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  _onPressed() {}
+
+  logout() async{
+    print("logout");
+    service.logout();
+    await getSharedPrefs();
+    prefs.remove("token");
+    print("token " + prefs.containsKey("token").toString());
+    setState(() {
+      _isLoged = false;
+      widget._login_callback(_isLoged);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-          children: <Widget>[Container(
+    return ListView(children: <Widget>[
+      Container(
         height: 605.0,
         width: 605.0,
         decoration: BoxDecoration(
@@ -74,10 +113,13 @@ class _PerfilState extends State<Perfil_Page> {
                         color: Color(0xffC5C5C5),
                         size: 32.0,
                       ),
-                      Icon(
-                        Icons.exit_to_app,
-                        color: Color(0xffC5C5C5),
-                        size: 32.0,
+                      GestureDetector(
+                        onTap: logout,
+                        child: Icon(
+                          Icons.exit_to_app,
+                          color: Color(0xffC5C5C5),
+                          size: 32.0,
+                        ),
                       ),
                     ],
                   ),
@@ -201,7 +243,8 @@ class _PerfilState extends State<Perfil_Page> {
                               Text(
                                 "Omnivoro",
                                 style: TextStyle(
-                                    fontSize: 20.0, fontWeight: FontWeight.bold),
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
                               ),
                               SizedBox(
                                 width: 60.0,
@@ -233,7 +276,8 @@ class _PerfilState extends State<Perfil_Page> {
                               Text(
                                 "Alergias",
                                 style: TextStyle(
-                                    fontSize: 20.0, fontWeight: FontWeight.bold),
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
                               ),
                               SizedBox(
                                 width: 60.0,
@@ -255,8 +299,8 @@ class _PerfilState extends State<Perfil_Page> {
             ),
           ),
         ]),
-      ),] 
-    );
+      ),
+    ]);
   }
 }
 

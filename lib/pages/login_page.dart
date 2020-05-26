@@ -4,32 +4,41 @@ import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login_Page extends StatefulWidget {
-  const Login_Page({Key key, bool loged, Function(bool) callback})
+  const Login_Page({Key key, bool loged, Function(bool) login_callback, Function(int) pageId_callback})
       : _isLoged = loged,
-        _callback = callback,
+        _login_callback = login_callback,
+        _pageId_callback = pageId_callback,
         super(key: key);
   final bool _isLoged;
-  final Function(bool) _callback;
+  final Function(bool) _login_callback;
+  final Function(int) _pageId_callback;
 
   @override
   _LoginState createState() =>
-      _LoginState(loged: _isLoged, callback: _callback);
+      _LoginState();
 }
 
 class _LoginState extends State<Login_Page> {
-  _LoginState({bool loged, Function(bool) callback})
-      : _isLoged = loged,
-        _callback = callback;
-
   PerfilService get perfilService => GetIt.I<PerfilService>();
-  final Function(bool) _callback;
-  APIResponse<Perfil> loginResponse;
+  SharedPreferences prefs;
+  APIResponse<String> loginResponse;
   TextEditingController _userController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _isLoged;
+
+  @override
+  initState(){
+    super.initState();
+    _isLoged = widget._isLoged;
+  }
+
+  getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
 
   sendData() async {
     String username = _userController.text.trim();
@@ -40,12 +49,17 @@ class _LoginState extends State<Login_Page> {
     });
 
     loginResponse = await perfilService.login(username, password);
+    await getSharedPrefs();
 
     setState(() {
       _isLoading = false;
       _isLoged = loginResponse.data == null ? false : true;
+      
+      prefs.setString("token", loginResponse.data.toString());
+      print("login: " + prefs.getString("token"));
       //print(loginResponse.data.nombre);
-      widget._callback(_isLoged);
+      widget._pageId_callback(0);
+      widget._login_callback(_isLoged);
     });
   }
 

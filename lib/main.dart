@@ -8,6 +8,7 @@ import 'package:eatapp/perfil_services.dart';
 import 'package:eatapp/receta_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/api_response.dart';
 import 'models/perfil.dart';
@@ -52,10 +53,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   PerfilService get perfilService => GetIt.I<PerfilService>();
+  SharedPreferences prefs;
   int _selectedIndex = 0;
   Perfil perfil;
   bool _isLoading = false;
   bool _isLoged = false;
+
+  Home_Page hPage;
+  Descubrir_Page dPage;
+  Crear_Page cPage;
+  Perfil_Page pPage;
+  List<Widget> _pages;
+
+  getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -63,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void callback(bool _loged) {
+  void login_callback(bool _loged) {
     setState(() {
       _isLoged = _loged;
     });
@@ -75,16 +87,33 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  List<Widget> _pages = [
-    new Home_Page(),
-    Descubrir_Page(),
-    Crear_Page(),
-    Perfil_Page(),
-  ];
-
   @override
   void initState() {
     _fetchPerfil();
+
+    hPage = Home_Page(
+        loged: _isLoged,
+        login_callback: login_callback,
+        pageId_callback: pageId_callback);
+    dPage = Descubrir_Page(
+        loged: _isLoged,
+        login_callback: login_callback,
+        pageId_callback: pageId_callback);
+    cPage = Crear_Page(
+        loged: _isLoged,
+        login_callback: login_callback,
+        pageId_callback: pageId_callback);
+    pPage = Perfil_Page(
+        loged: _isLoged,
+        login_callback: login_callback,
+        pageId_callback: pageId_callback);
+    _pages = [
+      hPage,
+      dPage,
+      cPage,
+      pPage,
+    ];
+
     super.initState();
   }
 
@@ -92,15 +121,22 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isLoading = true;
     });
+    await getSharedPrefs();
+    String _token;
 
-    APIResponse<Perfil> _apiResponse = await perfilService.getPerfil();
-    perfil = _apiResponse.data;
+    if (prefs.containsKey("token")) {
+      _token = prefs.getString("token");
+      print("Token: " + _token);
+      APIResponse<Perfil> _apiResponse =
+          await perfilService.getPerfil(token: _token);
+      perfil = _apiResponse.data;
+      if (perfil != null) {
+        login_callback(true);
+      }
+    }
 
     setState(() {
       _isLoading = false;
-      if (perfil != null) {
-        callback(true);
-      }
     });
   }
 
@@ -113,39 +149,41 @@ class _MyHomePageState extends State<MyHomePage> {
           if (_isLoading) {
             return Splash_Page();
           } else if (!_isLoading && !_isLoged) {
-            return Login_Page(loged: _isLoged, callback: callback);
+            return Login_Page(loged: _isLoged, login_callback: login_callback, pageId_callback: pageId_callback);
           } else {}
           return _pages[_selectedIndex];
         },
       ),
-      bottomNavigationBar: (!_isLoged) ? null : BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            title: Text('Explore'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            title: Text('Create'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            title: Text('Profile'),
-          ),
-        ],
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        iconSize: 32,
-        currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).accentColor,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
+      bottomNavigationBar: (!_isLoged)
+          ? null
+          : BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  title: Text('Home'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.search),
+                  title: Text('Explore'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.add),
+                  title: Text('Create'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  title: Text('Profile'),
+                ),
+              ],
+              type: BottomNavigationBarType.fixed,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              iconSize: 32,
+              currentIndex: _selectedIndex,
+              selectedItemColor: Theme.of(context).accentColor,
+              unselectedItemColor: Colors.grey,
+              onTap: _onItemTapped,
+            ),
     );
   }
 }
