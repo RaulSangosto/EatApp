@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffECECEC),
+      backgroundColor: (_isLoged) ? Color(0xffECECEC) : Theme.of(context).accentColor,
       body: Builder(
         builder: (_) {
           if (_isLoading) {

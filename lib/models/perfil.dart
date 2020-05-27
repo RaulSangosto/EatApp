@@ -2,8 +2,8 @@ import 'package:eatapp/models/receta.dart';
 
 class Perfil {
   int id;
-  String nombre;
-  String avatarUrl;
+  String nombre, email, ubicacion, descripcion;
+  String dieta, kcal_diarias, avatarUrl;
   DateTime fechaNac;
   String sexo;
   List<Receta> favoritos;
@@ -11,6 +11,11 @@ class Perfil {
   Perfil(
       {this.id,
       this.nombre,
+      this.email,
+      this.ubicacion,
+      this.descripcion,
+      this.dieta,
+      this.kcal_diarias,
       this.avatarUrl,
       this.fechaNac,
       this.sexo,
@@ -28,6 +33,11 @@ class Perfil {
     return Perfil(
       id: json['id'],
       nombre: json['nombre'],
+      email: json['email'],
+      ubicacion: json['ubicacion'],
+      descripcion: json['descripcion'],
+      dieta: json['dieta'],
+      kcal_diarias: json['kcal_diarias'].toString(),
       avatarUrl: json['avatar'],
       fechaNac: DateTime.now(),//json['fecha_nacimiento'],
       sexo: json['sexo'],
@@ -47,6 +57,11 @@ class Perfil {
     // }
     return {
       "nombre": nombre,
+      "email": email,
+      "ubicacion": ubicacion,
+      "descripcion": descripcion,
+      "dieta": dieta,
+      "kcal_diarias": kcal_diarias,
       "foto": avatarUrl,
       "fecha_nacimiento": fechaNac,
       "sexo": sexo,

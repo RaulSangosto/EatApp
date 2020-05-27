@@ -24,11 +24,11 @@ class _PerfilAvatar extends State<PerfilAvatar> {
 
   @override
   void initState() {
-    _fetchNotas();
+    _fetchPerfil();
     super.initState();
   }
 
-  _fetchNotas() async {
+  _fetchPerfil() async {
     print("loading perfil");
     setState(() {
       _isLoading = true;

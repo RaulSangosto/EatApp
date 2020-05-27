@@ -1,0 +1,24 @@
+EATAPP TODO
+    -Inicio
+        -Mas Categorías !
+        -Seleccionar categorías diarias !!!
+
+    -Descubrir
+        -Filtrar !
+            -por nombre
+            -por categorias
+            -por ingredientes
+
+    -Crear
+        -Más ingredientes ! 
+        -Añadir Ingredientes ?
+        -Mejorar Interfaz !!!
+
+    -Perfil
+        -Editar datos !!!
+        -Recetas Favoritas !
+        -Registro en la APP !!!
+
+    -Recetas
+        -Añadir a Favoritos !
+        -Vista Detalle(Crear sin modificaciones) !!!!

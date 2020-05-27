@@ -8,7 +8,8 @@ class PerfilService {
   static const API = Configuration.API;
   static var Token = "";
 
-  Future<APIResponse<Perfil>> getPerfil({token}) {  
+  Future<APIResponse<Perfil>> getPerfil({token}) {
+    print("getPerfil!");  
     var headers = {"Accept": "application/json"};
     if(token != null && token != ""){
       Token = token;
