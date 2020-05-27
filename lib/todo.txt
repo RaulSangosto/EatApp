@@ -21,4 +21,4 @@ EATAPP TODO
 
     -Recetas
         -Añadir a Favoritos !
-        -Vista Detalle(Crear sin modificaciones) !!!!
+        -Modificar datos de una receta !!

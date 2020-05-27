@@ -3,23 +3,26 @@ import 'package:eatapp/pages/receta_page.dart';
 import 'package:flutter/material.dart';
 
 class RecetaTile extends StatefulWidget {
-  RecetaTile(this.receta, this.height, this.width);
-  final Receta receta;
-  final double height;
-  final double width;
-  @override
-  State<StatefulWidget> createState() {
-    return _RecetaTile(receta, height, width);
-  }
-}
-
-class _RecetaTile extends State<RecetaTile> {
-  _RecetaTile(this.receta, this.height, this.width, {this.margin = 0});
-
+  RecetaTile(this.receta, this.height, this.width, {this.margin = 0});
   final Receta receta;
   final double height;
   final double width;
   final double margin;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _RecetaTile();
+  }
+}
+
+class _RecetaTile extends State<RecetaTile> {
+  bool _favorito;
+
+  @override
+  void initState() {
+    _favorito = false;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +32,21 @@ class _RecetaTile extends State<RecetaTile> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Receta_Page(recetaId: receta.id)),
+            MaterialPageRoute(
+                builder: (context) => Receta_Page(recetaId: widget.receta.id)),
           );
         },
         child: Container(
-          margin: new EdgeInsets.only(top: margin),
-          height: height,
-          width: width,
+          margin: new EdgeInsets.only(top: widget.margin),
+          height: widget.height,
+          width: widget.width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0),
             color: Colors.blueGrey,
-            image: receta.imgUrl == null
+            image: widget.receta.imgUrl == null
                 ? null
                 : new DecorationImage(
-                    image: new NetworkImage(receta.imgUrl),
+                    image: new NetworkImage(widget.receta.imgUrl),
                     fit: BoxFit.cover,
                   ),
           ),
@@ -52,9 +56,18 @@ class _RecetaTile extends State<RecetaTile> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Icon(Icons.favorite, color: Colors.redAccent),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      _favorito = !_favorito;
+                    });
+                  },
+                    child: Icon(_favorito ? Icons.favorite : Icons.favorite_border,
+                        color: _favorito
+                            ? Colors.redAccent
+                            : Colors.grey)),
                 Text(
-                  receta.titulo,
+                  widget.receta.titulo,
                   style: TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w600,

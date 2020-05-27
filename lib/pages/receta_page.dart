@@ -47,6 +47,7 @@ class _RecetaState extends State<Receta_Page> {
   Ingrediente ingredienteSelected;
   Receta receta;
   bool _isLoading = false;
+  bool _favorito = false;
 
   @override
   void initState() {
@@ -134,6 +135,21 @@ class _RecetaState extends State<Receta_Page> {
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _favorito = !_favorito;
+                                });
+                              },
+                              child: Icon(
+                                  _favorito
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: _favorito
+                                      ? Colors.redAccent
+                                      : Colors.black,
+                                  size: 32.0),
+                            )
                           ],
                         ),
                       ),
