@@ -18,13 +18,13 @@ samples, guidance on mobile development, and a full API reference.
 
 ## Instalación
 Es necesario tener instalado flutter, python 3.8 y un dispositivo android con depuración activada por usb o un emulador Android.
-Crea una carpeta local donde instalar el programa, cd a ella, ejecuta el comando git init
-Clona el repositorio con git clone y la url del proyecto
-A continuación cd a eatapp/backend
-Crea una máquina virtual de python 3.8 con el comando virtualvenv -p python3.8 venv
-Activa la máquina virtual con source venv/bin/activate
-Instala los requerimientos con pip install -r requirements.txt
-Ejecuta el servidor con eat_api/manage.py runserver
+- Crea una carpeta local donde instalar el programa, cd a ella, ejecuta el comando git init
+- Clona el repositorio con git clone y la url del proyecto
+- A continuación cd a eatapp/backend
+- Crea una máquina virtual de python 3.8 con el comando virtualvenv -p python3.8 venv
+- Activa la máquina virtual con source venv/bin/activate
+- Instala los requerimientos con pip install -r requirements.txt
+- Ejecuta el servidor con eat_api/manage.py runserver
 
 Abrimos el proyecto de flutter, preferiblemente en Visual Studio Code, mientras nos encontramos en un archivo abierto en el editor con extensión .dart pulsamos f5 y seleccionamos ejecutar en emulador Android.
 
