@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Splash_Page extends StatefulWidget {
-  Splash_Page({Key key}) : super(key: key);
+class SplashPage extends StatefulWidget {
+  SplashPage({Key key}) : super(key: key);
 
   @override
   _SplashState createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash_Page> {
+class _SplashState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -9,8 +9,6 @@ import 'package:eatapp/receta_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'models/api_response.dart';
 import 'models/perfil.dart';
 
 void setupLocator() {
@@ -35,7 +33,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
         accentColor: Color(0xff62CAE5),
         textTheme: TextTheme(
-          body1: TextStyle(fontSize: 14.0, color: Color(0xff363B4B)),
+          bodyText2: TextStyle(fontSize: 14.0, color: Color(0xff363B4B)),
         ),
       ),
       home: MyHomePage(title: 'EatApp'),
@@ -59,15 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = false;
   bool _isLoged = false;
 
-  Home_Page hPage;
-  Descubrir_Page dPage;
-  Crear_Page cPage;
-  Perfil_Page pPage;
+  HomePage hPage;
+  DescubrirPage dPage;
+  CrearPage cPage;
+  PerfilPage pPage;
   List<Widget> _pages;
-
-  getSharedPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -75,13 +69,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void login_callback(bool _loged) {
+  void loginCallback(bool _loged) {
     setState(() {
       _isLoged = _loged;
     });
   }
 
-  void pageId_callback(int _page) {
+  void pageIdCallback(int _page) {
     setState(() {
       _selectedIndex = _page;
     });
@@ -91,22 +85,22 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     _fetchPerfil();
 
-    hPage = Home_Page(
+    hPage = HomePage(
         loged: _isLoged,
-        login_callback: login_callback,
-        pageId_callback: pageId_callback);
-    dPage = Descubrir_Page(
+        loginCallback: loginCallback,
+        pageIdCallback: pageIdCallback);
+    dPage = DescubrirPage(
         loged: _isLoged,
-        login_callback: login_callback,
-        pageId_callback: pageId_callback);
-    cPage = Crear_Page(
+        loginCallback: loginCallback,
+        pageIdCallback: pageIdCallback);
+    cPage = CrearPage(
         loged: _isLoged,
-        login_callback: login_callback,
-        pageId_callback: pageId_callback);
-    pPage = Perfil_Page(
+        loginCallback: loginCallback,
+        pageIdCallback: pageIdCallback);
+    pPage = PerfilPage(
         loged: _isLoged,
-        login_callback: login_callback,
-        pageId_callback: pageId_callback);
+        loginCallback: loginCallback,
+        pageIdCallback: pageIdCallback);
     _pages = [
       hPage,
       dPage,
@@ -121,18 +115,11 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isLoading = true;
     });
-    await getSharedPrefs();
-    String _token;
 
-    if (prefs.containsKey("token")) {
-      _token = prefs.getString("token");
-      print("Token: " + _token);
-      APIResponse<Perfil> _apiResponse =
-          await perfilService.getPerfil(token: _token);
-      perfil = _apiResponse.data;
-      if (perfil != null) {
-        login_callback(true);
-      }
+    perfil = await perfilService.getPerfil();
+
+    if (perfil != null) {
+      loginCallback(true);
     }
 
     setState(() {
@@ -143,13 +130,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: (_isLoged) ? Color(0xffECECEC) : Theme.of(context).accentColor,
+      backgroundColor:
+          (_isLoged) ? Color(0xffECECEC) : Theme.of(context).accentColor,
       body: Builder(
         builder: (_) {
           if (_isLoading) {
-            return Splash_Page();
+            return SplashPage();
           } else if (!_isLoading && !_isLoged) {
-            return Login_Page(loged: _isLoged, login_callback: login_callback, pageId_callback: pageId_callback);
+            return LoginPage(
+                loged: _isLoged,
+                loginCallback: loginCallback,
+                pageIdCallback: pageIdCallback);
           } else {}
           return _pages[_selectedIndex];
         },

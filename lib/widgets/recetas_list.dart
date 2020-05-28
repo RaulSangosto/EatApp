@@ -35,7 +35,7 @@ class _RecetaList extends State<RecetaList> {
    
   @override
   Widget build(BuildContext context) {
-    double itemSize = cardW;
+    //double itemSize = cardW;
 
     return ListView.builder(
       scrollDirection: Axis.horizontal,

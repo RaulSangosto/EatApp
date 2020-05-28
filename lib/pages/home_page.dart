@@ -1,5 +1,4 @@
 import 'package:eatapp/models/api_response.dart';
-import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:eatapp/widgets/recetas_list.dart';
@@ -9,19 +8,19 @@ import 'package:get_it/get_it.dart';
 
 import '../receta_services.dart';
 
-class Home_Page extends StatefulWidget {
-  const Home_Page(
+class HomePage extends StatefulWidget {
+  const HomePage(
       {Key key,
       bool loged,
-      Function(bool) login_callback,
-      Function(int) pageId_callback})
+      Function(bool) loginCallback,
+      Function(int) pageIdCallback})
       : _isLoged = loged,
-        _login_callback = login_callback,
-        _pageId_callback = pageId_callback,
+        _loginCallback = loginCallback,
+        _pageIdCallback = pageIdCallback,
         super(key: key);
   final bool _isLoged;
-  final Function(bool) _login_callback;
-  final Function(int) _pageId_callback;
+  final Function(bool) _loginCallback;
+  final Function(int) _pageIdCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -29,7 +28,7 @@ class Home_Page extends StatefulWidget {
   }
 }
 
-class _HomeState extends State<Home_Page> {
+class _HomeState extends State<HomePage> {
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Categoria>> _apiResponseCategorias;
   APIResponse<List<Receta>> _apiResponseRecetas;
@@ -58,10 +57,6 @@ class _HomeState extends State<Home_Page> {
     setState(() {
       _isLoading = false;
     });
-  }
-
-  void _onPressed() {
-    print("pressed!!");
   }
 
   @override
@@ -157,7 +152,7 @@ class _HomeState extends State<Home_Page> {
                                           ),
                                           onPressed: () {
                                             setState(() {
-                                              widget._pageId_callback(1);
+                                              widget._pageIdCallback(1);
                                             });
                                           },
                                           child: Padding(
@@ -215,7 +210,7 @@ class _HomeState extends State<Home_Page> {
 class Dot extends StatelessWidget {
   Dot(this._index, this.selectedIndex);
 
-  int selectedIndex;
+  final int selectedIndex;
   final int _index;
 
   bool isSelected() {
@@ -241,7 +236,7 @@ class Dot extends StatelessWidget {
 class _TopCard extends StatelessWidget {
   _TopCard(this.categoria);
 
-  Categoria categoria;
+  final Categoria categoria;
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +294,7 @@ class _TopCard extends StatelessWidget {
                         ),
                       ]),
                 ),
-                PerfilAvatar(30),
+                new PerfilAvatar(30),
               ],
             ),
           ),

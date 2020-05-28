@@ -3,10 +3,11 @@ import 'package:eatapp/models/receta.dart';
 class Perfil {
   int id;
   String nombre, email, ubicacion, descripcion;
-  String dieta, kcal_diarias, avatarUrl;
+  String dieta, kcalDiarias, avatarUrl;
   DateTime fechaNac;
   String sexo;
-  List<Receta> favoritos;
+  List<int> favoritos;
+  int user;
 
   Perfil(
       {this.id,
@@ -15,19 +16,21 @@ class Perfil {
       this.ubicacion,
       this.descripcion,
       this.dieta,
-      this.kcal_diarias,
+      this.kcalDiarias,
       this.avatarUrl,
       this.fechaNac,
       this.sexo,
-      this.favoritos,});
+      this.favoritos,
+      this.user});
 
   factory Perfil.fromJson(Map<String, dynamic> json) {
-    List<dynamic> favoritos_json = json['favoritos'];
-    List<Receta> favoritos = new List<Receta>();
+    List<dynamic> favoritosJson = json['favoritos'];
+    List<int> _favoritos = new List<int>();
+    DateTime _fechaNac = DateTime.parse(json['fecha_nacimiento']);
 
-    for (var fav in favoritos_json) {
+    for (var fav in favoritosJson) {
       //categorias.add(Categoria.fromJson(cat));
-      favoritos.add(new Receta(id: fav, titulo: "titulo", imgUrl: "", minutes: 0, kcal: 0, descripcion: "descripcion"));
+      _favoritos.add(fav);
     }
 
     return Perfil(
@@ -37,35 +40,34 @@ class Perfil {
       ubicacion: json['ubicacion'],
       descripcion: json['descripcion'],
       dieta: json['dieta'],
-      kcal_diarias: json['kcal_diarias'].toString(),
+      kcalDiarias: json['kcal_diarias'].toString(),
       avatarUrl: json['avatar'],
-      fechaNac: DateTime.now(),//json['fecha_nacimiento'],
+      fechaNac: DateTime(_fechaNac.year, _fechaNac.month, _fechaNac.day),
       sexo: json['sexo'],
-      favoritos: favoritos,
+      user: json['user'],
+      favoritos: _favoritos,
     );
   }
 
   Map<String, dynamic> toJson() {
-    List<int> favoritos_id = new List<int>();
-
-    favoritos_id.add(1);
-    // for (var cat in categorias) {
-    //   categorias_id.add(cat.id);
-    // }
-    // for (var ing in ingredientes) {
-    //   ingredientes_id.add(ing.id);
-    // }
-    return {
+    String fecha = fechaNac.year.toString() + "-" + fechaNac.month.toString() + "-" + fechaNac.day.toString();
+    var response = {
       "nombre": nombre,
       "email": email,
+      "user": user,
       "ubicacion": ubicacion,
       "descripcion": descripcion,
       "dieta": dieta,
-      "kcal_diarias": kcal_diarias,
-      "foto": avatarUrl,
-      "fecha_nacimiento": fechaNac,
+      "kcalDiarias": kcalDiarias,
+      "fecha_nacimiento": fecha,
       "sexo": sexo,
-      "favoritos": favoritos_id,
+      "favoritos": favoritos,
     };
+
+    if(avatarUrl != null){
+      response["foto"] = avatarUrl;
+    }
+
+    return response;
   }
 }

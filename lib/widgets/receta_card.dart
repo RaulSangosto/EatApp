@@ -1,6 +1,10 @@
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/pages/receta_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+
+import '../perfil_services.dart';
 
 class RecetaTile extends StatefulWidget {
   RecetaTile(this.receta, this.height, this.width, {this.margin = 0});
@@ -16,24 +20,44 @@ class RecetaTile extends StatefulWidget {
 }
 
 class _RecetaTile extends State<RecetaTile> {
+  PerfilService get perfilService => GetIt.I<PerfilService>();
   bool _favorito;
+  bool _isLoading = false;
+  Perfil perfil;
 
   @override
   void initState() {
-    _favorito = false;
+     _fetchPerfil();
     super.initState();
+  }
+
+  _fetchPerfil() async {
+    setState(() {
+      _isLoading = true;
+    });
+    perfil = await perfilService.getPerfil();
+    for(int fav in perfil.favoritos){
+      if(fav == widget.receta.id){
+        widget.receta.favorito = true;
+        break;
+      }
+    }
+    _favorito = widget.receta.favorito;
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return (_isLoading) ? Center(child: CircularProgressIndicator()) : Padding(
       padding: EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Receta_Page(recetaId: widget.receta.id)),
+                builder: (context) => RecetaPage(recetaId: widget.receta.id)),
           );
         },
         child: Container(
@@ -57,9 +81,18 @@ class _RecetaTile extends State<RecetaTile> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 GestureDetector(
-                  onTap: (){
-                    setState(() {
-                      _favorito = !_favorito;
+                  onTap: () async {
+                    setState(() async {
+                      if(_favorito){
+                        perfil.favoritos.remove(widget.receta.id);
+                        _favorito = false;
+                      }
+                      else {
+                        perfil.favoritos.add(widget.receta.id);
+                        _favorito = true;
+                      }
+                      widget.receta.favorito = _favorito;
+                      perfil = await perfilService.updatePerfil();
                     });
                   },
                     child: Icon(_favorito ? Icons.favorite : Icons.favorite_border,

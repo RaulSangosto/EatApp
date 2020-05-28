@@ -10,19 +10,19 @@ import 'package:image_picker/image_picker.dart';
 
 import '../receta_services.dart';
 
-class Crear_Page extends StatefulWidget {
-  const Crear_Page(
+class CrearPage extends StatefulWidget {
+  const CrearPage(
       {Key key,
       bool loged,
-      Function(bool) login_callback,
-      Function(int) pageId_callback})
+      Function(bool) loginCallback,
+      Function(int) pageIdCallback})
       : _isLoged = loged,
-        _login_callback = login_callback,
-        _pageId_callback = pageId_callback,
+        _loginCallback = loginCallback,
+        _pageIdCallback = pageIdCallback,
         super(key: key);
   final bool _isLoged;
-  final Function(bool) _login_callback;
-  final Function(int) _pageId_callback;
+  final Function(bool) _loginCallback;
+  final Function(int) _pageIdCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -30,7 +30,7 @@ class Crear_Page extends StatefulWidget {
   }
 }
 
-class _CrearState extends State<Crear_Page> {
+class _CrearState extends State<CrearPage> {
   //bool get _isEditing => widget.recetaId != null;
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Ingrediente>> _apiResponse;
@@ -177,7 +177,7 @@ class _CrearState extends State<Crear_Page> {
                   ],
                 )).then((data) {
           if (data != null) {
-            widget._pageId_callback(1);
+            widget._pageIdCallback(1);
           }
         });
       }
@@ -374,7 +374,7 @@ class _CrearState extends State<Crear_Page> {
                         BackButton(
                           onPressed: () {
                             setState(() {
-                              widget._pageId_callback(0);
+                              widget._pageIdCallback(0);
                             });
                           },
                         ),

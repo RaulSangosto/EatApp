@@ -1,18 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
+import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../receta_services.dart';
 
-class Receta_Page extends StatefulWidget {
-  const Receta_Page({Key key, int recetaId})
+class RecetaPage extends StatefulWidget {
+  const RecetaPage({Key key, int recetaId})
       : _recetaId = recetaId,
         super(key: key);
   final int _recetaId;
@@ -23,21 +20,23 @@ class Receta_Page extends StatefulWidget {
   }
 }
 
-class _RecetaState extends State<Receta_Page> {
+class _RecetaState extends State<RecetaPage> {
   //bool get _isEditing => widget.recetaId != null;
   RecetasService get service => GetIt.I<RecetasService>();
+  PerfilService get perfilService => GetIt.I<PerfilService>();
+
   APIResponse<Receta> _apiResponseReceta;
   APIResponse<List<Ingrediente>> _apiResponse;
   APIResponse<List<Categoria>> _apiResponseCategoria;
   String errorMessage;
   String formErrors;
 
-  TextEditingController _tituloController = TextEditingController();
+  //TextEditingController _tituloController = TextEditingController();
   TextEditingController _prepController = TextEditingController();
   TextEditingController _personasController = TextEditingController();
   TextEditingController _kcalController = TextEditingController();
   TextEditingController _descrController = TextEditingController();
-  TextEditingController _cantidadController = TextEditingController();
+  //TextEditingController _cantidadController = TextEditingController();
 
   List<Ingrediente> _ingredientes;
   List<Instruccion> _instrucciones = [];
@@ -46,8 +45,9 @@ class _RecetaState extends State<Receta_Page> {
   Categoria categoriaSelected;
   Ingrediente ingredienteSelected;
   Receta receta;
+  Perfil perfil;
   bool _isLoading = false;
-  bool _favorito = false;
+  bool _favorito;
 
   @override
   void initState() {
@@ -76,6 +76,14 @@ class _RecetaState extends State<Receta_Page> {
     _descrController.text = receta.descripcion;
     _prepController.text = receta.minutes.toString();
     _kcalController.text = receta.kcal.toString();
+    perfil = await perfilService.getPerfil();
+
+    _favorito = false;
+    for(int f in perfil.favoritos){
+      if(f == receta.id){
+        _favorito = true;
+      }
+    }
 
     setState(() {
       _isLoading = false;
@@ -117,7 +125,7 @@ class _RecetaState extends State<Receta_Page> {
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             BackButton(
                               onPressed: () {
@@ -135,10 +143,20 @@ class _RecetaState extends State<Receta_Page> {
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
+                            SizedBox(width: 10.0,),
                             GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  _favorito = !_favorito;
+                                setState(() async {
+                                  if(_favorito){
+                                    _favorito = false;
+                                    perfil.favoritos.remove(receta.id);
+                                  }
+                                  else {
+                                    _favorito = true;
+                                    perfil.favoritos.add(receta.id);
+                                  }
+                                  receta.favorito = _favorito;
+                                  perfil = await perfilService.updatePerfil();
                                 });
                               },
                               child: Icon(
@@ -147,7 +165,7 @@ class _RecetaState extends State<Receta_Page> {
                                       : Icons.favorite_border,
                                   color: _favorito
                                       ? Colors.redAccent
-                                      : Colors.black,
+                                      : Colors.grey,
                                   size: 32.0),
                             )
                           ],

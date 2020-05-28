@@ -1,27 +1,26 @@
 import 'package:eatapp/models/api_response.dart';
-import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Login_Page extends StatefulWidget {
-  const Login_Page({Key key, bool loged, Function(bool) login_callback, Function(int) pageId_callback})
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key key, bool loged, Function(bool) loginCallback, Function(int) pageIdCallback})
       : _isLoged = loged,
-        _login_callback = login_callback,
-        _pageId_callback = pageId_callback,
+        _loginCallback = loginCallback,
+        _pageIdCallback = pageIdCallback,
         super(key: key);
   final bool _isLoged;
-  final Function(bool) _login_callback;
-  final Function(int) _pageId_callback;
+  final Function(bool) _loginCallback;
+  final Function(int) _pageIdCallback;
 
   @override
   _LoginState createState() =>
       _LoginState();
 }
 
-class _LoginState extends State<Login_Page> {
+class _LoginState extends State<LoginPage> {
   PerfilService get perfilService => GetIt.I<PerfilService>();
   SharedPreferences prefs;
   APIResponse<String> loginResponse;
@@ -36,10 +35,6 @@ class _LoginState extends State<Login_Page> {
     _isLoged = widget._isLoged;
   }
 
-  getSharedPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-  }
-
   sendData() async {
     String username = _userController.text.trim();
     String password = _passwordController.text.trim();
@@ -48,18 +43,13 @@ class _LoginState extends State<Login_Page> {
       _isLoading = true;
     });
 
-    loginResponse = await perfilService.login(username, password);
-    await getSharedPrefs();
+    _isLoged = await perfilService.login(username, password);
 
     setState(() {
       _isLoading = false;
-      _isLoged = loginResponse.data == null ? false : true;
-      
-      prefs.setString("token", loginResponse.data.toString());
-      print("login: " + prefs.getString("token"));
       //print(loginResponse.data.nombre);
-      widget._pageId_callback(0);
-      widget._login_callback(_isLoged);
+      widget._pageIdCallback(0);
+      widget._loginCallback(_isLoged);
     });
   }
 
@@ -221,6 +211,7 @@ class LoginFormField extends StatelessWidget {
         if (value.trim().isEmpty) {
           return 'Password is required';
         }
+        return value.trim();
       },
     );
   }
@@ -264,6 +255,7 @@ class PasswordFormField extends StatelessWidget {
         if (value.trim().isEmpty) {
           return 'Password is required';
         }
+        return value.trim();
       },
     );
   }

@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
 
-class Descubrir_Page extends StatefulWidget {
-  const Descubrir_Page({Key key, bool loged, Function(bool) login_callback, Function(int) pageId_callback})
+class DescubrirPage extends StatefulWidget {
+  const DescubrirPage({Key key, bool loged, Function(bool) loginCallback, Function(int) pageIdCallback})
       : _isLoged = loged,
-        _login_callback = login_callback,
-        _pageId_callback = pageId_callback,
+        _loginCallback = loginCallback,
+        _pageIdCallback = pageIdCallback,
         super(key: key);
   final bool _isLoged;
-  final Function(bool) _login_callback;
-  final Function(int) _pageId_callback;
+  final Function(bool) _loginCallback;
+  final Function(int) _pageIdCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -22,7 +22,7 @@ class Descubrir_Page extends StatefulWidget {
   }
 }
 
-class _DescubrirState extends State<Descubrir_Page> {
+class _DescubrirState extends State<DescubrirPage> {
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Receta>> _apiResponse;
   List<Receta> recetas;
@@ -143,7 +143,7 @@ class _TopCard extends StatelessWidget {
 }
 
 class _RecetasGrid extends StatelessWidget {
-  List<Receta> recetas;
+  final List<Receta> recetas;
 
   _RecetasGrid({this.recetas});
 

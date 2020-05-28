@@ -1,26 +1,29 @@
 import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/models/perfil.dart';
+import 'package:eatapp/models/receta.dart';
+import 'package:eatapp/pages/perfil_editar_page.dart';
+import 'package:eatapp/receta_services.dart';
 import 'package:eatapp/widgets/profile_avatar.dart';
+import 'package:eatapp/widgets/recetas_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../perfil_services.dart';
 
-class Perfil_Page extends StatefulWidget {
-  const Perfil_Page(
+class PerfilPage extends StatefulWidget {
+  const PerfilPage(
       {Key key,
       bool loged,
-      Function(bool) login_callback,
-      Function(int) pageId_callback})
+      Function(bool) loginCallback,
+      Function(int) pageIdCallback})
       : _isLoged = loged,
-        _login_callback = login_callback,
-        _pageId_callback = pageId_callback,
+        _loginCallback = loginCallback,
+        _pageIdCallback = pageIdCallback,
         super(key: key);
   final bool _isLoged;
-  final Function(bool) _login_callback;
-  final Function(int) _pageId_callback;
+  final Function(bool) _loginCallback;
+  final Function(int) _pageIdCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -28,15 +31,17 @@ class Perfil_Page extends StatefulWidget {
   }
 }
 
-class _PerfilState extends State<Perfil_Page> {
+class _PerfilState extends State<PerfilPage> {
   PerfilService get service => GetIt.I<PerfilService>();
-  SharedPreferences prefs;
+  RecetasService get recetaService => GetIt.I<RecetasService>();
+
   Perfil perfil;
+  APIResponse<List<Receta>> apiRecetas;
+  List<Receta> recetas = List<Receta>();
+  List<Receta> recetasFav = List<Receta>();
   bool _isLoged;
   bool _isLoading = false;
-  String nombre, email, ubicacion, descripcion, dieta, kcal_diarias;
-
-  get perfilService => null;
+  String nombre, email, ubicacion, descripcion, dieta, kcalDiarias;
 
   @override
   initState() {
@@ -46,32 +51,33 @@ class _PerfilState extends State<Perfil_Page> {
   }
 
   _fetchPerfil() async {
-    print("loading perfil");
     setState(() {
       _isLoading = true;
     });
 
-    await getSharedPrefs();
-    String _token = prefs.getString("token");
-
-    APIResponse<Perfil> _apiResponse = await service.getPerfil(token: _token);
-    perfil = _apiResponse.data;
+    perfil = await service.getPerfil();
 
     nombre = perfil.nombre;
     email = perfil.email;
     ubicacion = perfil.ubicacion;
     descripcion = perfil.descripcion;
     dieta = perfil.dieta;
-    kcal_diarias = perfil.kcal_diarias;
+    kcalDiarias = perfil.kcalDiarias;
 
+    apiRecetas = await recetaService.getRecetas();
+    recetas = apiRecetas.data;
+
+    for (Receta r in recetas) {
+      for (int f in perfil.favoritos) {
+        if (f == r.id) {
+          recetasFav.add(r);
+        }
+      }
+    }
 
     setState(() {
       _isLoading = false;
     });
-  }
-
-  getSharedPrefs() async {
-    prefs = await SharedPreferences.getInstance();
   }
 
   _onPressed() {}
@@ -79,12 +85,9 @@ class _PerfilState extends State<Perfil_Page> {
   logout() async {
     print("logout");
     service.logout();
-    await getSharedPrefs();
-    prefs.remove("token");
-    print("token " + prefs.containsKey("token").toString());
     setState(() {
       _isLoged = false;
-      widget._login_callback(_isLoged);
+      widget._loginCallback(_isLoged);
     });
   }
 
@@ -127,11 +130,14 @@ class _PerfilState extends State<Perfil_Page> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        BackButton(color: Colors.white, onPressed: () {
+                        BackButton(
+                          color: Colors.white,
+                          onPressed: () {
                             setState(() {
-                              widget._pageId_callback(0);
+                              widget._pageIdCallback(0);
                             });
-                          },),
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -139,7 +145,7 @@ class _PerfilState extends State<Perfil_Page> {
                 Container(
                   margin: new EdgeInsets.only(top: 110.0),
                   alignment: Alignment.topCenter,
-                  child: PerfilAvatar(90),
+                  child: new PerfilAvatar(90),
                 ),
                 Container(
                   margin: new EdgeInsets.only(top: 170.0),
@@ -177,15 +183,17 @@ class _PerfilState extends State<Perfil_Page> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text(
-                                    nombre,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .body1
-                                          .color,
-                                      fontSize: 32.0,
-                                      fontWeight: FontWeight.bold,
+                                  Flexible(
+                                    child: Text(
+                                      nombre,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2
+                                            .color,
+                                        fontSize: 32.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                   OutlineButton(
@@ -196,7 +204,14 @@ class _PerfilState extends State<Perfil_Page> {
                                     borderSide: BorderSide(
                                       color: Color(0xff48A299),
                                     ),
-                                    onPressed: _onPressed,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PerfilEditarPage()),
+                                      );
+                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8.0, vertical: 0),
@@ -285,8 +300,7 @@ class _PerfilState extends State<Perfil_Page> {
                                 padding: EdgeInsets.only(
                                   bottom: 15.0,
                                 ),
-                                child: Text(
-                                    descripcion),
+                                child: Text(descripcion),
                               ),
                               Container(
                                 margin: EdgeInsets.symmetric(vertical: 10.0),
@@ -304,7 +318,7 @@ class _PerfilState extends State<Perfil_Page> {
                                     Row(
                                       children: <Widget>[
                                         Text(
-                                          kcal_diarias,
+                                          kcalDiarias,
                                           style: TextStyle(
                                               fontSize: 20.0,
                                               fontWeight: FontWeight.bold),
@@ -351,6 +365,22 @@ class _PerfilState extends State<Perfil_Page> {
                   ),
                 ),
               ]),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 30.0),
+              child: Column(
+                children: <Widget>[
+                  Text("Mis Platos Favoritos",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyText2.color,
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.bold,
+                      )),
+                  SizedBox(
+                      height: 160.0,
+                      child: new RecetaList(150.0, 140.0, recetasFav)),
+                ],
+              ),
             ),
           ]);
   }

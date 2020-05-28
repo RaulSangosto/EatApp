@@ -1,4 +1,8 @@
-EATAPP TODO
+
+---------------------------------------------
+---------------  EATAPP TODO  ---------------
+---------------------------------------------
+
     -Inicio
         -Mas Categorías !
         -Seleccionar categorías diarias !!!
@@ -15,10 +19,13 @@ EATAPP TODO
         -Mejorar Interfaz !!!
 
     -Perfil
+        -mejorar añadir a favoritos
+        -mejorar codificacion utf-8
         -Editar datos !!!
-        -Recetas Favoritas !
         -Registro en la APP !!!
+        -PopUp al cerrar Sesion !
 
     -Recetas
-        -Añadir a Favoritos !
+        -Mejorar Interfaz !
         -Modificar datos de una receta !!
+        -Comentarios ?

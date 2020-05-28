@@ -65,7 +65,7 @@ class PerfilViewSet(viewsets.ViewSet):
 
             serializer = klass(instance=perfil,
                                data=request.data,
-                               context={"_loged": request})
+                               context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
 

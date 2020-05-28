@@ -1,69 +1,113 @@
 import 'dart:convert';
 import 'package:eatapp/services_conf.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'models/perfil.dart';
-import 'models/api_response.dart';
 
 class PerfilService {
   static const API = Configuration.API;
-  static var Token = "";
+  String token = "";
+  Perfil perfil;
+  SharedPreferences prefs;
 
-  Future<APIResponse<Perfil>> getPerfil({token}) {
-    print("getPerfil!");  
-    var headers = {"Accept": "application/json"};
-    if(token != null && token != ""){
-      Token = token;
-    }
-    if(Token != null && Token != ""){
-      headers["Authorization"] = "Token " + Token;
-      print(headers.toString());
-    }
-    return http.get(API + "perfil/me", headers: headers).then((data) {
-      print(data.statusCode);
-      if (data.statusCode == 200) {
-        Token = json.decode(data.body)['token'];
-        print("getPerfil data " + data.body);
-        Perfil perfil;
-        perfil = Perfil.fromJson(json.decode(data.body));
-        return APIResponse<Perfil>(data: perfil);
-      }
-      return APIResponse<Perfil>(
-          error: true,
-          errorMessage: data.statusCode.toString() + ': An error occurred');
-    }).catchError((_) =>
-        APIResponse<Perfil>(error: true, errorMessage: 'An error occurred'));
+  getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
+  Future<Perfil> getPerfil() async {
+    //print("getPerfil!");
+    if (perfil != null) {
+      return perfil;
+    }
 
-  Future<APIResponse<String>> login(String username, String password) {
-    return http
+    if (token == null || token == "") {
+      await getSharedPrefs();
+      if (prefs.containsKey("token")) {
+        token = prefs.getString("token");
+      } else {
+        return null;
+      }
+    }
+    var headers = {
+      "Accept": "application/json;charset=utf-8",
+      "Content-Type": "application/json;charset=utf-8",
+      "Authorization": "token " + token
+    };
+    await http.get(API + "perfil/me", headers: headers).then((data) {
+      if (data.statusCode == 200) {
+        perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
+      } else {}
+    });
+    return perfil;
+  }
+
+  Future<Perfil> updatePerfil({String nombre, String ubicacion, String descripcion, String kcal}) async {
+
+    if (token == null){
+      await getSharedPrefs();
+      token = prefs.getString("token");
+    }
+
+    var headers = {
+      "Content-Type": "application/json;charset=utf-8",
+      "Authorization": "token " + token
+    };
+
+    perfil.nombre = nombre?? perfil.nombre;
+    perfil.ubicacion = ubicacion?? perfil.ubicacion;
+    perfil.descripcion = descripcion?? perfil.descripcion;
+    perfil.kcalDiarias = kcal?? perfil.kcalDiarias;
+
+    print("update: token " + token);
+    print("update: user " + perfil.toJson().toString());
+
+    await http.post(API + "perfil/me", 
+      headers: headers,
+      body: jsonEncode(perfil.toJson()),
+      encoding: Encoding.getByName("utf-8"))
+      .then((data){
+      print(data.statusCode);
+      print(data.body);
+      if (data.statusCode == 200) {
+        perfil = Perfil.fromJson(json.decode(data.body));
+      } else {}
+    });
+    return perfil;
+  }
+
+  Future<bool> login(String username, String password) async {
+    bool login;
+    login = await http
         .post(API + "perfil/login",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json;charset=utf-8",
             },
             body: jsonEncode({"username": username, "password": password}))
-        .then((data) {
-      print(data.statusCode);
+        .then((data) async {
       if (data.statusCode == 200) {
-        String token = json.decode(data.body)['token'];
-        Token = token;
-        return APIResponse<String>(data: token);
+        String _token = json.decode(data.body)['token'];
+        if (_token != null) {
+          await getSharedPrefs();
+          prefs.setString("token", _token);
+          token = _token;
+          print(token);
+          return true;
+        }
       }
-      return APIResponse<String>(
-          error: true,
-          errorMessage:
-              "ERROR " + data.statusCode.toString() + ': An error occurred');
-    }).catchError((_) => APIResponse<String>(
-            error: true, errorMessage: 'An error occurred'));
+      return false;
+    });
+    return login;
   }
-  
 
   void logout() {
-    http.post(API + "perfil/logout",
-            headers: {
-              "Content-Type": "application/json",
-            },);
+    http.post(
+      API + "perfil/logout",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+    );
+    getSharedPrefs();
+    prefs.remove("token");
+    perfil = null;
   }
 }
-
-

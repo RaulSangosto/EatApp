@@ -6,6 +6,7 @@ class Receta {
   int kcal;
   String descripcion;
   List<Categoria> categorias;
+  bool favorito = false;
 
   Receta(
       {this.id,
@@ -17,14 +18,14 @@ class Receta {
       this.categorias});
 
   factory Receta.fromJson(Map<String, dynamic> json, {Categoria categoria}) {
-    List<dynamic> categorias_json = json['categorias'];
+    List<dynamic> categoriasJson = json['categorias'];
     List<Categoria> categorias = new List<Categoria>();
     List<Ingrediente> ingredientes = new List<Ingrediente>();
 
     if (categoria != null) {
       categorias.add(categoria);
     } else {
-      for (var cat in categorias_json) {
+      for (var cat in categoriasJson) {
         //categorias.add(Categoria.fromJson(cat));
         categorias.add(new Categoria(
             id: cat, titulo: "titulo", imgUrl: "", descripcion: "descripcion"));
@@ -43,11 +44,11 @@ class Receta {
   }
 
   Map<String, dynamic> toJson() {
-    List<int> categorias_id = new List<int>();
+    List<int> categoriasId = new List<int>();
 
-    //categorias_id.add(1);
+    //categoriasId.add(1);
     for (var cat in categorias) {
-      categorias_id.add(cat.id);
+      categoriasId.add(cat.id);
     }
     return {
       "titulo": titulo,
@@ -55,7 +56,7 @@ class Receta {
       "minutes": minutes,
       "kcal": kcal,
       "descripcion": descripcion,
-      "categorias": categorias_id,
+      "categorias": categoriasId,
     };
   }
 }

@@ -1,4 +1,3 @@
-import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
@@ -7,19 +6,16 @@ import 'package:get_it/get_it.dart';
 class PerfilAvatar extends StatefulWidget {
   PerfilAvatar(this.radius);
   final double radius;
-  Perfil perfil;
 
   @override
   State<StatefulWidget> createState() {
-    return _PerfilAvatar(radius);
+    return _PerfilAvatar();
   }
 }
 
 class _PerfilAvatar extends State<PerfilAvatar> {
   PerfilService get perfilService => GetIt.I<PerfilService>();
-  _PerfilAvatar(this.radius);
-
-  final double radius;
+  Perfil perfil;
   bool _isLoading = false;
 
   @override
@@ -34,11 +30,7 @@ class _PerfilAvatar extends State<PerfilAvatar> {
       _isLoading = true;
     });
 
-    APIResponse<Perfil> _apiResponse = await perfilService.getPerfil();
-    widget.perfil = _apiResponse.data;
-    print("perfilResponse data " + _apiResponse.data.toString());
-    print("perfilResponse error " + _apiResponse.errorMessage.toString());
-    print("perfilAvatar " + widget.perfil.toString());
+    perfil = await perfilService.getPerfil();
 
     setState(() {
       _isLoading = false;
@@ -50,21 +42,21 @@ class _PerfilAvatar extends State<PerfilAvatar> {
     return _isLoading
         ? Center(child: CircularProgressIndicator())
         : Container(
-            width: radius * 2,
-            height: radius * 2,
+            width: widget.radius * 2,
+            height: widget.radius * 2,
             padding:
-                EdgeInsets.all((radius * 0.08) <= 2.0 ? 2.0 : (radius * 0.08)),
+                EdgeInsets.all((widget.radius * 0.08) <= 2.0 ? 2.0 : (widget.radius * 0.08)),
             decoration: BoxDecoration(
               color: Colors.white, // border color
               shape: BoxShape.circle,
             ),
             child: CircleAvatar(
-              backgroundImage:widget.perfil.avatarUrl == null ? null : NetworkImage(widget.perfil.avatarUrl),
+              backgroundImage:perfil.avatarUrl == null ? null : NetworkImage(perfil.avatarUrl),
               backgroundColor: Colors.blueGrey,
-              radius: radius,
+              radius: widget.radius,
               child: Text(
-                widget.perfil.nombre.substring(0, 1).toUpperCase(),
-                style: TextStyle(fontSize: radius / ~8),
+                perfil.nombre.substring(0, 1).toUpperCase(),
+                style: TextStyle(fontSize: widget.radius / ~8),
               ),
             ),
           );
