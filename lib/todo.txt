@@ -20,7 +20,6 @@
 
     -Perfil
         -mejorar añadir a favoritos ? 
-        -Editar datos !!!
         -Registro en la APP !!!
         -PopUp al cerrar Sesion !
 

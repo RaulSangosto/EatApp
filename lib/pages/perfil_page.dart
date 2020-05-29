@@ -210,7 +210,12 @@ class _PerfilState extends State<PerfilPage> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 PerfilEditarPage()),
-                                      );
+                                      ).then((value) {
+                                        setState(() {
+                                          _fetchPerfil();
+                                        });
+                                      });
+                                      ;
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(

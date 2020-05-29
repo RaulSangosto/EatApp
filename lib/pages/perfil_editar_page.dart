@@ -20,10 +20,20 @@ class _PerfilState extends State<PerfilEditarPage> {
   Perfil perfil;
   bool _isLoading = false;
   String nombre, email, ubicacion, descripcion, dieta, kcalDiarias;
+  String formErrors;
+  List<String> dietas = new List<String>();
+  TextEditingController nombreController = new TextEditingController();
+  TextEditingController emailController = new TextEditingController();
+  TextEditingController ubicacionController = new TextEditingController();
+  TextEditingController descripcionController = new TextEditingController();
+  TextEditingController kcalDiariasController = new TextEditingController();
 
   @override
   initState() {
     super.initState();
+    dietas.add("o");
+    dietas.add("v");
+    dietas.add("n");
     _fetchPerfil();
   }
 
@@ -41,6 +51,12 @@ class _PerfilState extends State<PerfilEditarPage> {
     dieta = perfil.dieta;
     kcalDiarias = perfil.kcalDiarias;
 
+    nombreController.text = nombre;
+    emailController.text = email;
+    ubicacionController.text = ubicacion;
+    descripcionController.text = descripcion;
+    kcalDiariasController.text = kcalDiarias;
+
     setState(() {
       _isLoading = false;
     });
@@ -51,6 +67,62 @@ class _PerfilState extends State<PerfilEditarPage> {
     service.logout();
   }
 
+  sendData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    if (nombreController.text == null ||
+        nombreController.text == "" ||
+        emailController.text == null ||
+        emailController.text == "") {
+      formErrors = "Errores: ";
+      if (nombreController.text == null || nombreController.text == "") {
+        formErrors += "Debes Introducir un Nombre\n";
+      }
+      if (emailController.text == null || emailController.text == "") {
+        formErrors += "Debes Indicar las Kilocalorías\n";
+      }
+    } else {
+      formErrors = "";
+      perfil.nombre = nombreController.text;
+      perfil.email = emailController.text;
+      perfil.ubicacion = ubicacionController.text;
+      perfil.descripcion = descripcionController.text;
+      perfil.kcalDiarias = kcalDiariasController.text;
+
+      perfil = await service.updatePerfil(
+          nombre: perfil.nombre,
+          ubicacion: perfil.ubicacion,
+          descripcion: perfil.descripcion,
+          kcal: perfil.kcalDiarias);
+
+      if (perfil != null) {
+        final titulo = "Se han modificado tus datos";
+        final text = "Datos Actualizados correctamente.";
+
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  title: Text(titulo),
+                  content: Text(text),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Ok"))
+                  ],
+                )).then((data) {
+          Navigator.of(context).pop(perfil);
+        });
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +130,7 @@ class _PerfilState extends State<PerfilEditarPage> {
           ? Center(child: CircularProgressIndicator())
           : ListView(children: <Widget>[
               Container(
-                height: 605.0,
-                width: 605.0,
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius:
@@ -86,10 +157,10 @@ class _PerfilState extends State<PerfilEditarPage> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(40.0),
+                      padding: EdgeInsets.all(30.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           BackButton(
                             color: Colors.white,
@@ -103,16 +174,7 @@ class _PerfilState extends State<PerfilEditarPage> {
                             size: 32.0,
                           ),
                           Container(
-                            child: Stack(
-                              children: <Widget>[
-                                new PerfilAvatar(80),
-                                Icon(
-                                  Icons.add_a_photo,
-                                  color: Colors.white70,
-                                  size: 32.0,
-                                )
-                              ],
-                            ),
+                            child: new PerfilAvatar(40),
                           ),
                         ],
                       ),
@@ -131,127 +193,206 @@ class _PerfilState extends State<PerfilEditarPage> {
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    Flexible(
-                                      child: Text(
-                                        nombre,
+                                    Text("Nombre:",
                                         style: TextStyle(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2
-                                              .color,
-                                          fontSize: 32.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                            color: Colors.grey,
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(
+                                      width: 10.0,
                                     ),
+                                    SizedBox(
+                                      width: 200.0,
+                                      height: 50.0,
+                                      child: TextField(
+                                        controller: nombreController,
+                                        maxLength: 100,
+                                        decoration: InputDecoration(
+                                            hintText: "Nombre y Apellidos",
+                                            isDense: true),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(top: 4.0),
-                                  child: Row(
+                                  child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Text(
-                                        email,
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                        ),
-                                      ),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: <Widget>[
-                                          Icon(Icons.pin_drop),
-                                          Text(
-                                            ubicacion,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
+                                          Text("Email:",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          SizedBox(
+                                            width: 10.0,
+                                          ),
+                                          SizedBox(
+                                            width: 200.0,
+                                            height: 50.0,
+                                            child: TextField(
+                                              controller: emailController,
+                                              maxLength: 100,
+                                              decoration: InputDecoration(
+                                                  hintText: "email@email.com",
+                                                  isDense: true),
                                             ),
                                           )
                                         ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text("Ubicación:",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          SizedBox(
+                                            width: 10.0,
+                                          ),
+                                          SizedBox(
+                                            width: 200.0,
+                                            height: 50.0,
+                                            child: TextField(
+                                              controller: ubicacionController,
+                                              maxLength: 100,
+                                              decoration: InputDecoration(
+                                                  hintText: "Región, País",
+                                                  isDense: true),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(top: 20.0),
+                                  padding: EdgeInsets.only(
+                                    bottom: 15.0,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text("Descripción:",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 18.0,
+                                              fontWeight: FontWeight.bold)),
+                                      SizedBox(
+                                        height: 10.0,
+                                      ),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: TextField(
+                                          controller: descripcionController,
+                                          maxLength: 500,
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
+                                          minLines: 3,
+                                          decoration: InputDecoration(
+                                            isDense: true,
+                                            hintText:
+                                                "Añade una descripción...",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14.0,
+                                            ),
+                                            border: OutlineInputBorder(),
+                                          ),
+                                        ),
                                       )
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  margin:
-                                      EdgeInsets.only(top: 25.0, bottom: 10.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Text(
-                                            "12",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16.0),
-                                          ),
-                                          SizedBox(
-                                            width: 5.0,
-                                          ),
-                                          Text(
-                                            "Seguidores",
-                                            style: TextStyle(fontSize: 16.0),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        width: 60.0,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Text(
-                                            "32",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16.0),
-                                          ),
-                                          SizedBox(
-                                            width: 5.0,
-                                          ),
-                                          Text(
-                                            "Seguidos",
-                                            style: TextStyle(fontSize: 16.0),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                    bottom: 15.0,
-                                  ),
-                                  child: Text(descripcion),
-                                ),
-                                Container(
                                   margin: EdgeInsets.symmetric(vertical: 10.0),
-                                  child: Row(
+                                  child: Column(
                                     children: <Widget>[
-                                      Text(
-                                        dieta,
-                                        style: TextStyle(
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        width: 60.0,
-                                      ),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: <Widget>[
-                                          Text(
-                                            kcalDiarias,
-                                            style: TextStyle(
-                                                fontSize: 20.0,
-                                                fontWeight: FontWeight.bold),
+                                          Text("Dieta:",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          SizedBox(
+                                            width: 10.0,
                                           ),
                                           SizedBox(
-                                            width: 5.0,
+                                            width: 200.0,
+                                            child: DropdownButton<String>(
+                                              value: dieta,
+                                              icon: Icon(Icons.arrow_downward),
+                                              iconSize: 24,
+                                              elevation: 16,
+                                              //style: TextStyle(color: Theme.of(context).accentColor),
+                                              underline: Container(
+                                                height: 2,
+                                                color: Theme.of(context)
+                                                    .accentColor,
+                                              ),
+                                              onChanged: (newValue) {
+                                                setState(
+                                                    () => dieta = newValue);
+                                              },
+                                              items: dietas.map<
+                                                      DropdownMenuItem<String>>(
+                                                  (String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(value),
+                                                );
+                                              }).toList(),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 10.0,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text("Kcal Diarías:",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          SizedBox(
+                                            width: 10.0,
                                           ),
-                                          Text(
-                                            "kcal",
-                                            style: TextStyle(fontSize: 20.0),
+                                          SizedBox(
+                                            width: 200.0,
+                                            height: 50.0,
+                                            child: TextField(
+                                              controller: kcalDiariasController,
+                                              maxLength: 100,
+                                              decoration: InputDecoration(
+                                                  hintText: "0000",
+                                                  isDense: true),
+                                            ),
                                           )
                                         ],
                                       ),
@@ -280,31 +421,33 @@ class _PerfilState extends State<PerfilEditarPage> {
                                     ],
                                   ),
                                 ),
-                                RaisedButton(
-                                  color: Theme.of(context).accentColor,
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(18.0),
-                                    side: BorderSide(
-                                      color: Theme.of(context).accentColor,
+                                formErrors == null || formErrors == ""
+                                    ? SizedBox.shrink()
+                                    : Text(formErrors,
+                                        style:
+                                            TextStyle(color: Colors.redAccent)),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 30.0),
+                                  child: RaisedButton(
+                                    color: Theme.of(context).accentColor,
+                                    shape: new RoundedRectangleBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(18.0),
+                                      side: BorderSide(
+                                        color: Theme.of(context).accentColor,
+                                      ),
                                     ),
-                                  ),
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    perfil = await service.updatePerfil();
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0, vertical: 0),
-                                    child: Text(
-                                      "Guardar",
-                                      style: TextStyle(color: Colors.white),
+                                    onPressed: sendData,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0, vertical: 10.0),
+                                      child: Text(
+                                        "Guardar",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ),
