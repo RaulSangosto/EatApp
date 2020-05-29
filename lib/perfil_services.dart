@@ -29,8 +29,8 @@ class PerfilService {
       }
     }
     var headers = {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
       "Authorization": "token " + token
     };
     await http.get(API + "perfil/me", headers: headers).then((data) {
@@ -49,7 +49,7 @@ class PerfilService {
     }
 
     var headers = {
-      "Content-Type": "application/json;charset=utf-8",
+      "Content-Type": "application/json; charset=UTF-8",
       "Authorization": "token " + token
     };
 
@@ -59,17 +59,18 @@ class PerfilService {
     perfil.kcalDiarias = kcal?? perfil.kcalDiarias;
 
     print("update: token " + token);
-    print("update: user " + perfil.toJson().toString());
+    
 
     await http.post(API + "perfil/me", 
       headers: headers,
-      body: jsonEncode(perfil.toJson()),
+      body: utf8.encode(jsonEncode(perfil.toJson())),
       encoding: Encoding.getByName("utf-8"))
       .then((data){
       print(data.statusCode);
       print(data.body);
       if (data.statusCode == 200) {
-        perfil = Perfil.fromJson(json.decode(data.body));
+        perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
+        print("update: user " + perfil.toJson().toString());
       } else {}
     });
     return perfil;
@@ -80,7 +81,7 @@ class PerfilService {
     login = await http
         .post(API + "perfil/login",
             headers: {
-              "Content-Type": "application/json;charset=utf-8",
+              "Content-Type": "application/json; charset=UTF-8",
             },
             body: jsonEncode({"username": username, "password": password}))
         .then((data) async {
@@ -103,7 +104,7 @@ class PerfilService {
     http.post(
       API + "perfil/logout",
       headers: {
-        "Content-Type": "application/json;charset=utf-8",
+        "Content-Type": "application/json; charset=UTF-8",
       },
     );
     getSharedPrefs();

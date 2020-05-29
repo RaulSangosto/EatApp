@@ -10,8 +10,8 @@ class RecetasService {
   Future<APIResponse<List<Receta>>> getRecetas({Categoria categoria}) {
     var uri;
     Map<String, String> headers = {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
     };
     if (categoria == null) {
       uri =
@@ -41,8 +41,8 @@ class RecetasService {
 
   Future<APIResponse<Receta>> getRecetaDetalle(int recetaId) {
     return http.get(API + "recetas/" + recetaId.toString(), headers: {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
     }).then((data) {
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
@@ -61,8 +61,8 @@ class RecetasService {
     return http
         .post(API + "recetas",
             headers: {
-              "Accept": "application/json;charset=utf-8",
-              "Content-Type": "application/json;charset=utf-8",
+              "Accept": "application/json; charset=UTF-8",
+              "Content-Type": "application/json; charset=UTF-8",
             },
             body: jsonEncode(receta.toJson()))
         .then((data) {
@@ -84,8 +84,8 @@ class RecetasService {
     return http
         .put(API + "recetas/" + receta.id.toString(),
             headers: {
-              "Accept": "application/json;charset=utf-8",
-              "Content-Type": "application/json;charset=utf-8",
+              "Accept": "application/json; charset=UTF-8",
+              "Content-Type": "application/json; charset=UTF-8",
             },
             body: jsonEncode(receta.toJson()))
         .then((data) {
@@ -104,8 +104,8 @@ class RecetasService {
 
   Future<APIResponse<bool>> deleteReceta(int recetaId) {
     return http.put(API + "recetas/" + recetaId.toString(), headers: {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
     }).then((data) {
       print(data.statusCode);
       if (data.statusCode == 200) {
@@ -122,8 +122,8 @@ class RecetasService {
 
   Future<APIResponse<List<Categoria>>> getCategorias() {
     return http.get(API + "categorias", headers: {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
     }).then((data) {
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
@@ -143,8 +143,8 @@ class RecetasService {
   Future<APIResponse<List<Ingrediente>>> getIngredientes(
       List<Alergeno> _alergenos) {
     return http.get(API + "ingredientes", headers: {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
     }).then((data) {
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
@@ -163,8 +163,8 @@ class RecetasService {
 
   Future<APIResponse<List<Alergeno>>> getAlergenos() {
     return http.get(API + "alergenos", headers: {
-      "Accept": "application/json;charset=utf-8",
-      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
     }).then((data) {
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
@@ -185,8 +185,8 @@ class RecetasService {
     return http
         .post(API + "instrucciones",
             headers: {
-              "Accept": "application/json;charset=utf-8",
-              "Content-Type": "application/json;charset=utf-8",
+              "Accept": "application/json; charset=UTF-8",
+              "Content-Type": "application/json; charset=UTF-8",
             },
             body: jsonEncode(instruccion.toJson()))
         .then((data) {
