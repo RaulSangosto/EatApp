@@ -58,7 +58,18 @@ class _RecetaTile extends State<RecetaTile> {
             context,
             MaterialPageRoute(
                 builder: (context) => RecetaPage(recetaId: widget.receta.id)),
-          );
+          ).then((value) {
+            setState(() {
+              _favorito = false;
+              for(int f in perfil.favoritos){
+                if(f == widget.receta.id){
+                  _favorito = true;
+                  break;
+                }
+              }
+              widget.receta.favorito = _favorito;
+            });
+          });
         },
         child: Container(
           margin: new EdgeInsets.only(top: widget.margin),
@@ -82,7 +93,7 @@ class _RecetaTile extends State<RecetaTile> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () async {
-                    setState(() async {
+                    setState(() {
                       if(_favorito){
                         perfil.favoritos.remove(widget.receta.id);
                         _favorito = false;
@@ -92,8 +103,8 @@ class _RecetaTile extends State<RecetaTile> {
                         _favorito = true;
                       }
                       widget.receta.favorito = _favorito;
-                      perfil = await perfilService.updatePerfil();
                     });
+                    perfil = await perfilService.updatePerfil();
                   },
                     child: Icon(_favorito ? Icons.favorite : Icons.favorite_border,
                         color: _favorito

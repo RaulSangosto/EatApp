@@ -145,8 +145,8 @@ class _RecetaState extends State<RecetaPage> {
                             ),
                             SizedBox(width: 10.0,),
                             GestureDetector(
-                              onTap: () {
-                                setState(() async {
+                              onTap: () async {
+                                setState(() {
                                   if(_favorito){
                                     _favorito = false;
                                     perfil.favoritos.remove(receta.id);
@@ -156,8 +156,8 @@ class _RecetaState extends State<RecetaPage> {
                                     perfil.favoritos.add(receta.id);
                                   }
                                   receta.favorito = _favorito;
-                                  perfil = await perfilService.updatePerfil();
                                 });
+                                perfil = await perfilService.updatePerfil();
                               },
                               child: Icon(
                                   _favorito

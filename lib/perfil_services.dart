@@ -58,19 +58,13 @@ class PerfilService {
     perfil.descripcion = descripcion?? perfil.descripcion;
     perfil.kcalDiarias = kcal?? perfil.kcalDiarias;
 
-    print("update: token " + token);
-    
-
     await http.post(API + "perfil/me", 
       headers: headers,
       body: utf8.encode(jsonEncode(perfil.toJson())),
       encoding: Encoding.getByName("utf-8"))
       .then((data){
-      print(data.statusCode);
-      print(data.body);
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
-        print("update: user " + perfil.toJson().toString());
       } else {}
     });
     return perfil;

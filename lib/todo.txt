@@ -19,8 +19,7 @@
         -Mejorar Interfaz !!!
 
     -Perfil
-        -mejorar añadir a favoritos
-        -mejorar codificacion utf-8
+        -mejorar añadir a favoritos ? 
         -Editar datos !!!
         -Registro en la APP !!!
         -PopUp al cerrar Sesion !
