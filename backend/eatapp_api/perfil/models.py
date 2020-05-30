@@ -22,6 +22,7 @@ class Perfil(models.Model):
     sexo = models.CharField(max_length=1, choices=SEXO, null=True, blank=True)
     favoritos = models.ManyToManyField("receta.Receta", blank=True,
                                        related_name="favoritos_usuarios")
+    categoriasSemana = models.ManyToManyField("receta.Categoria", blank=True, related_name="dieta_semanal")
 
     #invitacion = models.CharField(max_length=15, null=True, blank=True)
 

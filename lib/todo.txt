@@ -5,7 +5,6 @@
 
     -Inicio
         -Mas Categorías !
-        -Seleccionar categorías diarias !!!
 
     -Descubrir
         -Filtrar !

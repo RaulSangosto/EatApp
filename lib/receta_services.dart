@@ -140,6 +140,25 @@ class RecetasService {
         error: true, errorMessage: 'An error occurred'));
   }
 
+  Future<APIResponse<Categoria>> getCategoriaHoy(token) {
+    return http.get(API + "categorias/categoria_hoy", headers: {
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": "token " + token
+    }).then((data) {
+
+      if (data.statusCode == 200) {
+        final jsonData = json.decode(utf8.decode(data.bodyBytes));
+        final Categoria categoria = Categoria.fromJson(jsonData);
+        return APIResponse<Categoria>(data: categoria);
+      }
+      return APIResponse<Categoria>(
+          error: true,
+          errorMessage: data.statusCode.toString() + ': An error occurred');
+    }).catchError((_) => APIResponse<Categoria>(
+        error: true, errorMessage: 'An error occurred'));
+  }
+
   Future<APIResponse<List<Ingrediente>>> getIngredientes(
       List<Alergeno> _alergenos) {
     return http.get(API + "ingredientes", headers: {

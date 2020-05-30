@@ -1,5 +1,7 @@
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
+import 'package:eatapp/perfil_services.dart';
 import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:eatapp/widgets/recetas_list.dart';
 import 'package:flutter/material.dart';
@@ -30,12 +32,15 @@ class HomePage extends StatefulWidget {
 
 class _HomeState extends State<HomePage> {
   RecetasService get service => GetIt.I<RecetasService>();
+  PerfilService get perfilService => GetIt.I<PerfilService>();
   APIResponse<List<Categoria>> _apiResponseCategorias;
+  APIResponse<Categoria> _apiResponseCategoriaHoy;
   APIResponse<List<Receta>> _apiResponseRecetas;
   List<Categoria> categorias;
   Categoria categoriaHoy;
   List<Receta> recetas;
   bool _isLoading = false;
+  Perfil perfil;
 
   @override
   void initState() {
@@ -47,10 +52,17 @@ class _HomeState extends State<HomePage> {
     setState(() {
       _isLoading = true;
     });
-
+    perfil = await perfilService.getPerfil();
     _apiResponseCategorias = await service.getCategorias();
     categorias = _apiResponseCategorias.data;
-    categoriaHoy = categorias[1];
+    _apiResponseCategoriaHoy = await service.getCategoriaHoy(perfilService.token);
+    Categoria cHoy = _apiResponseCategoriaHoy.data;
+    for(Categoria c in categorias){
+      if(c.id == cHoy.id){
+        categoriaHoy = c;
+        break;
+      }
+    }
     _apiResponseRecetas = await service.getRecetas(categoria: categoriaHoy);
     recetas = _apiResponseRecetas.data;
 

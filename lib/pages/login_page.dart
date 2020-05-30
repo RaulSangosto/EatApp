@@ -1,4 +1,5 @@
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/pages/register_page.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -6,7 +7,11 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key key, bool loged, Function(bool) loginCallback, Function(int) pageIdCallback})
+  const LoginPage(
+      {Key key,
+      bool loged,
+      Function(bool) loginCallback,
+      Function(int) pageIdCallback})
       : _isLoged = loged,
         _loginCallback = loginCallback,
         _pageIdCallback = pageIdCallback,
@@ -16,8 +21,7 @@ class LoginPage extends StatefulWidget {
   final Function(int) _pageIdCallback;
 
   @override
-  _LoginState createState() =>
-      _LoginState();
+  _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<LoginPage> {
@@ -30,7 +34,7 @@ class _LoginState extends State<LoginPage> {
   bool _isLoged;
 
   @override
-  initState(){
+  initState() {
     super.initState();
     _isLoged = widget._isLoged;
   }
@@ -63,10 +67,10 @@ class _LoginState extends State<LoginPage> {
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).accentColor.withOpacity(0.5),
-                // image: DecorationImage(
-                //     image: AssetImage("assets/images/espaguetis.jpg"),
-                //     fit: BoxFit.cover)
-                ),
+              // image: DecorationImage(
+              //     image: AssetImage("assets/images/espaguetis.jpg"),
+              //     fit: BoxFit.cover)
+            ),
             child: ListView(
               //mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -159,7 +163,19 @@ class _LoginState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text('¿Aún no estás registrado?'),
-                      Text('Registrate Aquí.'),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegisterPage()),
+                            ).then((value) {
+                              setState(() {
+                                //_fetchPerfil();
+                              });
+                            });
+                          },
+                          child: Text('Registrate Aquí.')),
                     ],
                   ),
                 ),
