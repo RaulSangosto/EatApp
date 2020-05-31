@@ -33,7 +33,6 @@ class _RegisterState extends State<RegisterPage> {
   TextEditingController _password2Controller = TextEditingController();
   TextEditingController _nombreController = new TextEditingController();
   TextEditingController _emailController = new TextEditingController();
-  TextEditingController _fechaController = new TextEditingController();
   TextEditingController _kcalDiariasController = new TextEditingController();
   List<Choice> dietas = new List<Choice>();
   List<Choice> sexos = new List<Choice>();
@@ -42,6 +41,7 @@ class _RegisterState extends State<RegisterPage> {
   String formErrors;
   bool _isLoading = false;
   bool _isLoged;
+  Perfil newPerfil;
 
   @override
   initState() {
@@ -87,11 +87,20 @@ class _RegisterState extends State<RegisterPage> {
       if (kcal == null || kcal == "") {
         formErrors += "Debes indicar unas Kcal Diarias\n";
       }
+      if (dieta == null || dieta == "") {
+        formErrors += "Debes indicar una Dieta\n";
+      }
+      if (sexo == null || sexo == "") {
+        formErrors += "Debes indicar un Sexo\n";
+      }
+      if (fecha_nacimiento== null) {
+        formErrors += "Debes indicar una Fecha de Nacimiento\n";
+      }
     });
 
     if (formErrors == "") {
-      Perfil p = new Perfil(nombre: nombre, email: email, kcalDiarias: kcal);
-      _isLoged = await perfilService.login(username, password);
+      Perfil p = new Perfil(nombre: nombre, email: email, kcalDiarias: kcal, dieta: dieta.code, sexo: sexo.code, fechaNac: fecha_nacimiento);
+      newPerfil = await perfilService.register(p, username: username, password: password);
     }
 
     setState(() {
@@ -222,19 +231,43 @@ class _RegisterState extends State<RegisterPage> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 10.0,
+                                    height: 20.0,
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      showDatePicker(context: context, initialDate: DateTime(DateTime.now().year -18), firstDate: DateTime(1900), lastDate: DateTime.now()).then((date) {
-                                        setState(() {
-                                          fecha_nacimiento = date;
-                                        });
-                                      });
-                                    },
-                                    child: Text(
-                                      fecha_nacimiento.toString()
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        "F. Nacimiento",
+                                        style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime(
+                                                      DateTime.now().year - 18),
+                                                  firstDate: DateTime(1900),
+                                                  lastDate: DateTime.now())
+                                              .then((date) {
+                                            setState(() {
+                                              fecha_nacimiento = date;
+                                            });
+                                          });
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey)),
+                                          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: (fecha_nacimiento == null) ? 10.0 : 20.0),
+                                          child: Text((fecha_nacimiento == null)
+                                              ? "Fecha de Nacimiento"
+                                              : fecha_nacimiento.day.toString() + "/" + fecha_nacimiento.month.toString() + "/" + fecha_nacimiento.year.toString()),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Container(
                                     margin:

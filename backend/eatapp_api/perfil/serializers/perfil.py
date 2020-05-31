@@ -15,12 +15,13 @@ numbers = string.digits
 
 class PerfilSerializer(serializers.ModelSerializer):
     email = serializers.ReadOnlyField(source="user.email")
-    avatar = serializers.ReadOnlyField()
+    #avatar = serializers.ReadOnlyField()
     token = serializers.SerializerMethodField()
 
     class Meta:
         model = Perfil
-        exclude = ["foto"]
+        #exclude = ["foto"]
+        fields = '__all__'
 
     def get_token(self, obj):
         token, _ = Token.objects.get_or_create(user=obj.user)
@@ -30,7 +31,7 @@ class PerfilSerializer(serializers.ModelSerializer):
 class PerfilSaveSerializer(serializers.ModelSerializer):
     email = serializers.ReadOnlyField(source="user.email")
     foto = Base64ImageField(required=False)
-    avatar = serializers.ReadOnlyField()
+    #avatar = serializers.ReadOnlyField()
     password_actual = serializers.CharField(required=False, allow_blank=True)
     password = serializers.CharField(required=False, allow_blank=True)
     password2 = serializers.CharField(required=False, allow_blank=True)

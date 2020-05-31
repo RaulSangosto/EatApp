@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:eatapp/services_conf.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'models/receta.dart';
 import 'models/api_response.dart';
@@ -7,7 +8,7 @@ import 'models/api_response.dart';
 class RecetasService {
   static const API = Configuration.API;
 
-  Future<APIResponse<List<Receta>>> getRecetas({Categoria categoria}) {
+  Future<APIResponse<List<Receta>>> getRecetas({Categoria categoria, @required List<Categoria> categorias}) {
     var uri;
     Map<String, String> headers = {
       "Accept": "application/json; charset=UTF-8",
@@ -28,7 +29,7 @@ class RecetasService {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
         final recetas = <Receta>[];
         for (var item in jsonData) {
-          recetas.add(Receta.fromJson(item));
+          recetas.add(Receta.fromJson(item, categorias: categorias));
         }
         return APIResponse<List<Receta>>(data: recetas);
       }
@@ -39,7 +40,30 @@ class RecetasService {
         error: true, errorMessage: 'An error occurred'));
   }
 
-  Future<APIResponse<Receta>> getRecetaDetalle(int recetaId) {
+  Future<APIResponse<List<Receta>>> getUltimasRecetas({@required List<Categoria> categorias}) {
+    var uri;
+    Map<String, String> headers = {
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
+    };
+    return http.get(API + "recetas/ultimas", headers: headers).then((data) {
+      print("ultimas recetas: " + data.statusCode.toString());
+      if (data.statusCode == 200) {
+        final jsonData = json.decode(utf8.decode(data.bodyBytes));
+        final recetas = <Receta>[];
+        for (var item in jsonData) {
+          recetas.add(Receta.fromJson(item, categorias: categorias));
+        }
+        return APIResponse<List<Receta>>(data: recetas);
+      }
+      return APIResponse<List<Receta>>(
+          error: true,
+          errorMessage: data.statusCode.toString() + ': An error occurred');
+    }).catchError((_) => APIResponse<List<Receta>>(
+        error: true, errorMessage: 'An error occurred'));
+  }
+
+  Future<APIResponse<Receta>> getRecetaDetalle(int recetaId, {categorias}) {
     return http.get(API + "recetas/" + recetaId.toString(), headers: {
       "Accept": "application/json; charset=UTF-8",
       "Content-Type": "application/json; charset=UTF-8",
@@ -47,7 +71,7 @@ class RecetasService {
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
 
-        final receta = Receta.fromJson(jsonData);
+        final receta = Receta.fromJson(jsonData, categorias: categorias);
         return APIResponse<Receta>(data: receta);
       }
       return APIResponse<Receta>(
@@ -69,7 +93,7 @@ class RecetasService {
       print(data.statusCode);
       if (data.statusCode == 201) {
         return APIResponse<Receta>(
-            data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes))));
+            data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes)), categoria: receta.categoria));
       }
       return APIResponse<Receta>(
           data: null,
@@ -146,7 +170,6 @@ class RecetasService {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": "token " + token
     }).then((data) {
-
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
         final Categoria categoria = Categoria.fromJson(jsonData);
@@ -155,8 +178,8 @@ class RecetasService {
       return APIResponse<Categoria>(
           error: true,
           errorMessage: data.statusCode.toString() + ': An error occurred');
-    }).catchError((_) => APIResponse<Categoria>(
-        error: true, errorMessage: 'An error occurred'));
+    }).catchError((_) =>
+        APIResponse<Categoria>(error: true, errorMessage: 'An error occurred'));
   }
 
   Future<APIResponse<List<Ingrediente>>> getIngredientes(

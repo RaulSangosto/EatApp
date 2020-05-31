@@ -25,21 +25,34 @@ class DescubrirPage extends StatefulWidget {
 class _DescubrirState extends State<DescubrirPage> {
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Receta>> _apiResponse;
+  APIResponse<List<Categoria>> _apiResponseCategorias;
+  ScrollController gridScrollController;
+  List<Categoria> categorias;
   List<Receta> recetas;
   bool _isLoading = false;
+
+  _scrollListener(){
+    if(gridScrollController.offset <= 80) {
+      _fetchRecetas();
+      gridScrollController.animateTo(150, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    }
+  }
 
   @override
   void initState() {
     _fetchRecetas();
     super.initState();
+    gridScrollController = new ScrollController(initialScrollOffset: 150.0, keepScrollOffset: true);
+    gridScrollController.addListener(_scrollListener);
   }
 
   _fetchRecetas() async {
     setState(() {
       _isLoading = true;
     });
-
-    _apiResponse = await service.getRecetas();
+    _apiResponseCategorias = await service.getCategorias();
+    categorias = _apiResponseCategorias.data;
+    _apiResponse = await service.getRecetas(categorias: categorias);
     recetas = _apiResponse.data;
     setState(() {
       _isLoading = false;
@@ -49,33 +62,34 @@ class _DescubrirState extends State<DescubrirPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Builder(builder: (_) {
-        if (_isLoading) {
-          return Center(child: CircularProgressIndicator());
-        }
+      child: //Builder(builder: (_) {
+        // if (_isLoading) {
+        //   return Center(child: CircularProgressIndicator());
+        // }
 
-        if (_apiResponse.error) {
-          return Center(child: Text(_apiResponse.errorMessage));
-        }
+        // if (_apiResponse.error) {
+        //   return Center(child: Text(_apiResponse.errorMessage));
+        // }
 
-        return Stack(
+        Stack(
           //mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Column(
               children: <Widget>[
-                Expanded(
+                (_isLoading) ? Center(child: CircularProgressIndicator(),) : Expanded(
                   child: SizedBox(
                     height: 472.0,
-                    child: _RecetasGrid(recetas: recetas),
+                    child: _RecetasGrid(recetas: recetas, controller: gridScrollController),
                   ),
                 ),
               ],
             ),
             _TopCard(),
           ],
-        );
-      }),
-    );
+        ),
+      //}
+      );
+    //);
   }
 }
 
@@ -144,8 +158,9 @@ class _TopCard extends StatelessWidget {
 
 class _RecetasGrid extends StatelessWidget {
   final List<Receta> recetas;
+  final ScrollController controller;
 
-  _RecetasGrid({this.recetas});
+  _RecetasGrid({this.recetas, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -154,13 +169,17 @@ class _RecetasGrid extends StatelessWidget {
 
     return GridView.builder(
       scrollDirection: Axis.vertical,
-      itemCount: recetas.length,
+      controller: controller,
+      itemCount: recetas.length + 2,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: (2 / 3),
+        childAspectRatio: (3 / 4),
       ),
-      itemBuilder: (BuildContext context, int index) {
-        Receta receta = recetas[index];
+      itemBuilder: (BuildContext context, int index) {     
+        if(index < 2){
+          return Container(height: 30, width: 30,);
+        }
+        Receta receta = recetas[index -2];
         return RecetaTile(receta, h / 3, (w - 40) / 2);
       },
     );

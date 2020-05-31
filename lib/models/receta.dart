@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class Receta {
   int id;
   String titulo;
@@ -5,7 +7,7 @@ class Receta {
   int minutes;
   int kcal;
   String descripcion;
-  List<Categoria> categorias;
+  Categoria categoria;
   bool favorito = false;
 
   Receta(
@@ -15,21 +17,21 @@ class Receta {
       this.minutes,
       this.kcal,
       this.descripcion,
-      this.categorias});
+      this.categoria});
 
-  factory Receta.fromJson(Map<String, dynamic> json, {Categoria categoria}) {
-    List<dynamic> categoriasJson = json['categorias'];
-    List<Categoria> categorias = new List<Categoria>();
+  factory Receta.fromJson(Map<String, dynamic> json, {Categoria categoria, List<Categoria> categorias}) {
+    int categoriaJson = json['categoria'];
+    Categoria _categoria;
     List<Ingrediente> ingredientes = new List<Ingrediente>();
 
     if (categoria != null) {
-      categorias.add(categoria);
+      _categoria =categoria;
     } else {
-      for (var cat in categoriasJson) {
-        //categorias.add(Categoria.fromJson(cat));
-        categorias.add(new Categoria(
-            id: cat, titulo: "titulo", imgUrl: "", descripcion: "descripcion"));
-      }
+        for(var c in categorias){
+          if(categoriaJson == c.id){
+            _categoria =c;
+          }
+        }
     }
 
     return Receta(
@@ -39,24 +41,18 @@ class Receta {
       minutes: json['minutos_preparacion'],
       kcal: json['kcal'],
       descripcion: json['descripcion'],
-      categorias: categorias,
+      categoria: _categoria,
     );
   }
 
   Map<String, dynamic> toJson() {
-    List<int> categoriasId = new List<int>();
-
-    //categoriasId.add(1);
-    for (var cat in categorias) {
-      categoriasId.add(cat.id);
-    }
     return {
       "titulo": titulo,
       "imagen": imgUrl,
       "minutes": minutes,
       "kcal": kcal,
       "descripcion": descripcion,
-      "categorias": categoriasId,
+      "categoria": categoria.id,
     };
   }
 }

@@ -135,8 +135,6 @@ class _CrearState extends State<CrearPage> {
       }
     } else {
       formErrors = "";
-      List<Categoria> _categoriasSelected = new List<Categoria>();
-      _categoriasSelected.add(categoriaSelected);
       final receta = Receta(
         titulo: _tituloController.text ?? "titulo",
         imgUrl: _image != null
@@ -145,7 +143,7 @@ class _CrearState extends State<CrearPage> {
         minutes: int.parse(_prepController.text ?? "20"),
         kcal: int.parse(_kcalController.text ?? "120"),
         descripcion: _descrController.text ?? "descripcion",
-        categorias: _categoriasSelected,
+        categoria: categoriaSelected,
       );
 
       final result = await service.createReceta(receta);

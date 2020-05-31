@@ -28,5 +28,6 @@ class Perfil(models.Model):
 
     def avatar(self, alias="avatar"):
         if self.foto:
+            import ipdb; ipdb.set_trace()
             thumbnailer = get_thumbnailer(self.foto)
             return thumbnailer[alias].url

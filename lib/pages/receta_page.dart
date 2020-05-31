@@ -70,7 +70,7 @@ class _RecetaState extends State<RecetaPage> {
     _apiResponseCategoria = await service.getCategorias();
     categorias = _apiResponseCategoria.data;
 
-    _apiResponseReceta = await service.getRecetaDetalle(widget._recetaId);
+    _apiResponseReceta = await service.getRecetaDetalle(widget._recetaId, categorias: categorias);
     receta = _apiResponseReceta.data;
 
     _descrController.text = receta.descripcion;
@@ -192,7 +192,7 @@ class _RecetaState extends State<RecetaPage> {
                                 padding: EdgeInsets.symmetric(
                                     vertical: 5.0, horizontal: 10.0),
                                 child: Text(
-                                  receta.categorias.first.titulo,
+                                  receta.categoria.titulo,
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16.0,

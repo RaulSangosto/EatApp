@@ -38,7 +38,8 @@ class _HomeState extends State<HomePage> {
   APIResponse<List<Receta>> _apiResponseRecetas;
   List<Categoria> categorias;
   Categoria categoriaHoy;
-  List<Receta> recetas;
+  List<Receta> ultimasRecetas;
+  List<Receta> recetasHoy;
   bool _isLoading = false;
   Perfil perfil;
 
@@ -63,8 +64,21 @@ class _HomeState extends State<HomePage> {
         break;
       }
     }
-    _apiResponseRecetas = await service.getRecetas(categoria: categoriaHoy);
-    recetas = _apiResponseRecetas.data;
+    _apiResponseRecetas = await service.getRecetas(categoria: categoriaHoy, categorias: categorias);
+    recetasHoy = _apiResponseRecetas.data;
+    _apiResponseRecetas = await service.getUltimasRecetas(categorias: categorias);
+    List<Receta>_ultimasRecetas = _apiResponseRecetas.data;
+     _apiResponseRecetas = await service.getRecetas(categorias: categorias);
+    List<Receta> _todasRecetas = _apiResponseRecetas.data;
+    ultimasRecetas = new List<Receta>();
+    for(Receta r in _ultimasRecetas){
+      for(Receta rc in _todasRecetas){
+        if (r.id == rc.id) {
+          ultimasRecetas.add(rc);
+          break;
+        }
+      }
+    }
 
     setState(() {
       _isLoading = false;
@@ -133,7 +147,7 @@ class _HomeState extends State<HomePage> {
                               children: <Widget>[
                                 SizedBox(
                                   height: 250.0,
-                                  child: new RecetaList(250.0, 160.0, recetas),
+                                  child: new RecetaList(250.0, 160.0, recetasHoy),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(20.0),
@@ -206,7 +220,7 @@ class _HomeState extends State<HomePage> {
                           ),
                           SizedBox(
                               height: 160.0,
-                              child: new RecetaList(150.0, 140.0, recetas)),
+                              child: new RecetaList(150.0, 140.0, ultimasRecetas)),
                         ],
                       )),
                 ],

@@ -3,4 +3,5 @@ Pillow
 ipdb
 easy-thumbnails==2.7
 django-extra-fields==2.0.5
+django-extensions==2.2.9
 djangorestframework==3.11.0 

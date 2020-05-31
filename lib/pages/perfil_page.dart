@@ -37,6 +37,8 @@ class _PerfilState extends State<PerfilPage> {
 
   Perfil perfil;
   APIResponse<List<Receta>> apiRecetas;
+  APIResponse<List<Categoria>> apiCategorias;
+  List<Categoria> categorias;
   List<Receta> recetas = List<Receta>();
   List<Receta> recetasFav = List<Receta>();
   bool _isLoged;
@@ -63,8 +65,10 @@ class _PerfilState extends State<PerfilPage> {
     descripcion = perfil.descripcion;
     dieta = perfil.dieta;
     kcalDiarias = perfil.kcalDiarias;
-
-    apiRecetas = await recetaService.getRecetas();
+    
+    apiCategorias = await recetaService.getCategorias();
+    categorias = apiCategorias.data;
+    apiRecetas = await recetaService.getRecetas(categorias: categorias);
     recetas = apiRecetas.data;
 
     for (Receta r in recetas) {

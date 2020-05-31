@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from receta.models import Receta
+from receta.models import Receta, Categoria
 from drf_extra_fields.fields import Base64ImageField
 
 class RecetaSerializer(serializers.ModelSerializer):

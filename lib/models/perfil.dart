@@ -48,7 +48,7 @@ class Perfil {
       descripcion: json['descripcion'],
       dieta: json['dieta'],
       kcalDiarias: json['kcal_diarias'].toString(),
-      avatarUrl: json['avatar'],
+      avatarUrl: json['foto'],
       fechaNac: DateTime(_fechaNac.year, _fechaNac.month, _fechaNac.day),
       sexo: json['sexo'],
       user: json['user'],

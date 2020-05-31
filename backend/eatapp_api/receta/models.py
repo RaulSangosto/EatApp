@@ -1,13 +1,14 @@
 from django.db import models
+from django_extensions.db.models import TimeStampedModel
 
 # Create your models here.
-class Receta(models.Model):
+class Receta(TimeStampedModel):
     titulo = models.CharField(blank=True, null=True, max_length=100)
     imagen = models.ImageField(blank=True, null=True, upload_to="imagenes/recetas")
     minutos_preparacion = models.SmallIntegerField(blank=True, null=True)
     kcal = models.SmallIntegerField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
-    categorias = models.ManyToManyField("Categoria")
+    categoria = models.ForeignKey("Categoria", on_delete= models.CASCADE)
 
     def __str__(self):
         return self.titulo

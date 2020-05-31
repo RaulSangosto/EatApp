@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'easy_thumbnails',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,12 @@ TEMPLATES = [
         },
     },
 ]
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar' : {'size': (50, 50), 'crop': True}
+    },
+}
 
 WSGI_APPLICATION = 'eatapp_api.wsgi.application'
 

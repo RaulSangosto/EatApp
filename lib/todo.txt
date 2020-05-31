@@ -7,6 +7,7 @@
         -Mas Categorías !
 
     -Descubrir
+        -Mejorar el grid !!
         -Filtrar !
             -por nombre
             -por categorias

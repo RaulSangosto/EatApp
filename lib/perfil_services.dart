@@ -36,6 +36,10 @@ class PerfilService {
     await http.get(API + "perfil/me", headers: headers).then((data) {
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
+        if (perfil.avatarUrl != null){
+          String url = "http://" + Configuration.localhost + perfil.avatarUrl;
+          perfil.avatarUrl = url;
+        }
       } else {}
     });
     return perfil;
@@ -93,6 +97,30 @@ class PerfilService {
       return false;
     });
     return login;
+  }
+
+  Future<Perfil> register(Perfil perfil ,{username, password}) async {
+    Perfil _p = await http
+        .post(API + "perfil/register",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: jsonEncode({perfil.toJson()}))
+        .then((data) async {
+      if (data.statusCode == 200) {
+        print(data.statusCode);
+        print(data.body);
+        String _token = json.decode(data.body)['token'];
+        if (_token != null) {
+          await getSharedPrefs();
+          prefs.setString("token", _token);
+          token = _token;
+          print(token);
+          return Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
+        }
+      }
+    });
+    return _p;
   }
 
   void logout() {
