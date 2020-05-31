@@ -1,5 +1,12 @@
 import 'package:eatapp/models/receta.dart';
 
+class Choice {
+  String nombre;
+  String code;
+
+  Choice(this.nombre, this.code);
+}
+
 class Perfil {
   int id;
   String nombre, email, ubicacion, descripcion;

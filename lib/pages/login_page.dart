@@ -67,9 +67,12 @@ class _LoginState extends State<LoginPage> {
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).accentColor.withOpacity(0.5),
-              // image: DecorationImage(
-              //     image: AssetImage("assets/images/espaguetis.jpg"),
-              //     fit: BoxFit.cover)
+              image: DecorationImage(
+                  colorFilter: new ColorFilter.mode(
+                      Theme.of(context).accentColor.withOpacity(0.45),
+                      BlendMode.dstATop),
+                  image: AssetImage("assets/images/guacamole.jpg"),
+                  fit: BoxFit.cover),
             ),
             child: ListView(
               //mainAxisAlignment: MainAxisAlignment.center,
@@ -175,7 +178,7 @@ class _LoginState extends State<LoginPage> {
                               });
                             });
                           },
-                          child: Text('Registrate Aquí.')),
+                          child: Text('Registrate Aquí.', style: TextStyle(fontWeight: FontWeight.bold),)),
                     ],
                   ),
                 ),

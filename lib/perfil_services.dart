@@ -41,7 +41,7 @@ class PerfilService {
     return perfil;
   }
 
-  Future<Perfil> updatePerfil({String nombre, String ubicacion, String descripcion, String kcal}) async {
+  Future<Perfil> updatePerfil({String nombre, String ubicacion, String descripcion, String kcal, String dieta}) async {
 
     if (token == null){
       await getSharedPrefs();
@@ -57,6 +57,7 @@ class PerfilService {
     perfil.ubicacion = ubicacion?? perfil.ubicacion;
     perfil.descripcion = descripcion?? perfil.descripcion;
     perfil.kcalDiarias = kcal?? perfil.kcalDiarias;
+    perfil.dieta = dieta ?? perfil.dieta;
 
     await http.post(API + "perfil/me", 
       headers: headers,

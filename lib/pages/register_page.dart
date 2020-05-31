@@ -1,4 +1,5 @@
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -32,25 +33,66 @@ class _RegisterState extends State<RegisterPage> {
   TextEditingController _password2Controller = TextEditingController();
   TextEditingController _nombreController = new TextEditingController();
   TextEditingController _emailController = new TextEditingController();
+  TextEditingController _fechaController = new TextEditingController();
   TextEditingController _kcalDiariasController = new TextEditingController();
+  List<Choice> dietas = new List<Choice>();
+  List<Choice> sexos = new List<Choice>();
+  Choice dieta, sexo;
+  DateTime fecha_nacimiento;
+  String formErrors;
   bool _isLoading = false;
   bool _isLoged;
 
   @override
   initState() {
     super.initState();
+    dietas.add(Choice("Omnivora", "o"));
+    dietas.add(Choice("Vegetariana", "v"));
+    dietas.add(Choice("Vegana", "n"));
+    sexos.add(Choice("Hombre", "h"));
+    sexos.add(Choice("Mujer", "m"));
+    sexos.add(Choice("Otros", "o"));
     _isLoged = widget._isLoged;
   }
 
   sendData() async {
     String username = _userController.text.trim();
     String password = _passwordController.text.trim();
+    String password2 = _password2Controller.text.trim();
+    String nombre = _nombreController.text.trim();
+    String email = _emailController.text.trim();
+    String kcal = _kcalDiariasController.text.trim();
 
     setState(() {
       _isLoading = true;
+      formErrors = "";
+
+      if (username == null || username == "") {
+        formErrors += "Debes indicar un Nombre de Usuario\n";
+      }
+      if (password == null ||
+          password == "" ||
+          password2 == null ||
+          password2 == "") {
+        formErrors += "Debes introducir una Contraseña\n";
+      } else if (password != password2) {
+        formErrors += "Las Contraseñas debes ser Iguales\n";
+      }
+      if (nombre == null || nombre == "") {
+        formErrors += "Debes indicar un Nombre\n";
+      }
+      if (email == null || email == "") {
+        formErrors += "Debes indicar un Email\n";
+      }
+      if (kcal == null || kcal == "") {
+        formErrors += "Debes indicar unas Kcal Diarias\n";
+      }
     });
 
-    _isLoged = await perfilService.login(username, password);
+    if (formErrors == "") {
+      Perfil p = new Perfil(nombre: nombre, email: email, kcalDiarias: kcal);
+      _isLoged = await perfilService.login(username, password);
+    }
 
     setState(() {
       _isLoading = false;
@@ -63,6 +105,7 @@ class _RegisterState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).accentColor,
       body: (_isLoading)
           ? Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -70,9 +113,12 @@ class _RegisterState extends State<RegisterPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).accentColor.withOpacity(0.5),
-                    // image: DecorationImage(
-                    //     image: AssetImage("assets/images/espaguetis.jpg"),
-                    //     fit: BoxFit.cover)
+                    image: DecorationImage(
+                        colorFilter: new ColorFilter.mode(
+                            Theme.of(context).accentColor.withOpacity(0.45),
+                            BlendMode.dstATop),
+                        image: AssetImage("assets/images/guacamole.jpg"),
+                        fit: BoxFit.cover),
                   ),
                   child: ListView(
                     //mainAxisAlignment: MainAxisAlignment.center,
@@ -81,74 +127,227 @@ class _RegisterState extends State<RegisterPage> {
                         width: double.infinity,
                         margin: EdgeInsets.symmetric(
                             vertical: 20.0, horizontal: 20.0),
-                        padding: EdgeInsets.all(30.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 30.0, horizontal: 10.0),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(40.0),
                             color: Colors.white),
                         child: Column(
                           children: <Widget>[
-                            Text(
-                              'Regístrate',
-                              style: TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                BackButton(),
+                                Text(
+                                  'Regístrate',
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  width: 32.0,
+                                )
+                              ],
                             ),
                             SizedBox(
                               height: 40.0,
                             ),
-                            TextField(
-                              controller: _userController,
-                              maxLength: 100,
-                              decoration: InputDecoration(
-                                  hintText: "Nombre Usuario", isDense: true),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Column(
+                                children: [
+                                  TextField(
+                                    controller: _nombreController,
+                                    maxLength: 100,
+                                    decoration: InputDecoration(
+                                        hintText: "Nombre y Apellidos",
+                                        isDense: true),
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  TextField(
+                                    controller: _emailController,
+                                    maxLength: 100,
+                                    decoration: InputDecoration(
+                                        hintText: "Email", isDense: true),
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Sexo:",
+                                        style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey),
+                                      ),
+                                      SizedBox(
+                                        width: 20.0,
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                200,
+                                        child: DropdownButton<Choice>(
+                                          hint: Text("Sexo"),
+                                          isExpanded: true,
+                                          value: sexo,
+                                          icon: Icon(Icons.arrow_downward),
+                                          iconSize: 24,
+                                          elevation: 16,
+                                          //style: TextStyle(color: Theme.of(context).accentColor),
+                                          underline: Container(
+                                            height: 2,
+                                            color:
+                                                Theme.of(context).accentColor,
+                                          ),
+                                          onChanged: (newValue) {
+                                            setState(() => sexo = newValue);
+                                          },
+                                          items: sexos
+                                              .map<DropdownMenuItem<Choice>>(
+                                                  (Choice value) {
+                                            return DropdownMenuItem<Choice>(
+                                              value: value,
+                                              child: Text(value.nombre),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDatePicker(context: context, initialDate: DateTime(DateTime.now().year -18), firstDate: DateTime(1900), lastDate: DateTime.now()).then((date) {
+                                        setState(() {
+                                          fecha_nacimiento = date;
+                                        });
+                                      });
+                                    },
+                                    child: Text(
+                                      fecha_nacimiento.toString()
+                                    ),
+                                  ),
+                                  Container(
+                                    margin:
+                                        EdgeInsets.symmetric(vertical: 30.0),
+                                    width: double.infinity,
+                                    height: 1.0,
+                                    color: Colors.grey,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Dieta:",
+                                        style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey),
+                                      ),
+                                      SizedBox(
+                                        width: 20.0,
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                200,
+                                        child: DropdownButton<Choice>(
+                                          hint: Text("Dieta"),
+                                          isExpanded: true,
+                                          value: dieta,
+                                          icon: Icon(Icons.arrow_downward),
+                                          iconSize: 24,
+                                          elevation: 16,
+                                          //style: TextStyle(color: Theme.of(context).accentColor),
+                                          underline: Container(
+                                            height: 2,
+                                            color:
+                                                Theme.of(context).accentColor,
+                                          ),
+                                          onChanged: (newValue) {
+                                            setState(() => dieta = newValue);
+                                          },
+                                          items: dietas
+                                              .map<DropdownMenuItem<Choice>>(
+                                                  (Choice value) {
+                                            return DropdownMenuItem<Choice>(
+                                              value: value,
+                                              child: Text(value.nombre),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  TextField(
+                                    controller: _kcalDiariasController,
+                                    maxLength: 4,
+                                    decoration: InputDecoration(
+                                        hintText: "kCal Diarias",
+                                        isDense: true),
+                                  ),
+                                  Container(
+                                    margin:
+                                        EdgeInsets.symmetric(vertical: 30.0),
+                                    width: double.infinity,
+                                    height: 1.0,
+                                    color: Colors.grey,
+                                  ),
+                                  TextField(
+                                    controller: _userController,
+                                    maxLength: 100,
+                                    decoration: InputDecoration(
+                                        hintText: "Nombre de Usuario",
+                                        isDense: true),
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  TextField(
+                                    controller: _passwordController,
+                                    obscureText: true,
+                                    decoration: InputDecoration(
+                                        hintText: "Contraseña", isDense: true),
+                                  ),
+                                  SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  TextField(
+                                    controller: _password2Controller,
+                                    obscureText: true,
+                                    decoration: InputDecoration(
+                                        hintText: "Repita Contraseña",
+                                        isDense: true),
+                                  ),
+                                  SizedBox(
+                                    height: 40.0,
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            TextField(
-                              controller: _emailController,
-                              maxLength: 100,
-                              decoration: InputDecoration(
-                                  hintText: "Email", isDense: true),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            TextField(
-                              controller: _nombreController,
-                              maxLength: 100,
-                              decoration: InputDecoration(
-                                  hintText: "Nombre y Apellidos", isDense: true),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            TextField(
-                              controller: _kcalDiariasController,
-                              maxLength: 100,
-                              decoration: InputDecoration(
-                                  hintText: "kCal Diarias", isDense: true),
-                            ),
-                            SizedBox(
-                              height: 30.0,
-                            ),
-                            TextField(
-                              controller: _passwordController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                  hintText: "Contraseña", isDense: true),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            TextField(
-                              controller: _password2Controller,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                  hintText: "Repita Contraseña", isDense: true),
-                            ),
-                            SizedBox(
-                              height: 40.0,
-                            ),
+                            (formErrors == null)
+                                ? SizedBox.shrink()
+                                : Container(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 10.0),
+                                    child: Text(
+                                      formErrors,
+                                      style: TextStyle(color: Colors.redAccent),
+                                    ),
+                                  ),
                             RaisedButton(
                               onPressed: sendData,
                               textColor: Colors.white,

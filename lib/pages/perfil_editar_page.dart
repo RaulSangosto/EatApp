@@ -19,9 +19,10 @@ class _PerfilState extends State<PerfilEditarPage> {
   PerfilService get service => GetIt.I<PerfilService>();
   Perfil perfil;
   bool _isLoading = false;
-  String nombre, email, ubicacion, descripcion, dieta, kcalDiarias;
+  String nombre, email, ubicacion, descripcion, kcalDiarias;
   String formErrors;
-  List<String> dietas = new List<String>();
+  List<Choice> dietas = new List<Choice>();
+  Choice dieta;
   TextEditingController nombreController = new TextEditingController();
   TextEditingController emailController = new TextEditingController();
   TextEditingController ubicacionController = new TextEditingController();
@@ -31,9 +32,9 @@ class _PerfilState extends State<PerfilEditarPage> {
   @override
   initState() {
     super.initState();
-    dietas.add("o");
-    dietas.add("v");
-    dietas.add("n");
+    dietas.add(Choice("Omnivora","o"));
+    dietas.add(Choice("Vegetariana","v"));
+    dietas.add(Choice("Vegana","n"));
     _fetchPerfil();
   }
 
@@ -48,7 +49,13 @@ class _PerfilState extends State<PerfilEditarPage> {
     email = perfil.email;
     ubicacion = perfil.ubicacion;
     descripcion = perfil.descripcion;
-    dieta = perfil.dieta;
+
+    for(Choice d in dietas){
+      if(d.code == perfil.dieta){
+        dieta = d;
+      }
+    }
+    
     kcalDiarias = perfil.kcalDiarias;
 
     nombreController.text = nombre;
@@ -94,7 +101,8 @@ class _PerfilState extends State<PerfilEditarPage> {
           nombre: perfil.nombre,
           ubicacion: perfil.ubicacion,
           descripcion: perfil.descripcion,
-          kcal: perfil.kcalDiarias);
+          kcal: perfil.kcalDiarias,
+          dieta: dieta.code);
 
       if (perfil != null) {
         final titulo = "Se han modificado tus datos";
@@ -339,8 +347,10 @@ class _PerfilState extends State<PerfilEditarPage> {
                                           ),
                                           SizedBox(
                                             width: 200.0,
-                                            child: DropdownButton<String>(
+                                            child: DropdownButton<Choice>(
+                                              hint: Text("Dieta"),
                                               value: dieta,
+                                              isExpanded: true,
                                               icon: Icon(Icons.arrow_downward),
                                               iconSize: 24,
                                               elevation: 16,
@@ -355,11 +365,11 @@ class _PerfilState extends State<PerfilEditarPage> {
                                                     () => dieta = newValue);
                                               },
                                               items: dietas.map<
-                                                      DropdownMenuItem<String>>(
-                                                  (String value) {
-                                                return DropdownMenuItem<String>(
+                                                      DropdownMenuItem<Choice>>(
+                                                  (Choice value) {
+                                                return DropdownMenuItem<Choice>(
                                                   value: value,
-                                                  child: Text(value),
+                                                  child: Text(value.nombre),
                                                 );
                                               }).toList(),
                                             ),
