@@ -65,7 +65,7 @@ class _PerfilState extends State<PerfilPage> {
     descripcion = perfil.descripcion;
     dieta = perfil.dieta;
     kcalDiarias = perfil.kcalDiarias;
-    
+
     apiCategorias = await recetaService.getCategorias();
     categorias = apiCategorias.data;
     apiRecetas = await recetaService.getRecetas(categorias: categorias);
@@ -84,14 +84,46 @@ class _PerfilState extends State<PerfilPage> {
     });
   }
 
-  _onPressed() {}
-
   logout() async {
     print("logout");
-    service.logout();
-    setState(() {
-      _isLoged = false;
-      widget._loginCallback(_isLoged);
+    showDialog(context: context, builder: (context) {
+      String contentText = "Cerrar Sesión";
+      return AlertDialog(
+        title: Text(contentText),
+          content: Container(child:Text("¿Estas Seguro de que quieres cerrar la Sesión?")),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Cancelar"),
+              onPressed: () {
+                // setState(() {
+                //   return false;
+                // });
+                Navigator.of(context).pop(false);
+              },
+            ),
+            FlatButton(
+              child: Text("Aceptar"),
+              onPressed: () {
+                // setState(() {
+                //   return true;
+                // });
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+      );
+    }).then((data) {
+      if (data) {
+        print("do log out");
+        service.logout();
+        setState(() {
+          _isLoged = false;
+          widget._loginCallback(_isLoged);
+        });
+      }
+      else {
+        print("cancel");
+      }
     });
   }
 
