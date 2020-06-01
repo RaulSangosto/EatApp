@@ -7,7 +7,6 @@
         -Mas Categorías !
 
     -Descubrir
-        -Mejorar el grid !!
         -Filtrar !
             -por nombre
             -por categorias
@@ -16,7 +15,6 @@
     -Crear
         -Más ingredientes ! 
         -Añadir Ingredientes ?
-        -Mejorar Interfaz !!!
 
     -Perfil
         -mejorar añadir a favoritos ? 

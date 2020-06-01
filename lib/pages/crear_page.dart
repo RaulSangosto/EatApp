@@ -186,49 +186,10 @@ class _CrearState extends State<CrearPage> {
     });
   }
 
-  _seleccionarCategoria() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String contentText = "Seleccionar Categoría";
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(contentText),
-              content: DropdownButton<Categoria>(
-                value: categoriaSelected,
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 24,
-                elevation: 16,
-                //style: TextStyle(color: Theme.of(context).accentColor),
-                underline: Container(
-                  height: 2,
-                  color: Theme.of(context).accentColor,
-                ),
-                onChanged: (newValue) {
-                  setState(() => categoriaSelected = newValue);
-                },
-                items: categorias
-                    .map<DropdownMenuItem<Categoria>>((Categoria value) {
-                  return DropdownMenuItem<Categoria>(
-                    value: value,
-                    child: Text(value.titulo),
-                  );
-                }).toList(),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("Aceptar"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
-        );
-      },
-    );
+  _addInstruccionCallBack(Instruccion i){
+    setState(() {
+      _instrucciones.add(i);
+    });
   }
 
   _addInstruccion() {
@@ -237,69 +198,69 @@ class _CrearState extends State<CrearPage> {
       context: context,
       builder: (context) {
         String contentText = "Añadir Instrucción";
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(contentText),
-              content: Container(
-                height: 120.0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    DropdownButton<Ingrediente>(
-                      value: ingredienteSelected,
-                      icon: Icon(Icons.arrow_downward),
-                      iconSize: 24,
-                      elevation: 16,
-                      //style: TextStyle(color: Theme.of(context).accentColor),
-                      underline: Container(
-                        height: 2,
-                        color: Theme.of(context).accentColor,
-                      ),
-                      onChanged: (Ingrediente newValue) {
-                        setState(() {
-                          ingredienteSelected = newValue;
-                        });
-                      },
-                      items: _ingredientes.map<DropdownMenuItem<Ingrediente>>(
-                          (Ingrediente value) {
-                        return DropdownMenuItem<Ingrediente>(
-                          value: value,
-                          child: Text(value.nombre),
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextField(
-                        controller: _cantidadController,
-                        maxLength: 100,
-                        decoration: InputDecoration(
-                          hintText: "Cantidad",
-                          isDense: true,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text("Añadir"),
-                  onPressed: () {
-                    _instruccion = new Instruccion(
-                        ingrediente: ingredienteSelected,
-                        cantidad: _cantidadController.text);
+        //return StatefulBuilder(
+        //builder: (context, setState) {
+        return AlertDialog(
+          title: Text(contentText),
+          content: Container(
+            height: 120.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                DropdownButton<Ingrediente>(
+                  value: ingredienteSelected,
+                  icon: Icon(Icons.arrow_downward),
+                  iconSize: 24,
+                  elevation: 16,
+                  //style: TextStyle(color: Theme.of(context).accentColor),
+                  underline: Container(
+                    height: 2,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  onChanged: (Ingrediente newValue) {
                     setState(() {
-                      _instrucciones.add(_instruccion);
+                      ingredienteSelected = newValue;
                     });
-                    Navigator.of(context).pop();
                   },
+                  items: _ingredientes
+                      .map<DropdownMenuItem<Ingrediente>>((Ingrediente value) {
+                    return DropdownMenuItem<Ingrediente>(
+                      value: value,
+                      child: Text(value.nombre),
+                    );
+                  }).toList(),
                 ),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextField(
+                    controller: _cantidadController,
+                    maxLength: 100,
+                    decoration: InputDecoration(
+                      hintText: "Cantidad",
+                      isDense: true,
+                    ),
+                  ),
+                )
               ],
-            );
-          },
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Añadir"),
+              onPressed: () {
+                _instruccion = new Instruccion(
+                    ingrediente: ingredienteSelected,
+                    cantidad: _cantidadController.text);
+                setState(() {
+                  _instrucciones.add(_instruccion);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
+        //},
+        //);
       },
     ).then((data) {
       // if (result.data) {
@@ -415,29 +376,27 @@ class _CrearState extends State<CrearPage> {
                           SizedBox(
                             width: 10.0,
                           ),
-                          GestureDetector(
-                              onTap: _seleccionarCategoria,
-                              child: categoriaSelected != null
-                                  ? Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 5.0, horizontal: 10.0),
-                                      child: Text(
-                                        categoriaSelected.titulo,
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color: Theme.of(context).accentColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20.0)),
-                                    )
-                                  : Text(
-                                      "Seleccionar Categoria.",
-                                      style: TextStyle(
-                                          color: Theme.of(context).accentColor),
-                                    )),
+                          DropdownButton<Categoria>(
+                            value: categoriaSelected,
+                            icon: Icon(Icons.arrow_downward),
+                            iconSize: 24,
+                            elevation: 16,
+                            //style: TextStyle(color: Theme.of(context).accentColor),
+                            underline: Container(
+                              height: 2,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            onChanged: (newValue) {
+                              setState(() => categoriaSelected = newValue);
+                            },
+                            items: categorias.map<DropdownMenuItem<Categoria>>(
+                                (Categoria value) {
+                              return DropdownMenuItem<Categoria>(
+                                value: value,
+                                child: Text(value.titulo),
+                              );
+                            }).toList(),
+                          ),
                         ],
                       ),
                       SizedBox(
@@ -530,7 +489,13 @@ class _CrearState extends State<CrearPage> {
                               ),
                       ),
                       GestureDetector(
-                        onTap: _addInstruccion,
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (_) {
+                                return InstruccionDialog(_addInstruccionCallBack);
+                              });
+                        },
                         child: Container(
                           padding: EdgeInsets.symmetric(
                               horizontal: 20.0, vertical: 10.0),
@@ -642,5 +607,114 @@ class InstruccionItem extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class InstruccionDialog extends StatefulWidget {
+  InstruccionDialog(this.addInstruccionCallBack, {Key key}) : super(key: key);
+  final Function addInstruccionCallBack;
+
+  @override
+  _InstruccionDialogState createState() => _InstruccionDialogState();
+}
+
+class _InstruccionDialogState extends State<InstruccionDialog> {
+  RecetasService get service => GetIt.I<RecetasService>();
+  APIResponse<List<Ingrediente>> _apiResponse;
+  Instruccion _instruccion;
+  List<Instruccion> _instrucciones = [];
+  List<Alergeno> _alergenos;
+  Ingrediente ingredienteSelected;
+  List<Ingrediente> _ingredientes;
+  TextEditingController _cantidadController = TextEditingController();
+  String contentText = "Añadir Instrucción";
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    _fetchIngredientes();
+    super.initState();
+  }
+
+  _fetchIngredientes() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    APIResponse<List<Alergeno>> _apiResponseAlergeno;
+    _apiResponseAlergeno = await service.getAlergenos();
+    _alergenos = _apiResponseAlergeno.data;
+    _apiResponse = await service.getIngredientes(_alergenos);
+    _ingredientes = _apiResponse.data;
+    ingredienteSelected = _ingredientes[0];
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return (_isLoading)
+        ? Center(child: CircularProgressIndicator())
+        : AlertDialog(
+            title: Text(contentText),
+            content: Container(
+              height: 120.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  DropdownButton<Ingrediente>(
+                    value: ingredienteSelected,
+                    icon: Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    //style: TextStyle(color: Theme.of(context).accentColor),
+                    underline: Container(
+                      height: 2,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    onChanged: (Ingrediente newValue) {
+                      setState(() {
+                        ingredienteSelected = newValue;
+                      });
+                    },
+                    items: _ingredientes.map<DropdownMenuItem<Ingrediente>>(
+                        (Ingrediente value) {
+                      return DropdownMenuItem<Ingrediente>(
+                        value: value,
+                        child: Text(value.nombre),
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextField(
+                      controller: _cantidadController,
+                      maxLength: 100,
+                      decoration: InputDecoration(
+                        hintText: "Cantidad",
+                        isDense: true,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Añadir"),
+                onPressed: () {
+                  _instruccion = new Instruccion(
+                      ingrediente: ingredienteSelected,
+                      cantidad: _cantidadController.text);
+                  setState(() {
+                    widget.addInstruccionCallBack(_instruccion);
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
   }
 }
