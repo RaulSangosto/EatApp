@@ -19,7 +19,6 @@
     -Perfil
         -mejorar añadir a favoritos ? 
         -Registro en la APP !!!
-        -PopUp al cerrar Sesion !
 
     -Recetas
         -Mejorar Interfaz !
