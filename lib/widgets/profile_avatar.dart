@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class PerfilAvatar extends StatefulWidget {
-  PerfilAvatar(this.radius);
+  PerfilAvatar(this.radius, {this.color, this.selectedcolor});
   final double radius;
+  final Color color;
+  final Color selectedcolor;
 
   @override
   State<StatefulWidget> createState() {
@@ -45,9 +47,9 @@ class _PerfilAvatar extends State<PerfilAvatar> {
             width: widget.radius * 2,
             height: widget.radius * 2,
             padding:
-                EdgeInsets.all((widget.radius * 0.08) <= 2.0 ? 2.0 : (widget.radius * 0.08)),
+                EdgeInsets.all((widget.radius * 0.08) <= 2.0 ? 3.0 : (widget.radius * 0.08)),
             decoration: BoxDecoration(
-              color: Colors.white, // border color
+              color: widget.color?? Colors.white, // border color
               shape: BoxShape.circle,
             ),
             child: CircleAvatar(

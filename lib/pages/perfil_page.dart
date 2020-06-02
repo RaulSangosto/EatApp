@@ -419,7 +419,7 @@ class _PerfilState extends State<PerfilPage> {
                       )),
                   SizedBox(
                       height: 160.0,
-                      child: new RecetaList(150.0, 140.0, recetasFav)),
+                      child: new RecetaList(160.0, recetasFav)),
                 ],
               ),
             ),

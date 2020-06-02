@@ -143,59 +143,7 @@ class _HomeState extends State<HomePage> {
                           alignment: Alignment(0, 1),
                           child: SizedBox(
                             height: 338.0,
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 250.0,
-                                  child: new RecetaList(250.0, 160.0, recetasHoy),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Dot(0, _selectedIndex),
-                                          Dot(1, _selectedIndex),
-                                          Dot(2, _selectedIndex),
-                                          Dot(3, _selectedIndex),
-                                          Dot(4, _selectedIndex),
-                                        ],
-                                      ),
-                                      Container(
-                                        margin:
-                                            const EdgeInsets.only(left: 70.0),
-                                        child: OutlineButton(
-                                          shape: new RoundedRectangleBorder(
-                                            borderRadius:
-                                                new BorderRadius.circular(18.0),
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Color(0xff48A299),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              widget._pageIdCallback(1);
-                                            });
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Ver todas",
-                                              style: TextStyle(
-                                                  color: Color(0xff48A299)),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: new RecetaList(250.0, recetasHoy, hasDots: true, pageIdCallback: widget._pageIdCallback,),
                           ),
                         ),
                       ],
@@ -220,7 +168,7 @@ class _HomeState extends State<HomePage> {
                           ),
                           SizedBox(
                               height: 160.0,
-                              child: new RecetaList(150.0, 140.0, ultimasRecetas)),
+                              child: new RecetaList(160.0, ultimasRecetas)),
                         ],
                       )),
                 ],
@@ -229,32 +177,6 @@ class _HomeState extends State<HomePage> {
           ],
         );
       }),
-    );
-  }
-}
-
-class Dot extends StatelessWidget {
-  Dot(this._index, this.selectedIndex);
-
-  final int selectedIndex;
-  final int _index;
-
-  bool isSelected() {
-    return (_index == selectedIndex);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(
-        right: isSelected() ? 10.0 : 7.0,
-      ),
-      width: isSelected() ? 13.0 : 10.0,
-      height: isSelected() ? 13.0 : 10.0,
-      decoration: BoxDecoration(
-        color: isSelected() ? Color(0xff363B4B) : Color(0xffC5C5C5),
-        borderRadius: BorderRadius.circular(50.0),
-      ),
     );
   }
 }
@@ -320,7 +242,6 @@ class _TopCard extends StatelessWidget {
                         ),
                       ]),
                 ),
-                new PerfilAvatar(30),
               ],
             ),
           ),

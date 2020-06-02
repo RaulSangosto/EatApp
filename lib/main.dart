@@ -6,6 +6,7 @@ import 'package:eatapp/pages/perfil_page.dart';
 import 'package:eatapp/pages/splash_page.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:eatapp/receta_services.dart';
+import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Perfil perfil;
   bool _isLoading = false;
   bool _isLoged = false;
+  Color color = Colors.grey;
 
   HomePage hPage;
   DescubrirPage dPage;
@@ -66,6 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if(index == 3){
+        color = Theme.of(context).accentColor;
+      }
+      else {
+        color = Colors.grey;
+      }
     });
   }
 
@@ -148,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: (!_isLoged)
           ? null
           : BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
+              items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
                   title: Text('Home'),
@@ -162,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   title: Text('Create'),
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
+                  icon: new PerfilAvatar(18, color: color),
                   title: Text('Profile'),
                 ),
               ],
