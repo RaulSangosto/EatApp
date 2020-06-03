@@ -33,6 +33,7 @@ class _DescubrirState extends State<DescubrirPage> {
   ScrollController gridScrollController;
   List<Categoria> categorias;
   List<Receta> recetas;
+  Categoria searchCategoria;
   bool _isLoading = false;
   bool _filterOpen = false;
 
@@ -47,6 +48,13 @@ class _DescubrirState extends State<DescubrirPage> {
   _openTopCardCallBack(bool open) {
     setState(() {
       _filterOpen = open;
+    });
+  }
+
+  _setCategoriaCallback(Categoria categoria) {
+    setState(() {
+      searchCategoria = categoria;
+      _fetchRecetas();
     });
   }
 
@@ -65,7 +73,7 @@ class _DescubrirState extends State<DescubrirPage> {
     });
     _apiResponseCategorias = await service.getCategorias();
     categorias = _apiResponseCategorias.data;
-    _apiResponse = await service.getRecetas(categorias: categorias);
+    _apiResponse = await service.getRecetas(categorias: categorias, categoria: searchCategoria);
     recetas = _apiResponse.data;
     setState(() {
       _isLoading = false;
@@ -99,6 +107,7 @@ class _DescubrirState extends State<DescubrirPage> {
           ),
           new TopCard(
             openCallBack: _openTopCardCallBack,
+            setCategoriaCallBack:  _setCategoriaCallback,
             categorias: categorias,
           ),
         ],
@@ -110,10 +119,10 @@ class _DescubrirState extends State<DescubrirPage> {
 }
 
 class TopCard extends StatefulWidget {
-  TopCard({this.openCallBack, this.categorias});
-  Function openCallBack;
-  List<Categoria> categorias;
-  
+  TopCard({this.openCallBack, this.setCategoriaCallBack, this.categorias});
+  final Function openCallBack;
+  final Function setCategoriaCallBack;
+  final List<Categoria> categorias;
 
   @override
   _TopCardState createState() => _TopCardState();
@@ -142,38 +151,46 @@ class _TopCardState extends State<TopCard> {
               height: 100.0,
               padding: EdgeInsets.only(top: 50.0),
               alignment: Alignment.bottomCenter,
-              decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(30.0)),
-                color: Colors.grey,
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromRGBO(0, 0, 0, 0.16),
-                    blurRadius: 6.0, // has the effect of softening the shadow
-                    offset: Offset(
-                      0.0, // horizontal, move right 10
-                      3.0, // vertical, move down 10
-                    ),
-                  )
-                ],
-              ),
+              color: Color(0xffECECEC),
               child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: widget.categorias.length,
                   itemBuilder: (BuildContext context, int index) {
                     Categoria categoria = widget.categorias[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex =index;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                            top: 90.0, left: 10.0, right: 10.0),
-                        child: Text(
-                          categoria.titulo,
-                          style: TextStyle(color: (index == selectedIndex) ? Theme.of(context).accentColor : Colors.white),
+                    return Padding(
+                      padding: EdgeInsets.only(
+                          top: 75.0, bottom: 10.0, left: (index == 0) ? 30.0 : 10.0, right: (index == widget.categorias.length-1) ? 30.0 : 10.0),
+                      child: OutlineButton(
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(18.0),
+                        ),
+                        borderSide: BorderSide(
+                          color: (index == selectedIndex)
+                              ? Color(0xff48A299)
+                              : Colors.grey,
+                          width: (index == selectedIndex) ? 2.0 : 1.0,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            selectedIndex = index;
+                            widget.setCategoriaCallBack(widget.categorias[index]);
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 0),
+                          child: Text(
+                            categoria.titulo,
+                            style: TextStyle(
+                                color: (index == selectedIndex)
+                                    ? Color(0xff48A299)
+                                    : Colors.grey,
+                                fontWeight: (index == selectedIndex)
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                fontSize:
+                                    (index == selectedIndex) ? 16.0 : 14.0),
+                          ),
                         ),
                       ),
                     );
@@ -228,10 +245,21 @@ class _TopCardState extends State<TopCard> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                open = !open;
+                              if(open){
+                                setState(() {
+                                open = false;
+                                widget.openCallBack(open);
+                                widget.setCategoriaCallBack(null);
+                                selectedIndex = -1;
+                              });
+                              }
+                              else{
+                                setState(() {
+                                open = true;
                                 widget.openCallBack(open);
                               });
+                              }
+                              
                             },
                             child: Icon(
                               open ? Icons.close : Icons.filter_list,
