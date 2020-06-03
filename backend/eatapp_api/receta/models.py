@@ -8,7 +8,8 @@ class Receta(TimeStampedModel):
     minutos_preparacion = models.SmallIntegerField(blank=True, null=True)
     kcal = models.SmallIntegerField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
-    categoria = models.ForeignKey("Categoria", on_delete= models.CASCADE)
+    categoria = models.ForeignKey("Categoria", on_delete=models.CASCADE)
+    autor = models.ForeignKey("perfil.Perfil", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.titulo

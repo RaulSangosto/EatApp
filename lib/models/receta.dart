@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class Receta {
   int id;
+  int autor_id;
   String titulo;
   String imgUrl;
   int minutes;
@@ -12,6 +13,7 @@ class Receta {
 
   Receta(
       {this.id,
+      this.autor_id,
       this.titulo,
       this.imgUrl,
       this.minutes,
@@ -36,6 +38,7 @@ class Receta {
 
     return Receta(
       id: json['id'],
+      autor_id: json['autor'],
       titulo: json['titulo'],
       imgUrl: json['imagen'],
       minutes: json['minutos_preparacion'],
@@ -48,8 +51,9 @@ class Receta {
   Map<String, dynamic> toJson() {
     return {
       "titulo": titulo,
+      "autor": autor_id,
       "imagen": imgUrl,
-      "minutes": minutes,
+      "minutos_preparacion": minutes,
       "kcal": kcal,
       "descripcion": descripcion,
       "categoria": categoria.id,

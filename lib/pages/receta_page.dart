@@ -70,7 +70,8 @@ class _RecetaState extends State<RecetaPage> {
     _apiResponseCategoria = await service.getCategorias();
     categorias = _apiResponseCategoria.data;
 
-    _apiResponseReceta = await service.getRecetaDetalle(widget._recetaId, categorias: categorias);
+    _apiResponseReceta = await service.getRecetaDetalle(widget._recetaId,
+        categorias: categorias);
     receta = _apiResponseReceta.data;
 
     _descrController.text = receta.descripcion;
@@ -79,8 +80,8 @@ class _RecetaState extends State<RecetaPage> {
     perfil = await perfilService.getPerfil();
 
     _favorito = false;
-    for(int f in perfil.favoritos){
-      if(f == receta.id){
+    for (int f in perfil.favoritos) {
+      if (f == receta.id) {
         _favorito = true;
       }
     }
@@ -143,31 +144,58 @@ class _RecetaState extends State<RecetaPage> {
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
-                            SizedBox(width: 10.0,),
-                            GestureDetector(
-                              onTap: () async {
-                                setState(() {
-                                  if(_favorito){
-                                    _favorito = false;
-                                    perfil.favoritos.remove(receta.id);
-                                  }
-                                  else {
-                                    _favorito = true;
-                                    perfil.favoritos.add(receta.id);
-                                  }
-                                  receta.favorito = _favorito;
-                                });
-                                perfil = await perfilService.updatePerfil();
-                              },
-                              child: Icon(
-                                  _favorito
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color: _favorito
-                                      ? Colors.redAccent
-                                      : Colors.grey,
-                                  size: 32.0),
-                            )
+                            SizedBox(
+                              width: 10.0,
+                            ),
+                            (receta.autor_id == perfil.id)
+                                ? OutlineButton(
+                                    shape: new RoundedRectangleBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(18.0),
+                                    ),
+                                    borderSide: BorderSide(
+                                      color: Color(0xff48A299),
+                                    ),
+                                    onPressed: () {
+                                      print(perfil.id);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 0),
+                                      child: Text(
+                                        "Editar",
+                                        style:
+                                            TextStyle(color: Color(0xff48A299)),
+                                      ),
+                                    ),
+                                  )
+                                : GestureDetector(
+                                    onTap: () async {
+                                      setState(() {
+                                        if (_favorito) {
+                                          _favorito = false;
+                                          perfil.favoritos.remove(receta.id);
+                                        } else {
+                                          _favorito = true;
+                                          perfil.favoritos.add(receta.id);
+                                        }
+                                        receta.favorito = _favorito;
+                                      });
+                                      perfil =
+                                          await perfilService.updatePerfil();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(
+                                          _favorito
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: _favorito
+                                              ? Colors.redAccent
+                                              : Colors.grey,
+                                          size: 32.0),
+                                    ),
+                                  )
                           ],
                         ),
                       ),

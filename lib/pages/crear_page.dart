@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
+import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -33,6 +36,7 @@ class CrearPage extends StatefulWidget {
 class _CrearState extends State<CrearPage> {
   //bool get _isEditing => widget.recetaId != null;
   RecetasService get service => GetIt.I<RecetasService>();
+  PerfilService get perfilService => GetIt.I<PerfilService>();
   APIResponse<List<Ingrediente>> _apiResponse;
   APIResponse<List<Categoria>> _apiResponseCategoria;
   String errorMessage;
@@ -49,6 +53,7 @@ class _CrearState extends State<CrearPage> {
   List<Instruccion> _instrucciones = [];
   List<Alergeno> _alergenos;
   List<Categoria> categorias;
+  Perfil perfil;
   Categoria categoriaSelected;
   Ingrediente ingredienteSelected;
   bool _isLoading = false;
@@ -135,6 +140,7 @@ class _CrearState extends State<CrearPage> {
       }
     } else {
       formErrors = "";
+      perfil = await perfilService.getPerfil();
       final receta = Receta(
         titulo: _tituloController.text ?? "titulo",
         imgUrl: _image != null
@@ -144,6 +150,7 @@ class _CrearState extends State<CrearPage> {
         kcal: int.parse(_kcalController.text ?? "120"),
         descripcion: _descrController.text ?? "descripcion",
         categoria: categoriaSelected,
+        autor_id: perfil.id,
       );
 
       final result = await service.createReceta(receta);
@@ -174,9 +181,7 @@ class _CrearState extends State<CrearPage> {
                         child: Text("Ok"))
                   ],
                 )).then((data) {
-          if (data != null) {
-            widget._pageIdCallback(1);
-          }
+          widget._pageIdCallback(1);
         });
       }
     }
@@ -186,7 +191,7 @@ class _CrearState extends State<CrearPage> {
     });
   }
 
-  _addInstruccionCallBack(Instruccion i){
+  _addInstruccionCallBack(Instruccion i) {
     setState(() {
       _instrucciones.add(i);
     });
@@ -493,7 +498,8 @@ class _CrearState extends State<CrearPage> {
                           showDialog(
                               context: context,
                               builder: (_) {
-                                return InstruccionDialog(_addInstruccionCallBack);
+                                return InstruccionDialog(
+                                    _addInstruccionCallBack);
                               });
                         },
                         child: Container(
@@ -527,6 +533,10 @@ class _CrearState extends State<CrearPage> {
                                 child: TextField(
                                   controller: _prepController,
                                   maxLength: 3,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    WhitelistingTextInputFormatter.digitsOnly
+                                  ], // Only numbers can be entered
                                   decoration: InputDecoration(
                                     hintText: "000",
                                     counterText: "",
@@ -549,6 +559,10 @@ class _CrearState extends State<CrearPage> {
                                 child: TextField(
                                   controller: _kcalController,
                                   maxLength: 4,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    WhitelistingTextInputFormatter.digitsOnly
+                                  ], // Only numbers can be entered
                                   decoration: InputDecoration(
                                     hintText: "0000",
                                     counterText: "",
