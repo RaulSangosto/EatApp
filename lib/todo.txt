@@ -21,6 +21,6 @@
         -Registro en la APP !!!
 
     -Recetas
-        -Mejorar Interfaz !
+        -Mostrar los Ingredientes !
         -Modificar datos de una receta !!
         -Comentarios ?
