@@ -58,6 +58,10 @@ class _DescubrirState extends State<DescubrirPage> {
     });
   }
 
+  _searchCallback(String params){
+    print(params);
+  }
+
   @override
   void initState() {
     _fetchRecetas();
@@ -73,7 +77,8 @@ class _DescubrirState extends State<DescubrirPage> {
     });
     _apiResponseCategorias = await service.getCategorias();
     categorias = _apiResponseCategorias.data;
-    _apiResponse = await service.getRecetas(categorias: categorias, categoria: searchCategoria);
+    _apiResponse = await service.getRecetas(
+        categorias: categorias, categoria: searchCategoria);
     recetas = _apiResponse.data;
     setState(() {
       _isLoading = false;
@@ -107,7 +112,8 @@ class _DescubrirState extends State<DescubrirPage> {
           ),
           new TopCard(
             openCallBack: _openTopCardCallBack,
-            setCategoriaCallBack:  _setCategoriaCallback,
+            setCategoriaCallBack: _setCategoriaCallback,
+            searchCallBack: _searchCallback,
             categorias: categorias,
           ),
         ],
@@ -119,9 +125,10 @@ class _DescubrirState extends State<DescubrirPage> {
 }
 
 class TopCard extends StatefulWidget {
-  TopCard({this.openCallBack, this.setCategoriaCallBack, this.categorias});
+  TopCard({this.openCallBack, this.setCategoriaCallBack, this.searchCallBack, this.categorias});
   final Function openCallBack;
   final Function setCategoriaCallBack;
+  final Function searchCallBack;
   final List<Categoria> categorias;
 
   @override
@@ -130,12 +137,14 @@ class TopCard extends StatefulWidget {
 
 class _TopCardState extends State<TopCard> {
   bool open = false;
+  bool search = false;
   int selectedIndex;
+  TextEditingController _searchController;
 
   @override
   void initState() {
-    print(widget.categorias.length);
     selectedIndex = -1;
+    _searchController = new TextEditingController();
     super.initState();
   }
 
@@ -159,7 +168,12 @@ class _TopCardState extends State<TopCard> {
                     Categoria categoria = widget.categorias[index];
                     return Padding(
                       padding: EdgeInsets.only(
-                          top: 75.0, bottom: 10.0, left: (index == 0) ? 30.0 : 10.0, right: (index == widget.categorias.length-1) ? 30.0 : 10.0),
+                          top: 75.0,
+                          bottom: 10.0,
+                          left: (index == 0) ? 30.0 : 10.0,
+                          right: (index == widget.categorias.length - 1)
+                              ? 30.0
+                              : 10.0),
                       child: OutlineButton(
                         shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(18.0),
@@ -173,7 +187,8 @@ class _TopCardState extends State<TopCard> {
                         onPressed: () {
                           setState(() {
                             selectedIndex = index;
-                            widget.setCategoriaCallBack(widget.categorias[index]);
+                            widget
+                                .setCategoriaCallBack(widget.categorias[index]);
                           });
                         },
                         child: Padding(
@@ -222,52 +237,96 @@ class _TopCardState extends State<TopCard> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: (search)? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Text(
-                            "Explorar",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 40),
-                          ),
-                          Text("Por Platos y Lugares"),
-                        ]),
-                    SizedBox(
-                      width: 70.0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Icon(
-                            Icons.search,
+                    (search)
+                        ? SizedBox.shrink()
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                                Text(
+                                  "Explorar",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 40),
+                                ),
+                                Text("Por Platos y Lugares"),
+                              ]),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (search) {
+                                search = false;
+                              } else {
+                                search = true;
+                              }
+                            });
+                          },
+                          child: Icon(
+                            (search) ? Icons.close : Icons.search,
                             size: 28.0,
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              if(open){
-                                setState(() {
+                        ),
+                        SizedBox(width: (search)? 10.0 : 5.0,),
+                        (search)
+                            ? SizedBox(
+                              width: MediaQuery.of(context).size.width - 120,
+                                child: TextField(
+                                  onChanged: (data) {
+                                    widget.searchCallBack(data);
+                                  },
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10.0, horizontal: 30.0),
+                                      hintText: "Buscar... ",
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.white, width: 0.0),
+                                        borderRadius: const BorderRadius.all(
+                                          const Radius.circular(50.0),
+                                        ),
+                                      ),
+                                      border: new OutlineInputBorder(
+                                        gapPadding: 0.0,
+                                        borderSide: const BorderSide(
+                                            color: Colors.white, width: 0.0),
+                                        borderRadius: const BorderRadius.all(
+                                          const Radius.circular(50.0),
+                                        ),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[300]),
+                                ),
+                              )
+                            : SizedBox.shrink(),
+                            SizedBox(width: (search)? 10.0 : 5.0,),
+                        GestureDetector(
+                          onTap: () {
+                            if (open) {
+                              setState(() {
                                 open = false;
                                 widget.openCallBack(open);
                                 widget.setCategoriaCallBack(null);
                                 selectedIndex = -1;
                               });
-                              }
-                              else{
-                                setState(() {
+                            } else {
+                              setState(() {
                                 open = true;
                                 widget.openCallBack(open);
                               });
-                              }
-                              
-                            },
-                            child: Icon(
-                              open ? Icons.close : Icons.filter_list,
-                              size: 28.0,
-                            ),
+                            }
+                          },
+                          child: Icon(
+                            open ? Icons.close : Icons.filter_list,
+                            size: 28.0,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
