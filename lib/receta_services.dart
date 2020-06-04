@@ -8,7 +8,8 @@ import 'models/api_response.dart';
 class RecetasService {
   static const API = Configuration.API;
 
-  Future<APIResponse<List<Receta>>> getRecetas({Categoria categoria, @required List<Categoria> categorias}) {
+  Future<APIResponse<List<Receta>>> getRecetas(
+      {Categoria categoria, @required List<Categoria> categorias}) {
     var uri;
     Map<String, String> headers = {
       "Accept": "application/json; charset=UTF-8",
@@ -40,7 +41,8 @@ class RecetasService {
         error: true, errorMessage: 'An error occurred'));
   }
 
-  Future<APIResponse<List<Receta>>> getUltimasRecetas({@required List<Categoria> categorias}) {
+  Future<APIResponse<List<Receta>>> getUltimasRecetas(
+      {@required List<Categoria> categorias}) {
     var uri;
     Map<String, String> headers = {
       "Accept": "application/json; charset=UTF-8",
@@ -93,7 +95,8 @@ class RecetasService {
       print(data.statusCode);
       if (data.statusCode == 201) {
         return APIResponse<Receta>(
-            data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes)), categoria: receta.categoria));
+            data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes)),
+                categoria: receta.categoria));
       }
       return APIResponse<Receta>(
           data: null,
@@ -220,6 +223,35 @@ class RecetasService {
           error: true,
           errorMessage: data.statusCode.toString() + ': An error occurred');
     }).catchError((_) => APIResponse<List<Alergeno>>(
+        error: true, errorMessage: 'An error occurred'));
+  }
+
+  Future<APIResponse<List<Instruccion>>> getInstruccionesReceta(Receta receta, List<Ingrediente> ingredientes) {
+    var uri;
+    Map<String, String> headers = {
+      "Accept": "application/json; charset=UTF-8",
+      "Content-Type": "application/json; charset=UTF-8",
+    };
+
+    var queryParameters = {
+      'receta': receta.id.toString(),
+    };
+    uri = Uri.http(Configuration.localhost, Configuration.baseUrl + "instrucciones",
+        queryParameters);
+    return http.get(uri, headers: headers).then((data) {
+      if (data.statusCode == 200) {
+        print(data.statusCode);
+        final jsonData = json.decode(utf8.decode(data.bodyBytes));
+        final instrucciones = <Instruccion>[];
+        for (var item in jsonData) {
+          instrucciones.add(Instruccion.fromJson(item, receta: receta, ingredientes: ingredientes));
+        }
+        return APIResponse<List<Instruccion>>(data: instrucciones);
+      }
+      return APIResponse<List<Instruccion>>(
+          error: true,
+          errorMessage: data.statusCode.toString() + ': An error occurred');
+    }).catchError((_) => APIResponse<List<Instruccion>>(
         error: true, errorMessage: 'An error occurred'));
   }
 

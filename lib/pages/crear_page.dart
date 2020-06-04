@@ -53,6 +53,8 @@ class _CrearState extends State<CrearPage> {
   List<Instruccion> _instrucciones = [];
   List<Alergeno> _alergenos;
   List<Categoria> categorias;
+  List<Choice> dietas = new List<Choice>();
+  Choice dieta;
   Perfil perfil;
   Categoria categoriaSelected;
   Ingrediente ingredienteSelected;
@@ -62,6 +64,9 @@ class _CrearState extends State<CrearPage> {
   @override
   void initState() {
     _fetchDatos();
+    dietas.add(Choice("Omnivora", "o"));
+    dietas.add(Choice("Vegetariana", "v"));
+    dietas.add(Choice("Vegana", "n"));
     _personasController.text = "1";
     super.initState();
   }
@@ -118,6 +123,7 @@ class _CrearState extends State<CrearPage> {
         _tituloController.text == "" ||
         _descrController.text == null ||
         _descrController.text == "" ||
+        dieta == null ||
         _instrucciones.length <= 0) {
       formErrors = "Errores: ";
       if (categoriaSelected == null) {
@@ -135,6 +141,9 @@ class _CrearState extends State<CrearPage> {
       if (_descrController.text == null || _descrController.text == "") {
         formErrors += "Debes Indicar una Descripción\n";
       }
+      if ( dieta == null) {
+        formErrors += "Debes seleccionar una Dieta\n";
+      }
       if (_instrucciones.length <= 0) {
         formErrors += "Debes Añadir algún Ingrediente\n";
       }
@@ -151,6 +160,7 @@ class _CrearState extends State<CrearPage> {
         descripcion: _descrController.text ?? "descripcion",
         categoria: categoriaSelected,
         autor_id: perfil.id,
+        dieta: dieta.code,
       );
 
       final result = await service.createReceta(receta);
@@ -433,6 +443,49 @@ class _CrearState extends State<CrearPage> {
                           ),
                           border: OutlineInputBorder(),
                         ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text("Dieta:",
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold)),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          SizedBox(
+                            width: 200.0,
+                            child: DropdownButton<Choice>(
+                              hint: Text("Dieta"),
+                              value: dieta,
+                              isExpanded: true,
+                              icon: Icon(Icons.arrow_downward),
+                              iconSize: 24,
+                              elevation: 16,
+                              //style: TextStyle(color: Theme.of(context).accentColor),
+                              underline: Container(
+                                height: 2,
+                                color: Theme.of(context).accentColor,
+                              ),
+                              onChanged: (newValue) {
+                                setState(() => dieta = newValue);
+                              },
+                              items: dietas.map<DropdownMenuItem<Choice>>(
+                                  (Choice value) {
+                                return DropdownMenuItem<Choice>(
+                                  value: value,
+                                  child: Text(value.nombre),
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10.0,
                       ),
                       Row(
                         children: <Widget>[

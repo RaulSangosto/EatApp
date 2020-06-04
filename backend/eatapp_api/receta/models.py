@@ -1,12 +1,15 @@
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
+DIETA = (('o', 'Omnivora'), ('v', 'Vegetariana'), ('n', "Vegana"))
+
 # Create your models here.
 class Receta(TimeStampedModel):
     titulo = models.CharField(blank=True, null=True, max_length=100)
     imagen = models.ImageField(blank=True, null=True, upload_to="imagenes/recetas")
     minutos_preparacion = models.SmallIntegerField(blank=True, null=True)
     kcal = models.SmallIntegerField(blank=True, null=True)
+    dieta = models.CharField(max_length=1, choices=DIETA, null=True, blank=True)
     descripcion = models.TextField(blank=True, null=True)
     categoria = models.ForeignKey("Categoria", on_delete=models.CASCADE)
     autor = models.ForeignKey("perfil.Perfil", on_delete=models.CASCADE)

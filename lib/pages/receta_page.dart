@@ -28,6 +28,7 @@ class _RecetaState extends State<RecetaPage> {
   APIResponse<Receta> _apiResponseReceta;
   APIResponse<List<Ingrediente>> _apiResponse;
   APIResponse<List<Categoria>> _apiResponseCategoria;
+  APIResponse<List<Instruccion>> _apiResponseInstrucciones;
   String errorMessage;
   String formErrors;
 
@@ -42,6 +43,8 @@ class _RecetaState extends State<RecetaPage> {
   List<Instruccion> _instrucciones = [];
   List<Alergeno> _alergenos;
   List<Categoria> categorias;
+  List<Choice> dietas = new List<Choice>();
+  Choice dieta;
   Categoria categoriaSelected;
   Ingrediente ingredienteSelected;
   Receta receta;
@@ -51,6 +54,9 @@ class _RecetaState extends State<RecetaPage> {
 
   @override
   void initState() {
+    dietas.add(Choice("Omnivora","o"));
+    dietas.add(Choice("Vegetariana","v"));
+    dietas.add(Choice("Vegana","n"));
     _fetchDatos();
     _personasController.text = "1";
     super.initState();
@@ -78,11 +84,19 @@ class _RecetaState extends State<RecetaPage> {
     _prepController.text = receta.minutes.toString();
     _kcalController.text = receta.kcal.toString();
     perfil = await perfilService.getPerfil();
+    _apiResponseInstrucciones = await service.getInstruccionesReceta(receta, _ingredientes);
+    _instrucciones = _apiResponseInstrucciones.data;
 
     _favorito = false;
     for (int f in perfil.favoritos) {
       if (f == receta.id) {
         _favorito = true;
+      }
+    }
+
+    for(Choice d in dietas){
+      if(d.code == receta.dieta){
+        dieta = d;
       }
     }
 
@@ -253,6 +267,17 @@ class _RecetaState extends State<RecetaPage> {
                                 ),
                               ],
                             ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text("Dieta", style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),),
+                                    SizedBox(
+                                width: 5.0,
+                              ),
+                              Text((dieta!=null) ? dieta.nombre : "No Disponible"),
+                            ],
                           ),
                           Row(
                             children: <Widget>[

@@ -43,13 +43,18 @@ class _PerfilState extends State<PerfilPage> {
   List<Receta> recetasFav = List<Receta>();
   bool _isLoged;
   bool _isLoading = false;
-  String nombre, email, ubicacion, descripcion, dieta, kcalDiarias;
+  String nombre, email, ubicacion, descripcion, kcalDiarias;
+  List<Choice> dietas = new List<Choice>();
+  Choice dieta;
 
   @override
   initState() {
-    super.initState();
+    dietas.add(Choice("Omnivora","o"));
+    dietas.add(Choice("Vegetariana","v"));
+    dietas.add(Choice("Vegana","n"));
     _isLoged = widget._isLoged;
     _fetchPerfil();
+    super.initState();
   }
 
   _fetchPerfil() async {
@@ -63,13 +68,18 @@ class _PerfilState extends State<PerfilPage> {
     email = perfil.email;
     ubicacion = perfil.ubicacion;
     descripcion = perfil.descripcion;
-    dieta = perfil.dieta;
     kcalDiarias = perfil.kcalDiarias;
 
     apiCategorias = await recetaService.getCategorias();
     categorias = apiCategorias.data;
     apiRecetas = await recetaService.getRecetas(categorias: categorias);
     recetas = apiRecetas.data;
+
+    for(Choice d in dietas){
+      if(d.code == perfil.dieta){
+        dieta = d;
+      }
+    }
 
     for (Receta r in recetas) {
       for (int f in perfil.favoritos) {
@@ -348,7 +358,7 @@ class _PerfilState extends State<PerfilPage> {
                                 child: Row(
                                   children: <Widget>[
                                     Text(
-                                      dieta,
+                                      dieta.nombre,
                                       style: TextStyle(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold),

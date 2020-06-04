@@ -8,6 +8,7 @@ class Receta {
   int minutes;
   int kcal;
   String descripcion;
+  String dieta;
   Categoria categoria;
   bool favorito = false;
 
@@ -19,6 +20,7 @@ class Receta {
       this.minutes,
       this.kcal,
       this.descripcion,
+      this.dieta,
       this.categoria});
 
   factory Receta.fromJson(Map<String, dynamic> json, {Categoria categoria, List<Categoria> categorias}) {
@@ -44,6 +46,7 @@ class Receta {
       minutes: json['minutos_preparacion'],
       kcal: json['kcal'],
       descripcion: json['descripcion'],
+      dieta: json['dieta'],
       categoria: _categoria,
     );
   }
@@ -56,6 +59,7 @@ class Receta {
       "minutos_preparacion": minutes,
       "kcal": kcal,
       "descripcion": descripcion,
+      "dieta": dieta,
       "categoria": categoria.id,
     };
   }
@@ -69,13 +73,23 @@ class Instruccion {
 
   Instruccion({this.id, this.ingrediente, this.cantidad, this.receta});
 
-  factory Instruccion.fromJson(Map<String, dynamic> json) {
-    return Instruccion(
+  factory Instruccion.fromJson(Map<String, dynamic> json, {@required Receta receta, @required List<Ingrediente> ingredientes}) {
+    int _ingredienteID = json['ingrediente'];
+    Ingrediente ingrediente;
+    for(Ingrediente i in ingredientes){
+      if(i.id == _ingredienteID){
+        ingrediente = i;
+      }
+    }
+    print(receta);
+    Instruccion i = new Instruccion(
       id: json['id'],
-      ingrediente: json['ingrediente'],
+      ingrediente: ingrediente,
       cantidad: json['cantidad'],
-      receta: json['receta'],
+      receta: receta,
     );
+    print(i);
+    return i;
   }
 
   Map<String, dynamic> toJson() {

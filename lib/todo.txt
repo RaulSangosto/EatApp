@@ -4,23 +4,26 @@
 ---------------------------------------------
 
     -Inicio
-        -Mas Categorías !
+        -Mas Categorías !   --- Admin
 
-    -Descubrir
-        -Filtrar !
+    -Descubrir   1 día
+        -Filtrar !  --- Backend
             -por nombre
-            -por categorias
             -por ingredientes
 
-    -Crear
-        -Más ingredientes ! 
-        -Añadir Ingredientes ?
+    -Crear   1 día
+        -Más ingredientes !   --- Admin
+        -Buscador ingredientes ?  --- Frontend
+        -Añadir Ingredientes ?   --- Frontend
 
-    -Perfil
+    -Perfil   1 día
         -mejorar añadir a favoritos ? 
-        -Registro en la APP !!!
+        -Registro en la APP !!!   --- Backend
+        -Como seleccionar categorias diarias?
 
-    -Recetas
-        -Mostrar los Ingredientes !
-        -Modificar datos de una receta !!
-        -Comentarios ?
+    -Recetas   1 día
+        -Modificar datos de una receta !!   --- Frontend
+    
+    -Añadir Animaciones y Transiciones ???   1 día
+    -Comprobar interfaz en diferentes dispositivos !!!
+    -Lanzar a producción !!!  1 día

@@ -1,10 +1,9 @@
 import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/pages/receta_page.dart';
+import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-
-import '../perfil_services.dart';
 
 class RecetaTile extends StatefulWidget {
   RecetaTile(this.receta, this.height, this.width, {this.margin = 0});
