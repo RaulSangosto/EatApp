@@ -5,11 +5,12 @@ import 'package:eatapp/widgets/receta_card.dart';
 import 'package:flutter/material.dart';
 
 class RecetaList extends StatefulWidget {
-  RecetaList(this.cardH, this.recetas, {this.hasDots = false, pageIdCallback}) : _pageIdCallback = pageIdCallback;
+  RecetaList(this.cardH, this.recetas, {this.hasDots = false, pageIdCallback, this.refreshDataCallback}) : _pageIdCallback = pageIdCallback;
   final double cardH;
   final List<Receta> recetas;
   final bool hasDots;
   final Function _pageIdCallback;
+  final Function refreshDataCallback;
 
   @override
   State<StatefulWidget> createState() {

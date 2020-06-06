@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class RecetaTile extends StatefulWidget {
-  RecetaTile(this.receta, this.height, this.width, {this.margin = 0});
+  RecetaTile(this.receta, this.height, this.width, {this.margin = 0, this.refreshDataCallback});
   final Receta receta;
   final double height;
   final double width;
   final double margin;
+  final Function refreshDataCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -67,6 +68,7 @@ class _RecetaTile extends State<RecetaTile> {
                 }
               }
               widget.receta.favorito = _favorito;
+              widget.refreshDataCallback();
             });
           });
         },

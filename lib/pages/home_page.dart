@@ -143,7 +143,7 @@ class _HomeState extends State<HomePage> {
                           alignment: Alignment(0, 1),
                           child: SizedBox(
                             height: 338.0,
-                            child: new RecetaList(250.0, recetasHoy, hasDots: true, pageIdCallback: widget._pageIdCallback,),
+                            child: new RecetaList(250.0, recetasHoy, hasDots: true, pageIdCallback: widget._pageIdCallback, refreshDataCallback: _fetchRecetasDias),
                           ),
                         ),
                       ],
@@ -168,7 +168,7 @@ class _HomeState extends State<HomePage> {
                           ),
                           SizedBox(
                               height: 160.0,
-                              child: new RecetaList(160.0, ultimasRecetas)),
+                              child: new RecetaList(160.0, ultimasRecetas, refreshDataCallback: _fetchRecetasDias,)),
                         ],
                       )),
                 ],

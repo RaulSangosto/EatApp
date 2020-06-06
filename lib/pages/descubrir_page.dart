@@ -34,6 +34,7 @@ class _DescubrirState extends State<DescubrirPage> {
   List<Categoria> categorias;
   List<Receta> recetas;
   Categoria searchCategoria;
+  String searchParams;
   bool _isLoading = false;
   bool _filterOpen = false;
 
@@ -58,7 +59,12 @@ class _DescubrirState extends State<DescubrirPage> {
     });
   }
 
-  _searchCallback(String params){
+  _searchCallback(String params) async {
+    searchParams = params;
+    _apiResponse = await service.getRecetas(categorias: categorias, categoria: searchCategoria, search: searchParams);
+    setState(() {
+      recetas = _apiResponse.data;
+    });
     print(params);
   }
 
@@ -78,7 +84,7 @@ class _DescubrirState extends State<DescubrirPage> {
     _apiResponseCategorias = await service.getCategorias();
     categorias = _apiResponseCategorias.data;
     _apiResponse = await service.getRecetas(
-        categorias: categorias, categoria: searchCategoria);
+        categorias: categorias, categoria: searchCategoria, search: searchParams);
     recetas = _apiResponse.data;
     setState(() {
       _isLoading = false;
@@ -104,7 +110,8 @@ class _DescubrirState extends State<DescubrirPage> {
                           height: 472.0,
                           child: _RecetasGrid(
                               recetas: recetas,
-                              controller: gridScrollController),
+                              controller: gridScrollController,
+                              refreshDataCallback: _fetchRecetas,),
                         ),
                       ),
                     ),
@@ -260,6 +267,8 @@ class _TopCardState extends State<TopCard> {
                             setState(() {
                               if (search) {
                                 search = false;
+                                widget.searchCallBack(null);
+                                _searchController.text = null;
                               } else {
                                 search = true;
                               }
@@ -342,8 +351,9 @@ class _TopCardState extends State<TopCard> {
 class _RecetasGrid extends StatelessWidget {
   final List<Receta> recetas;
   final ScrollController controller;
+  final Function refreshDataCallback;
 
-  _RecetasGrid({this.recetas, this.controller});
+  _RecetasGrid({this.recetas, this.controller, this.refreshDataCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -366,7 +376,7 @@ class _RecetasGrid extends StatelessWidget {
           );
         }
         Receta receta = recetas[index - 2];
-        return RecetaTile(receta, h / 3, (w - 40) / 2);
+        return RecetaTile(receta, h / 3, (w - 40) / 2, refreshDataCallback: refreshDataCallback,);
       },
     );
   }

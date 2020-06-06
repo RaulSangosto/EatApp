@@ -8,7 +8,6 @@
 
     -Descubrir   1 día
         -Filtrar !  --- Backend
-            -por nombre
             -por ingredientes
 
     -Perfil   1 día
@@ -18,4 +17,5 @@
     
     -Añadir Animaciones y Transiciones ???   1 día
     -Comprobar interfaz en diferentes dispositivos !!!
+    -Solucionar Errores !!!
     -Lanzar a producción !!!  1 día

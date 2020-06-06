@@ -9,19 +9,23 @@ class RecetasService {
   static const API = Configuration.API;
 
   Future<APIResponse<List<Receta>>> getRecetas(
-      {Categoria categoria, @required List<Categoria> categorias}) {
+      {Categoria categoria,String search ,@required List<Categoria> categorias}) {
     var uri;
     Map<String, String> headers = {
       "Accept": "application/json; charset=UTF-8",
       "Content-Type": "application/json; charset=UTF-8",
     };
-    if (categoria == null) {
+    Map<String, String> queryParameters = new Map<String, String>();
+    if(categoria != null){
+      queryParameters['categorias'] = categoria.id.toString();
+    }
+    if(search != null){
+      queryParameters['search'] = search;
+    }
+    if (queryParameters.isEmpty) {
       uri =
           Uri.http(Configuration.localhost, Configuration.baseUrl + "recetas");
     } else {
-      var queryParameters = {
-        'categorias': categoria.id.toString(),
-      };
       uri = Uri.http(Configuration.localhost, Configuration.baseUrl + "recetas",
           queryParameters);
     }

@@ -1,10 +1,12 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from receta.serializers.receta import RecetaSerializer
 from receta.models import Receta
 from rest_framework.decorators import action
 
 class RecetaViewSet(viewsets.ModelViewSet):
+    search_fields = ['titulo']
+    filter_backends = (filters.SearchFilter,)
     serializer_class = RecetaSerializer
     queryset = Receta.objects.all()
 
