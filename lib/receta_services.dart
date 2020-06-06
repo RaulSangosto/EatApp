@@ -206,6 +206,29 @@ class RecetasService {
         error: true, errorMessage: 'An error occurred'));
   }
 
+  Future<APIResponse<Ingrediente>> createIngrediente(Ingrediente ingrediente, List<Alergeno> alergenos) {
+    return http
+        .post(API + "ingredientes",
+            headers: {
+              "Accept": "application/json; charset=UTF-8",
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: jsonEncode(ingrediente.toJson()))
+        .then((data) {
+      print(data.statusCode);
+      if (data.statusCode == 201) {
+        return APIResponse<Ingrediente>(
+            data: Ingrediente.fromJson(jsonDecode(utf8.decode(data.bodyBytes)), alergenos));
+      }
+      return APIResponse<Ingrediente>(
+          data: null,
+          error: true,
+          errorMessage:
+              "ERROR " + data.statusCode.toString() + ': An error occurred');
+    }).catchError((_) => APIResponse<Ingrediente>(
+            data: null, error: true, errorMessage: 'An error occurred'));
+  }
+
   Future<APIResponse<List<Alergeno>>> getAlergenos() {
     return http.get(API + "alergenos", headers: {
       "Accept": "application/json; charset=UTF-8",

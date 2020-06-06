@@ -11,11 +11,6 @@
             -por nombre
             -por ingredientes
 
-    -Crear   1 día
-        -Más ingredientes !   --- Admin
-        -Buscador ingredientes ?  --- Frontend
-        -Añadir Ingredientes ?   --- Frontend
-
     -Perfil   1 día
         -mejorar añadir a favoritos ? 
         -Registro en la APP !!!   --- Backend

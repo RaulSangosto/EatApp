@@ -141,7 +141,7 @@ class _CrearState extends State<CrearPage> {
       if (_descrController.text == null || _descrController.text == "") {
         formErrors += "Debes Indicar una Descripción\n";
       }
-      if ( dieta == null) {
+      if (dieta == null) {
         formErrors += "Debes seleccionar una Dieta\n";
       }
       if (_instrucciones.length <= 0) {
@@ -691,16 +691,45 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
   Instruccion _instruccion;
   List<Instruccion> _instrucciones = [];
   List<Alergeno> _alergenos;
+  Alergeno alergenoSelected;
   Ingrediente ingredienteSelected;
   List<Ingrediente> _ingredientes;
+  List<Ingrediente> _filteredIngredientes;
   TextEditingController _cantidadController = TextEditingController();
+  TextEditingController _filterController = TextEditingController();
+  TextEditingController _nombreIngredienteController = TextEditingController();
   String contentText = "Añadir Instrucción";
+  String formErrors = "";
   bool _isLoading = false;
+  bool addIngrediente = false;
 
   @override
   void initState() {
     _fetchIngredientes();
     super.initState();
+  }
+
+  _isSelected(int index) {
+    if (ingredienteSelected == null) {
+      return false;
+    }
+    return ingredienteSelected.id == _filteredIngredientes[index].id;
+  }
+
+  _searchFilter(data) {
+    print("filter: " + data);
+    setState(() {
+      if (data != null) {
+        _filteredIngredientes = _ingredientes
+            .where((i) => i.nombre
+                .toLowerCase()
+                .contains(_filterController.text.toLowerCase()))
+            .toList();
+        print(_filteredIngredientes.length);
+      } else {
+        _filteredIngredientes = _ingredientes;
+      }
+    });
   }
 
   _fetchIngredientes() async {
@@ -713,10 +742,37 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
     _alergenos = _apiResponseAlergeno.data;
     _apiResponse = await service.getIngredientes(_alergenos);
     _ingredientes = _apiResponse.data;
-    ingredienteSelected = _ingredientes[0];
+    _filteredIngredientes = _ingredientes;
 
     setState(() {
       _isLoading = false;
+    });
+  }
+
+  _addIngrediente() async {
+    Ingrediente newIngrediente;
+    setState(() {
+      formErrors = "";
+      if(alergenoSelected == null){
+        formErrors += "Debes seleccionar un Alergeno.";
+      }
+      if(_nombreIngredienteController.text == "" || _nombreIngredienteController.text == null){
+        formErrors += "Debes indicar un Nombre.";
+      }
+    });
+    if(formErrors == ""){
+        _isLoading = true;
+        newIngrediente = new Ingrediente(alergeno: alergenoSelected, nombre: _nombreIngredienteController.text);
+        APIResponse<Ingrediente> _apiResponseNewIngrediente = await service.createIngrediente(newIngrediente, _alergenos);
+        newIngrediente == _apiResponseNewIngrediente.data;
+      }
+    setState(() {
+      if(newIngrediente != null){
+        ingredienteSelected = newIngrediente;
+      }
+      _isLoading = false;
+      _fetchIngredientes();
+      addIngrediente = false;
     });
   }
 
@@ -727,46 +783,172 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
         : AlertDialog(
             title: Text(contentText),
             content: Container(
-              height: 120.0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  DropdownButton<Ingrediente>(
-                    value: ingredienteSelected,
-                    icon: Icon(Icons.arrow_downward),
-                    iconSize: 24,
-                    elevation: 16,
-                    //style: TextStyle(color: Theme.of(context).accentColor),
-                    underline: Container(
-                      height: 2,
-                      color: Theme.of(context).accentColor,
+              width: double.maxFinite,
+              child: addIngrediente
+                  ? Column(
+                      children: <Widget>[
+                        SizedBox(height: 20.0,),
+                        Text("Crear un Nuevo Ingrediente."),
+                        SizedBox(height: 30.0,),
+                        DropdownButton<Alergeno>(
+                          hint: Text("Alergeno..."),
+                          isExpanded: true,
+                          value: alergenoSelected,
+                          icon: Icon(Icons.arrow_downward),
+                          iconSize: 24,
+                          elevation: 16,
+                          //style: TextStyle(color: Theme.of(context).accentColor),
+                          underline: Container(
+                            height: 2,
+                            color: Theme.of(context).accentColor,
+                          ),
+                          onChanged: (Alergeno newValue) {
+                            setState(() {
+                              alergenoSelected = newValue;
+                            });
+                          },
+                          items: _alergenos.map<DropdownMenuItem<Alergeno>>(
+                              (Alergeno value) {
+                            return DropdownMenuItem<Alergeno>(
+                              value: value,
+                              child: Text(value.nombre),
+                            );
+                          }).toList(),
+                        ),
+                        SizedBox(height: 20.0,),
+                        TextField(
+                          controller: _nombreIngredienteController,
+                          decoration: InputDecoration(hintText: "Nombre Ingrediente"),
+                        ),
+                        SizedBox(height: 50.0,),
+                        RaisedButton(
+                          onPressed: _addIngrediente,
+                          textColor: Colors.white,
+                          color: Theme.of(context).accentColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24.0),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 14.0),
+                          child: Text('Crear Ingrediente',
+                              style: TextStyle(fontSize: 16.0)),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        TextField(
+                          controller: _filterController,
+                          onChanged: (data) {
+                            _searchFilter(data);
+                          },
+                          decoration: InputDecoration(
+                              hintText: "Nombre de Ingrediente..."),
+                        ),
+                        (_filteredIngredientes.length > 0)
+                            ? SizedBox.shrink()
+                            : Expanded(
+                                child: Text(
+                                    "No se han encontrado Ingredientes. Puedes añadir un nuevo Ingrediente")),
+                        Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _filteredIngredientes.length + 1,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (index >= _filteredIngredientes.length) {
+                                return ListTile(
+                                  dense: true,
+                                  title: Text(
+                                    "Añadir Nuevo Ingrediente",
+                                  ),
+                                  leading: Container(
+                                    width: 20.0,
+                                    height: 20.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(25.0),
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 18.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      //Crear Ingrediente;
+                                      addIngrediente = true;
+                                    });
+                                  },
+                                );
+                              }
+                              return ListTile(
+                                dense: true,
+                                title: Text(_filteredIngredientes[index].nombre,
+                                    style: TextStyle(
+                                        fontWeight: (_isSelected(index))
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: _isSelected(index)
+                                            ? Theme.of(context).accentColor
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText2
+                                                .color)),
+                                onTap: () {
+                                  setState(() {
+                                    ingredienteSelected =
+                                        _filteredIngredientes[index];
+                                    _filterController.text =
+                                        ingredienteSelected.nombre;
+                                    _searchFilter(ingredienteSelected.nombre);
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        // DropdownButton<Ingrediente>(
+                        //   isExpanded: true,
+                        //   value: ingredienteSelected,
+                        //   icon: Icon(Icons.arrow_downward),
+                        //   iconSize: 24,
+                        //   elevation: 16,
+                        //   //style: TextStyle(color: Theme.of(context).accentColor),
+                        //   underline: Container(
+                        //     height: 2,
+                        //     color: Theme.of(context).accentColor,
+                        //   ),
+                        //   onChanged: (Ingrediente newValue) {
+                        //     setState(() {
+                        //       ingredienteSelected = newValue;
+                        //     });
+                        //   },
+                        //   items: _ingredientes.map<DropdownMenuItem<Ingrediente>>(
+                        //       (Ingrediente value) {
+                        //     return DropdownMenuItem<Ingrediente>(
+                        //       value: value,
+                        //       child: Text(value.nombre),
+                        //     );
+                        //   }).toList(),
+                        // ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextField(
+                            controller: _cantidadController,
+                            maxLength: 100,
+                            decoration: InputDecoration(
+                              hintText: "Cantidad",
+                              isDense: true,
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                    onChanged: (Ingrediente newValue) {
-                      setState(() {
-                        ingredienteSelected = newValue;
-                      });
-                    },
-                    items: _ingredientes.map<DropdownMenuItem<Ingrediente>>(
-                        (Ingrediente value) {
-                      return DropdownMenuItem<Ingrediente>(
-                        value: value,
-                        child: Text(value.nombre),
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextField(
-                      controller: _cantidadController,
-                      maxLength: 100,
-                      decoration: InputDecoration(
-                        hintText: "Cantidad",
-                        isDense: true,
-                      ),
-                    ),
-                  )
-                ],
-              ),
             ),
             actions: <Widget>[
               FlatButton(
