@@ -107,26 +107,27 @@ class RecetasService {
             data: null, error: true, errorMessage: 'An error occurred'));
   }
 
-  Future<APIResponse<bool>> updateReceta(Receta receta) {
+  Future<APIResponse<Receta>> updateReceta(Receta receta) {
     return http
-        .put(API + "recetas/" + receta.id.toString(),
+        .patch(API + "recetas/" + receta.id.toString(),
             headers: {
               "Accept": "application/json; charset=UTF-8",
               "Content-Type": "application/json; charset=UTF-8",
             },
-            body: jsonEncode(receta.toJson()))
+            body: jsonEncode(receta.toJson(patch: true)))
         .then((data) {
       print(data.statusCode);
       if (data.statusCode == 200) {
-        return APIResponse<bool>(data: true);
+        return APIResponse<Receta>(data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes)),
+                categoria: receta.categoria));
       }
-      return APIResponse<bool>(
-          data: false,
+      return APIResponse<Receta>(
+          data: null,
           error: true,
           errorMessage:
               "ERROR " + data.statusCode.toString() + ': An error occurred');
-    }).catchError((_) => APIResponse<bool>(
-            data: false, error: true, errorMessage: 'An error occurred'));
+    }).catchError((_) => APIResponse<Receta>(
+            data: null, error: true, errorMessage: 'An error occurred'));
   }
 
   Future<APIResponse<bool>> deleteReceta(int recetaId) {

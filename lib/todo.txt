@@ -15,9 +15,6 @@
         -mejorar añadir a favoritos ? 
         -Registro en la APP !!!   --- Backend
         -Como seleccionar categorias diarias?
-
-    -Recetas   1 día
-        -Modificar datos de una receta !!   --- Frontend
     
     -Añadir Animaciones y Transiciones ???   1 día
     -Comprobar interfaz en diferentes dispositivos !!!

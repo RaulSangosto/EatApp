@@ -51,7 +51,37 @@ class Receta {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({bool patch}) {
+    if (patch){
+      Map <String, dynamic> response = new Map<String, dynamic>();
+      if(titulo != null){
+        response["titulo"] = titulo;
+      }
+      if(autor_id != null){
+        response["autor"] = autor_id;
+      }
+      if(imgUrl != null){
+        response["imagen"] = imgUrl;
+      }
+      if(minutes != null){
+        response["minutos_preparacion"] = minutes;
+      }
+      if(kcal != null){
+        response["kcal"] = kcal;
+      }
+      if(descripcion != null){
+        response["descripcion"] = descripcion;
+      }
+      if(dieta != null){
+        response["dieta"] = dieta;
+      }
+      if(categoria.id != null){
+        response["categoria"] = categoria.id;
+      }
+
+      return response;
+    }
+    
     return {
       "titulo": titulo,
       "autor": autor_id,

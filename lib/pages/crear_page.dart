@@ -18,14 +18,17 @@ class CrearPage extends StatefulWidget {
       {Key key,
       bool loged,
       Function(bool) loginCallback,
-      Function(int) pageIdCallback})
+      Function(int) pageIdCallback,
+      Receta receta})
       : _isLoged = loged,
         _loginCallback = loginCallback,
         _pageIdCallback = pageIdCallback,
+        _receta = receta,
         super(key: key);
   final bool _isLoged;
   final Function(bool) _loginCallback;
   final Function(int) _pageIdCallback;
+  final Receta _receta;
 
   @override
   State<StatefulWidget> createState() {
@@ -37,6 +40,7 @@ class _CrearState extends State<CrearPage> {
   //bool get _isEditing => widget.recetaId != null;
   RecetasService get service => GetIt.I<RecetasService>();
   PerfilService get perfilService => GetIt.I<PerfilService>();
+  bool get _isEditing => widget._receta != null;
   APIResponse<List<Ingrediente>> _apiResponse;
   APIResponse<List<Categoria>> _apiResponseCategoria;
   String errorMessage;
@@ -68,7 +72,36 @@ class _CrearState extends State<CrearPage> {
     dietas.add(Choice("Vegetariana", "v"));
     dietas.add(Choice("Vegana", "n"));
     _personasController.text = "1";
+    if (_isEditing) {
+      _tituloController.text = widget._receta.titulo;
+      _prepController.text = widget._receta.minutes.toString();
+      _kcalController.text = widget._receta.kcal.toString();
+      _descrController.text = widget._receta.descripcion;
+      for (Choice d in dietas) {
+        if (d.code == widget._receta.dieta) {
+          dieta = d;
+          break;
+        }
+      }
+      categoriaSelected = widget._receta.categoria;
+      _fetchIngredientes();
+    }
     super.initState();
+  }
+
+  _fetchIngredientes() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    APIResponse<List<Instruccion>> _apiResponseInstrucciones;
+    _apiResponseInstrucciones =
+        await service.getInstruccionesReceta(widget._receta, _ingredientes);
+    _instrucciones = _apiResponseInstrucciones.data;
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   _fetchDatos() async {
@@ -173,10 +206,10 @@ class _CrearState extends State<CrearPage> {
           await service.createInstruccion(item);
         }
 
-        final titulo = "Hecho";
+        final titulo = "Crear Receta";
         final text = result.error
             ? (result.errorMessage ?? "Ha ocurrido un error")
-            : "Receta Publicada";
+            : "La Receta ha sido publicada correctamente.";
 
         showDialog(
             context: context,
@@ -389,28 +422,32 @@ class _CrearState extends State<CrearPage> {
                                 fontWeight: FontWeight.bold, fontSize: 16.0),
                           ),
                           SizedBox(
-                            width: 10.0,
+                            width: 40.0,
                           ),
-                          DropdownButton<Categoria>(
-                            value: categoriaSelected,
-                            icon: Icon(Icons.arrow_downward),
-                            iconSize: 24,
-                            elevation: 16,
-                            //style: TextStyle(color: Theme.of(context).accentColor),
-                            underline: Container(
-                              height: 2,
-                              color: Theme.of(context).accentColor,
+                          Expanded(
+                            child: DropdownButton<Categoria>(
+                              value: categoriaSelected,
+                              isExpanded: true,
+                              icon: Icon(Icons.arrow_downward),
+                              iconSize: 24,
+                              elevation: 16,
+                              //style: TextStyle(color: Theme.of(context).accentColor),
+                              underline: Container(
+                                height: 2,
+                                color: Theme.of(context).accentColor,
+                              ),
+                              onChanged: (newValue) {
+                                setState(() => categoriaSelected = newValue);
+                              },
+                              items: categorias
+                                  .map<DropdownMenuItem<Categoria>>(
+                                      (Categoria value) {
+                                return DropdownMenuItem<Categoria>(
+                                  value: value,
+                                  child: Text(value.titulo),
+                                );
+                              }).toList(),
                             ),
-                            onChanged: (newValue) {
-                              setState(() => categoriaSelected = newValue);
-                            },
-                            items: categorias.map<DropdownMenuItem<Categoria>>(
-                                (Categoria value) {
-                              return DropdownMenuItem<Categoria>(
-                                value: value,
-                                child: Text(value.titulo),
-                              );
-                            }).toList(),
                           ),
                         ],
                       ),
@@ -454,10 +491,9 @@ class _CrearState extends State<CrearPage> {
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.bold)),
                           SizedBox(
-                            width: 10.0,
+                            width: 40.0,
                           ),
-                          SizedBox(
-                            width: 200.0,
+                          Expanded(
                             child: DropdownButton<Choice>(
                               hint: Text("Dieta"),
                               value: dieta,
@@ -753,21 +789,25 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
     Ingrediente newIngrediente;
     setState(() {
       formErrors = "";
-      if(alergenoSelected == null){
+      if (alergenoSelected == null) {
         formErrors += "Debes seleccionar un Alergeno.";
       }
-      if(_nombreIngredienteController.text == "" || _nombreIngredienteController.text == null){
+      if (_nombreIngredienteController.text == "" ||
+          _nombreIngredienteController.text == null) {
         formErrors += "Debes indicar un Nombre.";
       }
     });
-    if(formErrors == ""){
-        _isLoading = true;
-        newIngrediente = new Ingrediente(alergeno: alergenoSelected, nombre: _nombreIngredienteController.text);
-        APIResponse<Ingrediente> _apiResponseNewIngrediente = await service.createIngrediente(newIngrediente, _alergenos);
-        newIngrediente == _apiResponseNewIngrediente.data;
-      }
+    if (formErrors == "") {
+      _isLoading = true;
+      newIngrediente = new Ingrediente(
+          alergeno: alergenoSelected,
+          nombre: _nombreIngredienteController.text);
+      APIResponse<Ingrediente> _apiResponseNewIngrediente =
+          await service.createIngrediente(newIngrediente, _alergenos);
+      newIngrediente == _apiResponseNewIngrediente.data;
+    }
     setState(() {
-      if(newIngrediente != null){
+      if (newIngrediente != null) {
         ingredienteSelected = newIngrediente;
       }
       _isLoading = false;
@@ -787,9 +827,13 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
               child: addIngrediente
                   ? Column(
                       children: <Widget>[
-                        SizedBox(height: 20.0,),
+                        SizedBox(
+                          height: 20.0,
+                        ),
                         Text("Crear un Nuevo Ingrediente."),
-                        SizedBox(height: 30.0,),
+                        SizedBox(
+                          height: 30.0,
+                        ),
                         DropdownButton<Alergeno>(
                           hint: Text("Alergeno..."),
                           isExpanded: true,
@@ -815,12 +859,17 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                             );
                           }).toList(),
                         ),
-                        SizedBox(height: 20.0,),
+                        SizedBox(
+                          height: 20.0,
+                        ),
                         TextField(
                           controller: _nombreIngredienteController,
-                          decoration: InputDecoration(hintText: "Nombre Ingrediente"),
+                          decoration:
+                              InputDecoration(hintText: "Nombre Ingrediente"),
                         ),
-                        SizedBox(height: 50.0,),
+                        SizedBox(
+                          height: 50.0,
+                        ),
                         RaisedButton(
                           onPressed: _addIngrediente,
                           textColor: Colors.white,
