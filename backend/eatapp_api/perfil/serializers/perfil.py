@@ -79,6 +79,8 @@ class PerfilSaveSerializer(serializers.ModelSerializer):
 
 class RegistroSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
+    nombre = serializers.CharField()
+    username = serializers.CharField()
     password = serializers.CharField()
     password2 = serializers.CharField()
     sexo = serializers.CharField()
@@ -100,9 +102,15 @@ class RegistroSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         email = value.lower()
-        if User.objects.filter(username=email).exists():
+        if User.objects.filter(email=email).exists():
             raise serializers.ValidationError("El email ya está registrado")
         return email
+    
+    def validate_username(self, value):
+        username = value
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("El nombre de usuario ya está registrado")
+        return username
 
     # def validate_fecha_nacimiento(self, value):
     #     hoy = date.today()
@@ -116,17 +124,19 @@ class RegistroSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         email = data.pop("email")
         email.lower()
+        username = data.pop("username")
         password = data.pop("password")
         data.pop("password2")
         #potitica_privacidad = data.pop("politica-privacidad")
 
-        user = User.objects.create(username=email,
+        user = User.objects.create(username=username,
                                    email=email,
                                    is_active=True)
         user.set_password(password)
         user.save()
 
         data["user"] = user
-        data["invitacion"] = ''.join(secrets.choice(numbers) for i in range(4))
+        #data["invitacion"] = ''.join(secrets.choice(numbers) for i in range(4))
+
         auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return data

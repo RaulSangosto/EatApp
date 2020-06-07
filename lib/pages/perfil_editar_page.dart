@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../perfil_services.dart';
 
@@ -28,13 +32,15 @@ class _PerfilState extends State<PerfilEditarPage> {
   TextEditingController ubicacionController = new TextEditingController();
   TextEditingController descripcionController = new TextEditingController();
   TextEditingController kcalDiariasController = new TextEditingController();
+  File _imagePerfil;
+  File _imageBg;
 
   @override
   initState() {
     super.initState();
-    dietas.add(Choice("Omnivora","o"));
-    dietas.add(Choice("Vegetariana","v"));
-    dietas.add(Choice("Vegana","n"));
+    dietas.add(Choice("Omnivora", "o"));
+    dietas.add(Choice("Vegetariana", "v"));
+    dietas.add(Choice("Vegana", "n"));
     _fetchPerfil();
   }
 
@@ -50,12 +56,12 @@ class _PerfilState extends State<PerfilEditarPage> {
     ubicacion = perfil.ubicacion;
     descripcion = perfil.descripcion;
 
-    for(Choice d in dietas){
-      if(d.code == perfil.dieta){
+    for (Choice d in dietas) {
+      if (d.code == perfil.dieta) {
         dieta = d;
       }
     }
-    
+
     kcalDiarias = perfil.kcalDiarias;
 
     nombreController.text = nombre;
@@ -66,6 +72,26 @@ class _PerfilState extends State<PerfilEditarPage> {
 
     setState(() {
       _isLoading = false;
+    });
+  }
+
+  Future cameraImageBg() async {
+    var image = await ImagePicker.pickImage(
+      source: ImageSource.camera,
+    );
+
+    setState(() {
+      _imageBg = image;
+    });
+  }
+
+  Future galleryImageBg() async {
+    var image = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    setState(() {
+      _imageBg = image;
     });
   }
 
@@ -97,7 +123,18 @@ class _PerfilState extends State<PerfilEditarPage> {
       perfil.descripcion = descripcionController.text;
       perfil.kcalDiarias = kcalDiariasController.text;
 
+      String _imgUrl = (_imagePerfil != null)
+              ? 'data:image/png;base64,' +
+                  base64Encode(_imagePerfil.readAsBytesSync())
+              : null;
+      String _fondoUrl = (_imageBg != null)
+              ? 'data:image/png;base64,' +
+                  base64Encode(_imageBg.readAsBytesSync())
+              : null;
+
       perfil = await service.updatePerfil(
+          imgUrl: _imgUrl,
+          fondoUrl: _fondoUrl,
           nombre: perfil.nombre,
           ubicacion: perfil.ubicacion,
           descripcion: perfil.descripcion,
@@ -159,10 +196,17 @@ class _PerfilState extends State<PerfilEditarPage> {
                     height: 150.0,
                     decoration: BoxDecoration(
                       color: Colors.pinkAccent,
-                      image: new DecorationImage(
-                        image: new ExactAssetImage("assets/images/pasta.jpeg"),
-                        fit: BoxFit.cover,
-                      ),
+                      image: (perfil.fondoUrl != null)
+                          ? new DecorationImage(
+                              image: new NetworkImage(perfil.fondoUrl),
+                              fit: BoxFit.cover,
+                            )
+                          : (_imageBg != null)
+                              ? new DecorationImage(
+                                  image: new FileImage(_imageBg),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(30.0),
@@ -176,13 +220,46 @@ class _PerfilState extends State<PerfilEditarPage> {
                               Navigator.of(context).pop();
                             },
                           ),
-                          Icon(
-                            Icons.add_a_photo,
-                            color: Colors.white70,
-                            size: 32.0,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: cameraImageBg,
+                                child: Icon(
+                                  Icons.add_a_photo,
+                                  color: Colors.white70,
+                                  size: 32.0,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20.0,
+                              ),
+                              GestureDetector(
+                                onTap: galleryImageBg,
+                                child: Icon(
+                                  Icons.image,
+                                  color: Colors.white70,
+                                  size: 32.0,
+                                ),
+                              ),
+                            ],
                           ),
                           Container(
-                            child: new PerfilAvatar(40),
+                            child: Stack(
+                              children: <Widget>[
+                                new PerfilAvatar(40),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Icon(
+                                    Icons.add_a_photo,
+                                    color: Colors.white,
+                                    size: 32.0,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

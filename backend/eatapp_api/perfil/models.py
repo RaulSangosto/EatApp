@@ -11,16 +11,16 @@ class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     activo = models.BooleanField(default=True)
     nombre = models.CharField(max_length=100)
-    email = models.EmailField(null=True, blank=True)
     descripcion = models.CharField(max_length=200, null=True, blank=True)
     ubicacion = models.CharField(max_length=30, null=True, blank=True)
     dieta = models.CharField(max_length=1, choices=DIETA, null=True, blank=True)
     kcal_diarias = models.IntegerField(null=True, blank=True)
     foto = models.ImageField(upload_to='perfil', null=True, blank=True)
+    fotoBg = models.ImageField(upload_to='perfil/Bg', null=True, blank=True)
 
     fecha_nacimiento = models.DateField(null=True, blank=True)
     sexo = models.CharField(max_length=1, choices=SEXO, null=True, blank=True)
-    favoritos = models.ManyToManyField("receta.Receta", blank=True,
+    favoritos = models.ManyToManyField("receta.Receta", blank=True, null=True,
                                        related_name="favoritos_usuarios")
     categoriasSemana = models.ManyToManyField("receta.Categoria", blank=True, related_name="dieta_semanal")
 
@@ -28,6 +28,5 @@ class Perfil(models.Model):
 
     def avatar(self, alias="avatar"):
         if self.foto:
-            import ipdb; ipdb.set_trace()
             thumbnailer = get_thumbnailer(self.foto)
             return thumbnailer[alias].url

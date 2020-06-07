@@ -10,7 +10,7 @@ class Choice {
 class Perfil {
   int id;
   String nombre, email, ubicacion, descripcion;
-  String dieta, kcalDiarias, avatarUrl;
+  String dieta, kcalDiarias, avatarUrl, fondoUrl;
   DateTime fechaNac;
   String sexo;
   List<int> favoritos;
@@ -25,6 +25,7 @@ class Perfil {
       this.dieta,
       this.kcalDiarias,
       this.avatarUrl,
+      this.fondoUrl,
       this.fechaNac,
       this.sexo,
       this.favoritos,
@@ -40,7 +41,7 @@ class Perfil {
       _favoritos.add(fav);
     }
 
-    return Perfil(
+    Perfil p = new Perfil(
       id: json['id'],
       nombre: json['nombre'],
       email: json['email'],
@@ -49,15 +50,20 @@ class Perfil {
       dieta: json['dieta'],
       kcalDiarias: json['kcal_diarias'].toString(),
       avatarUrl: json['foto'],
+      fondoUrl: json['fotoBg'],
       fechaNac: DateTime(_fechaNac.year, _fechaNac.month, _fechaNac.day),
       sexo: json['sexo'],
       user: json['user'],
       favoritos: _favoritos,
     );
+    return p;
   }
 
   Map<String, dynamic> toJson() {
-    String fecha = fechaNac.year.toString() + "-" + fechaNac.month.toString() + "-" + fechaNac.day.toString();
+    String fecha;
+    if(fechaNac!=null){
+      fecha = fechaNac.year.toString() + "-" + fechaNac.month.toString() + "-" + fechaNac.day.toString();
+    }
     var response = {
       "nombre": nombre,
       "email": email,
@@ -65,14 +71,20 @@ class Perfil {
       "ubicacion": ubicacion,
       "descripcion": descripcion,
       "dieta": dieta,
-      "kcalDiarias": kcalDiarias,
+      "kcal_diarias": kcalDiarias,
       "fecha_nacimiento": fecha,
       "sexo": sexo,
-      "favoritos": favoritos,
     };
+
+    if(favoritos != null){
+      response["favoritos"] = favoritos;
+    }
 
     if(avatarUrl != null){
       response["foto"] = avatarUrl;
+    }
+    if(fondoUrl != null){
+      response["fotoBg"] = fondoUrl;
     }
 
     return response;

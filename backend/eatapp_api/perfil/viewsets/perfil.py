@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from django.contrib.auth.tokens import default_token_generator
 from api.utils import es_usuario
 from perfil.models import Perfil
+from receta.models import Categoria
 from perfil.serializers.perfil import (PerfilSaveSerializer, PerfilSerializer, RegistroSerializer)
 
 
@@ -45,10 +46,11 @@ class PerfilViewSet(viewsets.ViewSet):
 
         # if not (aceptar_politica):
         #     raise ValidationError({"politica-privacidad": ["Debes aceptar la política de Privacidad"]})
-
         serializer = RegistroSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         perfil = serializer.save()
+        categorias = Categoria.objects.all()
+        perfil.categoriasSemana.set(categorias)
 
         return Response(PerfilSerializer(perfil).data)
 

@@ -12,8 +12,10 @@
 
     -Perfil   1 día
         -mejorar añadir a favoritos ? 
-        -Registro en la APP !!!   --- Backend
+        -Mejorar verificación !!!   --- Frontend
+        -Poder cambiar fotos perfil !!! --- Frontend y Backend
         -Como seleccionar categorias diarias?
+        -Pasar la verificacion al backend !!!
     
     -Añadir Animaciones y Transiciones ???   1 día
     -Comprobar interfaz en diferentes dispositivos !!!

@@ -37,7 +37,7 @@ class _RegisterState extends State<RegisterPage> {
   List<Choice> dietas = new List<Choice>();
   List<Choice> sexos = new List<Choice>();
   Choice dieta, sexo;
-  DateTime fecha_nacimiento;
+  DateTime fechaNacimiento;
   String formErrors;
   bool _isLoading = false;
   bool _isLoged;
@@ -67,47 +67,63 @@ class _RegisterState extends State<RegisterPage> {
       _isLoading = true;
       formErrors = "";
 
-      if (username == null || username == "") {
-        formErrors += "Debes indicar un Nombre de Usuario\n";
-      }
-      if (password == null ||
-          password == "" ||
-          password2 == null ||
-          password2 == "") {
-        formErrors += "Debes introducir una Contraseña\n";
-      } else if (password != password2) {
-        formErrors += "Las Contraseñas debes ser Iguales\n";
-      }
-      if (nombre == null || nombre == "") {
-        formErrors += "Debes indicar un Nombre\n";
-      }
-      if (email == null || email == "") {
-        formErrors += "Debes indicar un Email\n";
-      }
-      if (kcal == null || kcal == "") {
-        formErrors += "Debes indicar unas Kcal Diarias\n";
-      }
-      if (dieta == null || dieta == "") {
-        formErrors += "Debes indicar una Dieta\n";
-      }
-      if (sexo == null || sexo == "") {
-        formErrors += "Debes indicar un Sexo\n";
-      }
-      if (fecha_nacimiento== null) {
-        formErrors += "Debes indicar una Fecha de Nacimiento\n";
-      }
+      // if (username == null || username == "") {
+      //   formErrors += "Debes indicar un Nombre de Usuario\n";
+      // }
+      // if (password == null ||
+      //     password == "" ||
+      //     password2 == null ||
+      //     password2 == "") {
+      //   formErrors += "Debes introducir una Contraseña\n";
+      // } else if (password != password2) {
+      //   formErrors += "Las Contraseñas debes ser Iguales\n";
+      // }
+      // if (nombre == null || nombre == "") {
+      //   formErrors += "Debes indicar un Nombre\n";
+      // }
+      // if (email == null || email == "") {
+      //   formErrors += "Debes indicar un Email\n";
+      // }
+      // if (kcal == null || kcal == "") {
+      //   formErrors += "Debes indicar unas Kcal Diarias\n";
+      // }
+      // if (dieta == null || dieta == "") {
+      //   formErrors += "Debes indicar una Dieta\n";
+      // }
+      // if (sexo == null || sexo == "") {
+      //   formErrors += "Debes indicar un Sexo\n";
+      // }
+      // if (fechaNacimiento== null) {
+      //   formErrors += "Debes indicar una Fecha de Nacimiento\n";
+      // }
     });
 
     if (formErrors == "") {
-      Perfil p = new Perfil(nombre: nombre, email: email, kcalDiarias: kcal, dieta: dieta.code, sexo: sexo.code, fechaNac: fecha_nacimiento);
-      newPerfil = await perfilService.register(p, username: username, password: password);
+      Perfil p = new Perfil(nombre: nombre, email: email, kcalDiarias: kcal);
+      if(fechaNacimiento != null){
+        p.fechaNac = fechaNacimiento;
+      }
+      if(sexo != null){
+        p.sexo = sexo.code;
+      }
+      if(dieta != null){
+        p.dieta = dieta.code;
+      }
+      APIResponse<Perfil> _apiResponsePerfil = await perfilService.register(perfil: p, username: username, password: password, password2: password2);
+      if(_apiResponsePerfil.data != null){
+        Perfil newPerfil = _apiResponsePerfil.data;
+        formErrors = "";
+      }
+      else {
+        formErrors = _apiResponsePerfil.errorMessage;
+      }
     }
 
     setState(() {
       _isLoading = false;
       //print(loginResponse.data.nombre);
-      widget._pageIdCallback(0);
-      widget._loginCallback(_isLoged);
+      // widget._pageIdCallback(0);
+      // widget._loginCallback(_isLoged);
     });
   }
 
@@ -253,7 +269,7 @@ class _RegisterState extends State<RegisterPage> {
                                                   lastDate: DateTime.now())
                                               .then((date) {
                                             setState(() {
-                                              fecha_nacimiento = date;
+                                              fechaNacimiento = date;
                                             });
                                           });
                                         },
@@ -261,10 +277,10 @@ class _RegisterState extends State<RegisterPage> {
                                           decoration: BoxDecoration(
                                               border: Border.all(
                                                   color: Colors.grey)),
-                                          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: (fecha_nacimiento == null) ? 10.0 : 20.0),
-                                          child: Text((fecha_nacimiento == null)
+                                          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: (fechaNacimiento == null) ? 10.0 : 20.0),
+                                          child: Text((fechaNacimiento == null)
                                               ? "Fecha de Nacimiento"
-                                              : fecha_nacimiento.day.toString() + "/" + fecha_nacimiento.month.toString() + "/" + fecha_nacimiento.year.toString()),
+                                              : fechaNacimiento.day.toString() + "/" + fechaNacimiento.month.toString() + "/" + fechaNacimiento.year.toString()),
                                         ),
                                       ),
                                     ],

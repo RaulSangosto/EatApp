@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/services_conf.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/perfil.dart';
@@ -15,7 +17,6 @@ class PerfilService {
   }
 
   Future<Perfil> getPerfil() async {
-    //print("getPerfil!");
     if (perfil != null) {
       return perfil;
     }
@@ -40,12 +41,16 @@ class PerfilService {
           String url = "http://" + Configuration.localhost + perfil.avatarUrl;
           perfil.avatarUrl = url;
         }
+        if (perfil.fondoUrl != null){
+          String url = "http://" + Configuration.localhost + perfil.fondoUrl;
+          perfil.fondoUrl = url;
+        }
       } else {}
     });
     return perfil;
   }
 
-  Future<Perfil> updatePerfil({String nombre, String ubicacion, String descripcion, String kcal, String dieta}) async {
+  Future<Perfil> updatePerfil({String nombre, String ubicacion, String descripcion, String kcal, String dieta, String imgUrl, String fondoUrl}) async {
 
     if (token == null){
       await getSharedPrefs();
@@ -62,8 +67,11 @@ class PerfilService {
     perfil.descripcion = descripcion?? perfil.descripcion;
     perfil.kcalDiarias = kcal?? perfil.kcalDiarias;
     perfil.dieta = dieta ?? perfil.dieta;
-
-    await http.post(API + "perfil/me", 
+    perfil.avatarUrl = imgUrl ?? perfil.avatarUrl;
+    perfil.fondoUrl = fondoUrl ?? perfil.fondoUrl;
+    print(perfil.avatarUrl?? "" + " " + perfil.fondoUrl ?? "");
+    
+    await http.patch(API + "perfil/me", 
       headers: headers,
       body: utf8.encode(jsonEncode(perfil.toJson())),
       encoding: Encoding.getByName("utf-8"))
@@ -99,14 +107,20 @@ class PerfilService {
     return login;
   }
 
-  Future<Perfil> register(Perfil perfil ,{username, password}) async {
-    Perfil _p = await http
+  Future<APIResponse<Perfil>> register({@required Perfil perfil, @required String username, @required String password, @required String password2}) async {
+    print("register");
+    Map<String, dynamic> body = perfil.toJson();
+    Map<String, dynamic> extra = {"username":username, "password" : password, "password2":password2};
+    body.addAll(extra);
+    return await http
         .post(API + "perfil/register",
             headers: {
+              "Accept": "application/json; charset=UTF-8",
               "Content-Type": "application/json; charset=UTF-8",
             },
-            body: jsonEncode({perfil.toJson()}))
+            body: jsonEncode(body),)
         .then((data) async {
+          print(data.statusCode);
       if (data.statusCode == 200) {
         print(data.statusCode);
         print(data.body);
@@ -116,11 +130,16 @@ class PerfilService {
           prefs.setString("token", _token);
           token = _token;
           print(token);
-          return Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
         }
+        return APIResponse<Perfil>(data:Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes))));
       }
-    });
-    return _p;
+      return APIResponse<Perfil>(
+          data: null,
+          error: true,
+          errorMessage:
+              data.body);
+    }).catchError((_) => APIResponse<Perfil>(
+            data: null, error: true, errorMessage: 'An error occurred'));
   }
 
   void logout() {

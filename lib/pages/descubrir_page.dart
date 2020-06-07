@@ -39,10 +39,13 @@ class _DescubrirState extends State<DescubrirPage> {
   bool _filterOpen = false;
 
   _scrollListener() {
-    if (gridScrollController.offset <= 80) {
-      _fetchRecetas();
-      gridScrollController.animateTo(150,
-          duration: Duration(milliseconds: 500), curve: Curves.linear);
+    if (recetas.length <= 2) {
+    } else {
+      if (gridScrollController.offset <= 30) {
+        _fetchRecetas();
+        gridScrollController.animateTo(150,
+            duration: Duration(milliseconds: 500), curve: Curves.linear);
+      }
     }
   }
 
@@ -61,9 +64,14 @@ class _DescubrirState extends State<DescubrirPage> {
 
   _searchCallback(String params) async {
     searchParams = params;
-    _apiResponse = await service.getRecetas(categorias: categorias, categoria: searchCategoria, search: searchParams);
+    _apiResponse = await service.getRecetas(
+        categorias: categorias,
+        categoria: searchCategoria,
+        search: searchParams);
     setState(() {
       recetas = _apiResponse.data;
+      gridScrollController.animateTo(150,
+            duration: Duration(milliseconds: 500), curve: Curves.linear);
     });
     print(params);
   }
@@ -84,7 +92,9 @@ class _DescubrirState extends State<DescubrirPage> {
     _apiResponseCategorias = await service.getCategorias();
     categorias = _apiResponseCategorias.data;
     _apiResponse = await service.getRecetas(
-        categorias: categorias, categoria: searchCategoria, search: searchParams);
+        categorias: categorias,
+        categoria: searchCategoria,
+        search: searchParams);
     recetas = _apiResponse.data;
     setState(() {
       _isLoading = false;
@@ -98,20 +108,30 @@ class _DescubrirState extends State<DescubrirPage> {
         //mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               (_isLoading)
-                  ? Center(
-                      child: CircularProgressIndicator(),
+                  ? Expanded(
+                      child: Container(
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
                     )
                   : Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: _filterOpen ? 60.0 : 0.0),
-                        child: SizedBox(
-                          height: 472.0,
-                          child: _RecetasGrid(
+                      child: Container(
+                        width: double.maxFinite,
+                        child: Padding(
+                          padding:
+                              EdgeInsets.only(top: _filterOpen ? 60.0 : 0.0),
+                          child: Expanded(
+                            child: _RecetasGrid(
                               recetas: recetas,
                               controller: gridScrollController,
-                              refreshDataCallback: _fetchRecetas,),
+                              refreshDataCallback: _fetchRecetas,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -132,7 +152,11 @@ class _DescubrirState extends State<DescubrirPage> {
 }
 
 class TopCard extends StatefulWidget {
-  TopCard({this.openCallBack, this.setCategoriaCallBack, this.searchCallBack, this.categorias});
+  TopCard(
+      {this.openCallBack,
+      this.setCategoriaCallBack,
+      this.searchCallBack,
+      this.categorias});
   final Function openCallBack;
   final Function setCategoriaCallBack;
   final Function searchCallBack;
@@ -244,7 +268,9 @@ class _TopCardState extends State<TopCard> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Row(
-                  mainAxisAlignment: (search)? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: (search)
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     (search)
                         ? SizedBox.shrink()
@@ -279,10 +305,12 @@ class _TopCardState extends State<TopCard> {
                             size: 28.0,
                           ),
                         ),
-                        SizedBox(width: (search)? 10.0 : 5.0,),
+                        SizedBox(
+                          width: (search) ? 10.0 : 5.0,
+                        ),
                         (search)
                             ? SizedBox(
-                              width: MediaQuery.of(context).size.width - 120,
+                                width: MediaQuery.of(context).size.width - 120,
                                 child: TextField(
                                   onChanged: (data) {
                                     widget.searchCallBack(data);
@@ -313,7 +341,9 @@ class _TopCardState extends State<TopCard> {
                                 ),
                               )
                             : SizedBox.shrink(),
-                            SizedBox(width: (search)? 10.0 : 5.0,),
+                        SizedBox(
+                          width: (search) ? 10.0 : 5.0,
+                        ),
                         GestureDetector(
                           onTap: () {
                             if (open) {
@@ -360,24 +390,40 @@ class _RecetasGrid extends StatelessWidget {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
 
-    return GridView.builder(
-      scrollDirection: Axis.vertical,
-      controller: controller,
-      itemCount: recetas.length + 2,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: (3 / 4),
-      ),
-      itemBuilder: (BuildContext context, int index) {
-        if (index < 2) {
-          return Container(
-            height: 30,
-            width: 30,
-          );
+    return NotificationListener<UserScrollNotification>(
+      onNotification: (notification) {
+        if (notification.direction == ScrollDirection.idle) {
+          if (controller.offset < 150) {
+            controller.animateTo(150,
+                duration: Duration(milliseconds: 500), curve: Curves.linear);
+          }
         }
-        Receta receta = recetas[index - 2];
-        return RecetaTile(receta, h / 3, (w - 40) / 2, refreshDataCallback: refreshDataCallback,);
       },
+      child: GridView.builder(
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        controller: controller,
+        itemCount: recetas.length + 2,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: (3 / 4),
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          if (index < 2) {
+            return Container(
+              height: 30,
+              width: 30,
+            );
+          }
+          Receta receta = recetas[index - 2];
+          return RecetaTile(
+            receta,
+            h / 3,
+            (w - 40) / 2,
+            refreshDataCallback: refreshDataCallback,
+          );
+        },
+      ),
     );
   }
 }

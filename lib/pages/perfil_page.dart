@@ -44,14 +44,15 @@ class _PerfilState extends State<PerfilPage> {
   bool _isLoged;
   bool _isLoading = false;
   String nombre, email, ubicacion, descripcion, kcalDiarias;
+  TextEditingController descripcionController = new TextEditingController();
   List<Choice> dietas = new List<Choice>();
   Choice dieta;
 
   @override
   initState() {
-    dietas.add(Choice("Omnivora","o"));
-    dietas.add(Choice("Vegetariana","v"));
-    dietas.add(Choice("Vegana","n"));
+    dietas.add(Choice("Omnivora", "o"));
+    dietas.add(Choice("Vegetariana", "v"));
+    dietas.add(Choice("Vegana", "n"));
     _isLoged = widget._isLoged;
     _fetchPerfil();
     super.initState();
@@ -65,9 +66,10 @@ class _PerfilState extends State<PerfilPage> {
     perfil = await service.getPerfil();
 
     nombre = perfil.nombre;
-    email = perfil.email;
-    ubicacion = perfil.ubicacion;
+    email = perfil.email ?? "email";
+    ubicacion = perfil.ubicacion ?? "Ubicación desconocida";
     descripcion = perfil.descripcion;
+    descripcionController.text = descripcion;
     kcalDiarias = perfil.kcalDiarias;
 
     apiCategorias = await recetaService.getCategorias();
@@ -75,8 +77,8 @@ class _PerfilState extends State<PerfilPage> {
     apiRecetas = await recetaService.getRecetas(categorias: categorias);
     recetas = apiRecetas.data;
 
-    for(Choice d in dietas){
-      if(d.code == perfil.dieta){
+    for (Choice d in dietas) {
+      if (d.code == perfil.dieta) {
         dieta = d;
       }
     }
@@ -96,33 +98,36 @@ class _PerfilState extends State<PerfilPage> {
 
   logout() async {
     print("logout");
-    showDialog(context: context, builder: (context) {
-      String contentText = "Cerrar Sesión";
-      return AlertDialog(
-        title: Text(contentText),
-          content: Container(child:Text("¿Estas Seguro de que quieres cerrar la Sesión?")),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Cancelar"),
-              onPressed: () {
-                // setState(() {
-                //   return false;
-                // });
-                Navigator.of(context).pop(false);
-              },
-            ),
-            FlatButton(
-              child: Text("Aceptar"),
-              onPressed: () {
-                // setState(() {
-                //   return true;
-                // });
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-      );
-    }).then((data) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          String contentText = "Cerrar Sesión";
+          return AlertDialog(
+            title: Text(contentText),
+            content: Container(
+                child: Text("¿Estas Seguro de que quieres cerrar la Sesión?")),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  // setState(() {
+                  //   return false;
+                  // });
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              FlatButton(
+                child: Text("Aceptar"),
+                onPressed: () {
+                  // setState(() {
+                  //   return true;
+                  // });
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        }).then((data) {
       if (data) {
         print("do log out");
         service.logout();
@@ -130,8 +135,7 @@ class _PerfilState extends State<PerfilPage> {
           _isLoged = false;
           widget._loginCallback(_isLoged);
         });
-      }
-      else {
+      } else {
         print("cancel");
       }
     });
@@ -165,10 +169,10 @@ class _PerfilState extends State<PerfilPage> {
                   height: 200.0,
                   decoration: BoxDecoration(
                     color: Colors.pinkAccent,
-                    image: new DecorationImage(
-                      image: new ExactAssetImage("assets/images/pasta.jpeg"),
+                     image: (perfil.fondoUrl != null) ? new DecorationImage(
+                      image: new NetworkImage(perfil.fondoUrl),
                       fit: BoxFit.cover,
-                    ),
+                    ) : null,
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
@@ -301,57 +305,73 @@ class _PerfilState extends State<PerfilPage> {
                                   ],
                                 ),
                               ),
-                              Container(
-                                margin:
-                                    EdgeInsets.only(top: 25.0, bottom: 10.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        Text(
-                                          "12",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.0),
-                                        ),
-                                        SizedBox(
-                                          width: 5.0,
-                                        ),
-                                        Text(
-                                          "Seguidores",
-                                          style: TextStyle(fontSize: 16.0),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 60.0,
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        Text(
-                                          "32",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.0),
-                                        ),
-                                        SizedBox(
-                                          width: 5.0,
-                                        ),
-                                        Text(
-                                          "Seguidos",
-                                          style: TextStyle(fontSize: 16.0),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                              // Container(
+                              //   margin:
+                              //       EdgeInsets.only(top: 25.0, bottom: 10.0),
+                              //   child: Row(
+                              //     mainAxisAlignment: MainAxisAlignment.start,
+                              //     children: <Widget>[
+                              //       Row(
+                              //         children: <Widget>[
+                              //           Text(
+                              //             "12",
+                              //             style: TextStyle(
+                              //                 fontWeight: FontWeight.bold,
+                              //                 fontSize: 16.0),
+                              //           ),
+                              //           SizedBox(
+                              //             width: 5.0,
+                              //           ),
+                              //           Text(
+                              //             "Seguidores",
+                              //             style: TextStyle(fontSize: 16.0),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //       SizedBox(
+                              //         width: 60.0,
+                              //       ),
+                              //       Row(
+                              //         children: <Widget>[
+                              //           Text(
+                              //             "32",
+                              //             style: TextStyle(
+                              //                 fontWeight: FontWeight.bold,
+                              //                 fontSize: 16.0),
+                              //           ),
+                              //           SizedBox(
+                              //             width: 5.0,
+                              //           ),
+                              //           Text(
+                              //             "Seguidos",
+                              //             style: TextStyle(fontSize: 16.0),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                              SizedBox(
+                                height: 20.0,
                               ),
                               Container(
                                 padding: EdgeInsets.only(
                                   bottom: 15.0,
                                 ),
-                                child: Text(descripcion),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: TextField(
+                                    controller: descripcionController,
+                                    readOnly: true,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    minLines: 3,
+                                    decoration: InputDecoration(
+                                      hintText: "Añade una descipción",
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
                               ),
                               Container(
                                 margin: EdgeInsets.symmetric(vertical: 10.0),
@@ -428,8 +448,7 @@ class _PerfilState extends State<PerfilPage> {
                         fontWeight: FontWeight.bold,
                       )),
                   SizedBox(
-                      height: 160.0,
-                      child: new RecetaList(160.0, recetasFav)),
+                      height: 160.0, child: new RecetaList(160.0, recetasFav)),
                 ],
               ),
             ),
