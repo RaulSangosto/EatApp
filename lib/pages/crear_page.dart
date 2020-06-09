@@ -44,7 +44,7 @@ class _CrearState extends State<CrearPage> {
   APIResponse<List<Ingrediente>> _apiResponse;
   APIResponse<List<Categoria>> _apiResponseCategoria;
   String errorMessage;
-  String formErrors;
+  Map<String, dynamic> formErrors;
 
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _prepController = TextEditingController();
@@ -72,6 +72,8 @@ class _CrearState extends State<CrearPage> {
     dietas.add(Choice("Vegetariana", "v"));
     dietas.add(Choice("Vegana", "n"));
     _personasController.text = "1";
+    formErrors = new Map<String, dynamic>();
+
     if (_isEditing) {
       _tituloController.text = widget._receta.titulo;
       _prepController.text = widget._receta.minutes.toString();
@@ -147,86 +149,86 @@ class _CrearState extends State<CrearPage> {
     setState(() {
       _isLoading = true;
     });
-    if (categoriaSelected == null ||
-        _prepController.text == null ||
-        _prepController.text == "" ||
-        _kcalController.text == null ||
-        _kcalController.text == "" ||
-        _tituloController.text == null ||
-        _tituloController.text == "" ||
-        _descrController.text == null ||
-        _descrController.text == "" ||
-        dieta == null ||
-        _instrucciones.length <= 0) {
-      formErrors = "Errores: ";
-      if (categoriaSelected == null) {
-        formErrors += "Debes Seleccionar una Categoria\n";
+    // if (categoriaSelected == null ||
+    //     _prepController.text == null ||
+    //     _prepController.text == "" ||
+    //     _kcalController.text == null ||
+    //     _kcalController.text == "" ||
+    //     _tituloController.text == null ||
+    //     _tituloController.text == "" ||
+    //     _descrController.text == null ||
+    //     _descrController.text == "" ||
+    //     dieta == null ||
+    //     _instrucciones.length <= 0) {
+    //   formErrors = "Errores: ";
+    //   if (categoriaSelected == null) {
+    //     formErrors += "Debes Seleccionar una Categoria\n";
+    //   }
+    //   if (_prepController.text == null || _prepController.text == "") {
+    //     formErrors += "Debes Indicar un Tiempo de Preparacion\n";
+    //   }
+    //   if (_kcalController.text == null || _kcalController.text == "") {
+    //     formErrors += "Debes Indicar las Kilocalorías\n";
+    //   }
+    //   if (_tituloController.text == null || _tituloController.text == "") {
+    //     formErrors += "Debes Indicar un Título\n";
+    //   }
+    //   if (_descrController.text == null || _descrController.text == "") {
+    //     formErrors += "Debes Indicar una Descripción\n";
+    //   }
+    //   if (dieta == null) {
+    //     formErrors += "Debes seleccionar una Dieta\n";
+    //   }
+    //   if (_instrucciones.length <= 0) {
+    //     formErrors += "Debes Añadir algún Ingrediente\n";
+    //   }
+    // }
+    perfil = await perfilService.getPerfil();
+    final receta = Receta(
+      titulo: _tituloController.text ?? "titulo",
+      imgUrl: _image != null
+          ? 'data:image/png;base64,' + base64Encode(_image.readAsBytesSync())
+          : '',
+      minutes: int.parse(_prepController.text ?? "20"),
+      kcal: int.parse(_kcalController.text ?? "120"),
+      descripcion: _descrController.text ?? "descripcion",
+      categoria: categoriaSelected,
+      autor_id: perfil.id,
+      dieta: dieta.code,
+    );
+
+    final result = await service.createReceta(receta);
+
+    if (result.data != null) {
+      Receta _receta = result.data;
+      for (var item in _instrucciones) {
+        item.receta = _receta;
+        print(item.receta);
+        await service.createInstruccion(item);
       }
-      if (_prepController.text == null || _prepController.text == "") {
-        formErrors += "Debes Indicar un Tiempo de Preparacion\n";
-      }
-      if (_kcalController.text == null || _kcalController.text == "") {
-        formErrors += "Debes Indicar las Kilocalorías\n";
-      }
-      if (_tituloController.text == null || _tituloController.text == "") {
-        formErrors += "Debes Indicar un Título\n";
-      }
-      if (_descrController.text == null || _descrController.text == "") {
-        formErrors += "Debes Indicar una Descripción\n";
-      }
-      if (dieta == null) {
-        formErrors += "Debes seleccionar una Dieta\n";
-      }
-      if (_instrucciones.length <= 0) {
-        formErrors += "Debes Añadir algún Ingrediente\n";
-      }
+
+      final titulo = "Crear Receta";
+      final text = result.error
+          ? (result.errorMessage ?? "Ha ocurrido un error")
+          : "La Receta ha sido publicada correctamente.";
+
+      showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+                title: Text(titulo),
+                content: Text(text),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Ok"))
+                ],
+              )).then((data) {
+        widget._pageIdCallback(1);
+      });
     } else {
-      formErrors = "";
-      perfil = await perfilService.getPerfil();
-      final receta = Receta(
-        titulo: _tituloController.text ?? "titulo",
-        imgUrl: _image != null
-            ? 'data:image/png;base64,' + base64Encode(_image.readAsBytesSync())
-            : '',
-        minutes: int.parse(_prepController.text ?? "20"),
-        kcal: int.parse(_kcalController.text ?? "120"),
-        descripcion: _descrController.text ?? "descripcion",
-        categoria: categoriaSelected,
-        autor_id: perfil.id,
-        dieta: dieta.code,
-      );
-
-      final result = await service.createReceta(receta);
-
-      if (result.data != null) {
-        Receta _receta = result.data;
-        for (var item in _instrucciones) {
-          item.receta = _receta;
-          print(item.receta);
-          await service.createInstruccion(item);
-        }
-
-        final titulo = "Crear Receta";
-        final text = result.error
-            ? (result.errorMessage ?? "Ha ocurrido un error")
-            : "La Receta ha sido publicada correctamente.";
-
-        showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-                  title: Text(titulo),
-                  content: Text(text),
-                  actions: <Widget>[
-                    FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("Ok"))
-                  ],
-                )).then((data) {
-          widget._pageIdCallback(1);
-        });
-      }
+      formErrors = json.decode(result.errorMessage);
     }
 
     setState(() {
@@ -410,9 +412,9 @@ class _CrearState extends State<CrearPage> {
                   padding: EdgeInsets.all(30.0),
                   child: Column(
                     children: <Widget>[
-                      formErrors == null || formErrors == ""
+                      formErrors == null
                           ? SizedBox.shrink()
-                          : Text(formErrors,
+                          : Text(json.encode(formErrors),
                               style: TextStyle(color: Colors.redAccent)),
                       Row(
                         children: <Widget>[
@@ -458,6 +460,10 @@ class _CrearState extends State<CrearPage> {
                         controller: _tituloController,
                         maxLength: 100,
                         decoration: InputDecoration(
+                          errorText: (formErrors != null &&
+                                  formErrors["titulo"] != null)
+                              ? formErrors["titulo"][0]
+                              : null,
                           hintText: "Nombre del Plato",
                           isDense: true,
                         ),
@@ -473,6 +479,10 @@ class _CrearState extends State<CrearPage> {
                         maxLines: null,
                         minLines: 3,
                         decoration: InputDecoration(
+                          errorText: (formErrors != null &&
+                                  formErrors["descripcion"] != null)
+                              ? formErrors["descripcion"][0]
+                              : null,
                           isDense: true,
                           hintText: "Añade una descripción...",
                           hintStyle: TextStyle(
@@ -627,6 +637,11 @@ class _CrearState extends State<CrearPage> {
                                     WhitelistingTextInputFormatter.digitsOnly
                                   ], // Only numbers can be entered
                                   decoration: InputDecoration(
+                                    errorText: (formErrors != null &&
+                                            formErrors["minutos_preparacion"] !=
+                                                null)
+                                        ? formErrors["minutos_preparacion"][0]
+                                        : null,
                                     hintText: "000",
                                     counterText: "",
                                     border: InputBorder.none,
@@ -653,6 +668,10 @@ class _CrearState extends State<CrearPage> {
                                     WhitelistingTextInputFormatter.digitsOnly
                                   ], // Only numbers can be entered
                                   decoration: InputDecoration(
+                                    errorText: (formErrors != null &&
+                                            formErrors["kcal"] != null)
+                                        ? formErrors["kcal"][0]
+                                        : null,
                                     hintText: "0000",
                                     counterText: "",
                                     border: InputBorder.none,
@@ -735,13 +754,14 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
   TextEditingController _filterController = TextEditingController();
   TextEditingController _nombreIngredienteController = TextEditingController();
   String contentText = "Añadir Instrucción";
-  String formErrors = "";
+  Map<String, dynamic> formErrors;
   bool _isLoading = false;
   bool addIngrediente = false;
 
   @override
   void initState() {
     _fetchIngredientes();
+    formErrors = new Map<String, dynamic>();
     super.initState();
   }
 
@@ -788,31 +808,26 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
   _addIngrediente() async {
     Ingrediente newIngrediente;
     setState(() {
-      formErrors = "";
-      if (alergenoSelected == null) {
-        formErrors += "Debes seleccionar un Alergeno.";
-      }
-      if (_nombreIngredienteController.text == "" ||
-          _nombreIngredienteController.text == null) {
-        formErrors += "Debes indicar un Nombre.";
-      }
-    });
-    if (formErrors == "") {
       _isLoading = true;
-      newIngrediente = new Ingrediente(
-          alergeno: alergenoSelected,
-          nombre: _nombreIngredienteController.text);
-      APIResponse<Ingrediente> _apiResponseNewIngrediente =
-          await service.createIngrediente(newIngrediente, _alergenos);
+    });
+
+    newIngrediente = new Ingrediente(
+        alergeno: alergenoSelected, nombre: _nombreIngredienteController.text);
+    APIResponse<Ingrediente> _apiResponseNewIngrediente =
+        await service.createIngrediente(newIngrediente, _alergenos);
+    if (_apiResponseNewIngrediente.data != null) {
       newIngrediente == _apiResponseNewIngrediente.data;
+    } else {
+      formErrors = json.decode(_apiResponseNewIngrediente.errorMessage);
     }
+
     setState(() {
       if (newIngrediente != null) {
         ingredienteSelected = newIngrediente;
+        _fetchIngredientes();
+        addIngrediente = false;
       }
       _isLoading = false;
-      _fetchIngredientes();
-      addIngrediente = false;
     });
   }
 
@@ -854,6 +869,7 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                           items: _alergenos.map<DropdownMenuItem<Alergeno>>(
                               (Alergeno value) {
                             return DropdownMenuItem<Alergeno>(
+                              key: UniqueKey(),
                               value: value,
                               child: Text(value.nombre),
                             );
@@ -864,8 +880,13 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                         ),
                         TextField(
                           controller: _nombreIngredienteController,
-                          decoration:
-                              InputDecoration(hintText: "Nombre Ingrediente"),
+                          decoration: InputDecoration(
+                            hintText: "Nombre Ingrediente",
+                            errorText: (formErrors != null &&
+                                    formErrors["nombre"] != null)
+                                ? formErrors["nombre"][0]
+                                : null,
+                          ),
                         ),
                         SizedBox(
                           height: 50.0,
@@ -991,6 +1012,10 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                             controller: _cantidadController,
                             maxLength: 100,
                             decoration: InputDecoration(
+                              errorText: (formErrors != null &&
+                                      formErrors["cantidad"] != null)
+                                  ? formErrors["cantidad"][0]
+                                  : null,
                               hintText: "Cantidad",
                               isDense: true,
                             ),

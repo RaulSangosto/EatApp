@@ -129,7 +129,7 @@ class RecetasService {
           data: null,
           error: true,
           errorMessage:
-              "ERROR " + data.statusCode.toString() + ': An error occurred');
+              data.body);
     }).catchError((_) => APIResponse<Receta>(
             data: null, error: true, errorMessage: 'An error occurred'));
   }
@@ -147,7 +147,7 @@ class RecetasService {
           data: false,
           error: true,
           errorMessage:
-              "ERROR " + data.statusCode.toString() + ': An error occurred');
+              data.body);
     }).catchError((_) => APIResponse<bool>(
         data: false, error: true, errorMessage: 'An error occurred'));
   }
@@ -167,7 +167,7 @@ class RecetasService {
       }
       return APIResponse<List<Categoria>>(
           error: true,
-          errorMessage: data.statusCode.toString() + ': An error occurred');
+          errorMessage: data.body);
     }).catchError((_) => APIResponse<List<Categoria>>(
         error: true, errorMessage: 'An error occurred'));
   }
@@ -185,7 +185,7 @@ class RecetasService {
       }
       return APIResponse<Categoria>(
           error: true,
-          errorMessage: data.statusCode.toString() + ': An error occurred');
+          errorMessage: data.body);
     }).catchError((_) =>
         APIResponse<Categoria>(error: true, errorMessage: 'An error occurred'));
   }
@@ -206,7 +206,7 @@ class RecetasService {
       }
       return APIResponse<List<Ingrediente>>(
           error: true,
-          errorMessage: data.statusCode.toString() + ': An error occurred');
+          errorMessage: data.body);
     }).catchError((_) => APIResponse<List<Ingrediente>>(
         error: true, errorMessage: 'An error occurred'));
   }
@@ -229,7 +229,7 @@ class RecetasService {
           data: null,
           error: true,
           errorMessage:
-              "ERROR " + data.statusCode.toString() + ': An error occurred');
+              data.body);
     }).catchError((_) => APIResponse<Ingrediente>(
             data: null, error: true, errorMessage: 'An error occurred'));
   }
@@ -249,7 +249,7 @@ class RecetasService {
       }
       return APIResponse<List<Alergeno>>(
           error: true,
-          errorMessage: data.statusCode.toString() + ': An error occurred');
+          errorMessage: data.body);
     }).catchError((_) => APIResponse<List<Alergeno>>(
         error: true, errorMessage: 'An error occurred'));
   }
@@ -278,7 +278,7 @@ class RecetasService {
       }
       return APIResponse<List<Instruccion>>(
           error: true,
-          errorMessage: data.statusCode.toString() + ': An error occurred');
+          errorMessage: data.body);
     }).catchError((_) => APIResponse<List<Instruccion>>(
         error: true, errorMessage: 'An error occurred'));
   }
@@ -300,7 +300,7 @@ class RecetasService {
           data: false,
           error: true,
           errorMessage:
-              "ERROR " + data.statusCode.toString() + ': An error occurred');
+              data.body);
     }).catchError((_) => APIResponse<bool>(
             data: false, error: true, errorMessage: 'An error occurred'));
   }

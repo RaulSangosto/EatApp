@@ -445,6 +445,7 @@ class _RecetaState extends State<RecetaPage> {
                                             .map<DropdownMenuItem<Categoria>>(
                                                 (Categoria value) {
                                           return DropdownMenuItem<Categoria>(
+                                            key: UniqueKey(),
                                             value: value,
                                             child: Text(value.titulo),
                                           );
@@ -894,6 +895,7 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                           items: _alergenos.map<DropdownMenuItem<Alergeno>>(
                               (Alergeno value) {
                             return DropdownMenuItem<Alergeno>(
+                              key: UniqueKey(),
                               value: value,
                               child: Text(value.nombre),
                             );

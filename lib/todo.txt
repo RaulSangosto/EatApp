@@ -12,7 +12,6 @@
 
     -Perfil   1 día
         -mejorar añadir a favoritos ? 
-        -Mejorar verificación !!!   --- Frontend
         -Como seleccionar categorias diarias?
         -Pasar la verificacion al backend !!!
     
