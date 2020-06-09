@@ -48,7 +48,6 @@ class PerfilSaveSerializer(serializers.ModelSerializer):
         return value
 
     def validate_password(self, value):
-        print("validate password")
         validate_password_orig(value)
         return value
 

@@ -82,7 +82,6 @@ class PerfilService {
         .patch(API + "perfil/me",
             headers: headers, body: jsonEncode(newP.toJson(patch: true)))
         .then((data) {
-      print(data.statusCode);
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
         if (perfil.avatarUrl != null) {
@@ -93,8 +92,6 @@ class PerfilService {
           String url = "http://" + Configuration.localhost + perfil.fondoUrl;
           perfil.fondoUrl = url;
         }
-      } else {
-        print(data.body);
       }
     });
     return perfil;
@@ -129,7 +126,6 @@ class PerfilService {
       @required String username,
       @required String password,
       @required String password2}) async {
-    print("register");
     Map<String, dynamic> body = perfil.toJson();
     Map<String, dynamic> extra = {
       "username": username,
@@ -147,7 +143,6 @@ class PerfilService {
       body: jsonEncode(body),
     )
         .then((data) async {
-      print(data.statusCode);
       if (data.statusCode == 200) {
         String _token = json.decode(data.body)['token'];
         if (_token != null) {

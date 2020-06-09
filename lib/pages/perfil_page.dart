@@ -97,7 +97,6 @@ class _PerfilState extends State<PerfilPage> {
   }
 
   logout() async {
-    print("logout");
     showDialog(
         context: context,
         builder: (context) {
@@ -129,7 +128,6 @@ class _PerfilState extends State<PerfilPage> {
           );
         }).then((data) {
       if (data) {
-        print("do log out");
         service.logout();
         setState(() {
           _isLoged = false;
@@ -143,7 +141,6 @@ class _PerfilState extends State<PerfilPage> {
                                 Scaffold.of(context).showSnackBar(snackBar);
         });
       } else {
-        print("cancel");
       }
     });
   }

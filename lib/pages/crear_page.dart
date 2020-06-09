@@ -182,7 +182,6 @@ class _CrearState extends State<CrearPage> {
       Receta _receta = result.data;
       for (var item in _instrucciones) {
         item.receta = _receta;
-        print(item.receta);
         await service.createInstruccion(item);
       }
 

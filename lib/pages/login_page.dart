@@ -63,7 +63,6 @@ class _LoginState extends State<LoginPage> {
 
     setState(() {
       _isLoading = false;
-      //print(loginResponse.data.nombre);
       widget._pageIdCallback(0);
       widget._loginCallback(_isLoged);
     });

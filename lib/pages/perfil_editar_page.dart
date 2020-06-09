@@ -116,7 +116,6 @@ class _PerfilState extends State<PerfilEditarPage> {
   }
 
   logout() async {
-    print("logout");
     service.logout();
   }
 
@@ -183,7 +182,6 @@ class _PerfilState extends State<PerfilEditarPage> {
     }
 
     setState(() {
-      print(perfil.fondoUrl);
       _isLoading = false;
     });
   }

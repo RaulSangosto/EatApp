@@ -30,7 +30,6 @@ class _PerfilAvatar extends State<PerfilAvatar> {
   }
 
   _fetchPerfil() async {
-    print("loading perfil");
     setState(() {
       _isLoading = true;
     });

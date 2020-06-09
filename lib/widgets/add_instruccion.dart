@@ -82,7 +82,6 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
   }
 
   _searchFilter(data) {
-    print("filter: " + data);
     setState(() {
       if (data != null) {
         _filteredIngredientes = _ingredientes
@@ -90,7 +89,6 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                 .toLowerCase()
                 .contains(_filterController.text.toLowerCase()))
             .toList();
-        print(_filteredIngredientes.length);
       } else {
         _filteredIngredientes = _ingredientes;
       }
@@ -363,8 +361,6 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                       widget.addInstruccionCallBack(_instruccion);
                     });
                     Navigator.of(context).pop();
-                  } else {
-                    print(formErrors);
                   }
                 },
               ),

@@ -11,7 +11,6 @@
             -por ingredientes
 
     -Perfil   1 día
-        -Añadir a favoritos no funciona !!! 
         -Como seleccionar categorias diarias?
     
     -Añadir Animaciones y Transiciones ???   1 día

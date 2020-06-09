@@ -1,10 +1,13 @@
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/receta_services.dart';
 import 'package:eatapp/widgets/receta_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
+
+import '../perfil_services.dart';
 
 class DescubrirPage extends StatefulWidget {
   const DescubrirPage(
@@ -27,6 +30,7 @@ class DescubrirPage extends StatefulWidget {
 }
 
 class _DescubrirState extends State<DescubrirPage> {
+  PerfilService get perfilService => GetIt.I<PerfilService>();
   RecetasService get service => GetIt.I<RecetasService>();
   APIResponse<List<Receta>> _apiResponse;
   APIResponse<List<Categoria>> _apiResponseCategorias;
@@ -37,6 +41,7 @@ class _DescubrirState extends State<DescubrirPage> {
   String searchParams;
   bool _isLoading = false;
   bool _filterOpen = false;
+  Perfil perfil;
 
   _scrollListener() {
     if (recetas.length <= 2) {
@@ -73,16 +78,38 @@ class _DescubrirState extends State<DescubrirPage> {
       gridScrollController.animateTo(150,
           duration: Duration(milliseconds: 500), curve: Curves.linear);
     });
-    print(params);
   }
 
   @override
   void initState() {
     _fetchRecetas();
+    _fetchPerfil();
     super.initState();
     gridScrollController =
         new ScrollController(initialScrollOffset: 150, keepScrollOffset: true);
     gridScrollController.addListener(_scrollListener);
+  }
+
+  _fetchPerfil() async {
+    setState(() {
+      _isLoading = true;
+    });
+    Perfil getperfil = await perfilService.getPerfil();
+    setState(() {
+      perfil = getperfil;
+      _isLoading = false;
+    });
+  }
+
+  _updatePerfilCallback() async {
+    setState(() {
+      _isLoading = true;
+    });
+    Perfil getperfil = await perfilService.updatePerfil();
+    setState(() {
+      perfil = getperfil;
+      _isLoading = false;
+    });
   }
 
   _fetchRecetas() async {
@@ -132,6 +159,8 @@ class _DescubrirState extends State<DescubrirPage> {
                                     recetas: recetas,
                                     controller: gridScrollController,
                                     refreshDataCallback: _fetchRecetas,
+                                    perfil: perfil,
+                                    updatePerfilCallback: _updatePerfilCallback,
                                   ),
                                 ),
                               ),
@@ -383,9 +412,16 @@ class _TopCardState extends State<TopCard> {
 class _RecetasGrid extends StatelessWidget {
   final List<Receta> recetas;
   final ScrollController controller;
+  final Perfil perfil;
   final Function refreshDataCallback;
+  final Function updatePerfilCallback;
 
-  _RecetasGrid({this.recetas, this.controller, this.refreshDataCallback});
+  _RecetasGrid(
+      {this.recetas,
+      this.controller,
+      this.refreshDataCallback,
+      this.perfil,
+      this.updatePerfilCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -422,6 +458,7 @@ class _RecetasGrid extends StatelessWidget {
             receta,
             h / 3,
             (w - 40) / 2,
+            perfil,
             refreshDataCallback: refreshDataCallback,
           );
         },

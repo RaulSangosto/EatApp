@@ -193,7 +193,6 @@ class _RecetaState extends State<RecetaPage> {
         }
         if (!exist) {
           item.receta = _newReceta;
-          print(item.receta);
           await service.createInstruccion(item);
         }
       }
@@ -345,7 +344,6 @@ class _RecetaState extends State<RecetaPage> {
                                           color: Color(0xff48A299),
                                         ),
                                         onPressed: () {
-                                          print(perfil.id);
                                           setState(() {
                                             _isEditing = true;
                                           });

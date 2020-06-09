@@ -53,7 +53,6 @@ class RecetasService {
       "Content-Type": "application/json; charset=UTF-8",
     };
     return http.get(API + "recetas/ultimas", headers: headers).then((data) {
-      print("ultimas recetas: " + data.statusCode.toString());
       if (data.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
         final recetas = <Receta>[];
@@ -96,7 +95,6 @@ class RecetasService {
             },
             body: jsonEncode(receta.toJson()))
         .then((data) {
-      print(data.statusCode);
       if (data.statusCode == 201) {
         return APIResponse<Receta>(
             data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes)),
@@ -120,7 +118,6 @@ class RecetasService {
             },
             body: jsonEncode(receta.toJson(patch: true)))
         .then((data) {
-      print(data.statusCode);
       if (data.statusCode == 200) {
         return APIResponse<Receta>(data: Receta.fromJson(jsonDecode(utf8.decode(data.bodyBytes)),
                 categoria: receta.categoria));
@@ -139,7 +136,6 @@ class RecetasService {
       "Accept": "application/json; charset=UTF-8",
       "Content-Type": "application/json; charset=UTF-8",
     }).then((data) {
-      print(data.statusCode);
       if (data.statusCode == 200) {
         return APIResponse<bool>(data: true);
       }
@@ -220,7 +216,6 @@ class RecetasService {
             },
             body: jsonEncode(ingrediente.toJson()))
         .then((data) {
-      print(data.statusCode);
       if (data.statusCode == 201) {
         return APIResponse<Ingrediente>(
             data: Ingrediente.fromJson(jsonDecode(utf8.decode(data.bodyBytes)), alergenos));
@@ -268,7 +263,6 @@ class RecetasService {
         queryParameters);
     return http.get(uri, headers: headers).then((data) {
       if (data.statusCode == 200) {
-        print(data.statusCode);
         final jsonData = json.decode(utf8.decode(data.bodyBytes));
         final instrucciones = <Instruccion>[];
         for (var item in jsonData) {
@@ -292,7 +286,6 @@ class RecetasService {
             },
             body: jsonEncode(instruccion.toJson()))
         .then((data) {
-      print(data.statusCode);
       if (data.statusCode == 201) {
         return APIResponse<bool>(data: true);
       }

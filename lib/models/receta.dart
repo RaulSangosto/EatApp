@@ -111,14 +111,12 @@ class Instruccion {
         ingrediente = i;
       }
     }
-    print(receta);
     Instruccion i = new Instruccion(
       id: json['id'],
       ingrediente: ingrediente,
       cantidad: json['cantidad'],
       receta: receta,
     );
-    print(i);
     return i;
   }
 

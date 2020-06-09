@@ -1,18 +1,20 @@
 import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/pages/receta_page.dart';
-import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 class RecetaTile extends StatefulWidget {
-  RecetaTile(this.receta, this.height, this.width,
-      {this.margin = 0, this.refreshDataCallback});
+  RecetaTile(this.receta, this.height, this.width, this.perfil,
+      {this.margin = 0,
+      @required this.refreshDataCallback,
+      @required this.updatePerfilCallback});
   final Receta receta;
   final double height;
   final double width;
   final double margin;
+  final Perfil perfil;
   final Function refreshDataCallback;
+  final Function updatePerfilCallback;
 
   @override
   State<StatefulWidget> createState() {
@@ -21,32 +23,19 @@ class RecetaTile extends StatefulWidget {
 }
 
 class _RecetaTile extends State<RecetaTile> {
-  PerfilService get perfilService => GetIt.I<PerfilService>();
   bool _favorito;
   bool _isLoading = false;
-  Perfil perfil;
 
   @override
   void initState() {
-    _fetchPerfil();
-    super.initState();
-  }
-
-  _fetchPerfil() async {
-    setState(() {
-      _isLoading = true;
-    });
-    perfil = await perfilService.getPerfil();
-    for (int fav in perfil.favoritos) {
+    for (int fav in widget.perfil.favoritos) {
       if (fav == widget.receta.id) {
         widget.receta.favorito = true;
         break;
       }
     }
     _favorito = widget.receta.favorito;
-    setState(() {
-      _isLoading = false;
-    });
+    super.initState();
   }
 
   @override
@@ -63,16 +52,13 @@ class _RecetaTile extends State<RecetaTile> {
                       builder: (context) =>
                           RecetaPage(recetaId: widget.receta.id)),
                 ).then((value) {
-                  print("vuelvo a " +
-                      widget.receta.id.toString() +
-                      value.toString());
                   if (value == null) {
                     value = false;
                   }
                   setState(() {
                     _favorito = value;
                     widget.receta.favorito = _favorito;
-                    widget.refreshDataCallback();
+                    widget.updatePerfilCallback();
                   });
                 });
               },
@@ -100,15 +86,16 @@ class _RecetaTile extends State<RecetaTile> {
                           onTap: () async {
                             setState(() {
                               if (_favorito) {
-                                perfil.favoritos.remove(widget.receta.id);
+                                widget.perfil.favoritos
+                                    .remove(widget.receta.id);
                                 _favorito = false;
                               } else {
-                                perfil.favoritos.add(widget.receta.id);
+                                widget.perfil.favoritos.add(widget.receta.id);
                                 _favorito = true;
                               }
                               widget.receta.favorito = _favorito;
                             });
-                            perfil = await perfilService.updatePerfil();
+                            widget.updatePerfilCallback();
                           },
                           child: Icon(
                               _favorito
