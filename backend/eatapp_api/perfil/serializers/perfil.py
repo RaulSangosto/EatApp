@@ -90,7 +90,7 @@ class RegistroSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Perfil
-        exclude = ["user", "foto"]
+        exclude = ["user", "foto", "favoritos"]
 
     def validate_password(self, value):
         validate_password_orig(value)

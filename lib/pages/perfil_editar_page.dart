@@ -215,7 +215,7 @@ class _PerfilState extends State<PerfilEditarPage> {
                   Container(
                     height: 150.0,
                     decoration: BoxDecoration(
-                      color: Colors.pinkAccent,
+                      color: Colors.blueGrey,
                       image: (_imageBg != null)
                           ? new DecorationImage(
                               image: new FileImage(_imageBg),

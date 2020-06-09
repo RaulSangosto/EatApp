@@ -13,7 +13,6 @@
     -Perfil   1 día
         -mejorar añadir a favoritos ? 
         -Mejorar verificación !!!   --- Frontend
-        -Poder cambiar fotos perfil !!! --- Frontend y Backend
         -Como seleccionar categorias diarias?
         -Pasar la verificacion al backend !!!
     

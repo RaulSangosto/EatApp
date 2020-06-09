@@ -134,6 +134,13 @@ class _PerfilState extends State<PerfilPage> {
         setState(() {
           _isLoged = false;
           widget._loginCallback(_isLoged);
+          final snackBar = SnackBar(
+                                  backgroundColor: Colors.white,
+                                    content: Text(
+                                        'Sesión Cerrada', style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),));
+
+                                // Find the Scaffold in the widget tree and use it to show a SnackBar.
+                                Scaffold.of(context).showSnackBar(snackBar);
         });
       } else {
         print("cancel");

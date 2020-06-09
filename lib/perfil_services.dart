@@ -99,9 +99,8 @@ class PerfilService {
     return perfil;
   }
 
-  Future<bool> login(String username, String password) async {
-    bool login;
-    login = await http
+  Future<APIResponse<Perfil>> login(String username, String password) async {
+    return await http
         .post(API + "perfil/login",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -114,12 +113,14 @@ class PerfilService {
           await getSharedPrefs();
           prefs.setString("token", _token);
           token = _token;
-          return true;
         }
+        return APIResponse<Perfil>(
+            data: Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes))));
       }
-      return false;
-    });
-    return login;
+      return APIResponse<Perfil>(
+            data: null, error: true, errorMessage: data.body);
+    }).catchError((_) => APIResponse<Perfil>(
+            data: null, error: true, errorMessage: 'An error occurred'));
   }
 
   Future<APIResponse<Perfil>> register(

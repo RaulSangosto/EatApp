@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:eatapp/models/api_response.dart';
+import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/pages/register_page.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +33,8 @@ class _LoginState extends State<LoginPage> {
   APIResponse<String> loginResponse;
   TextEditingController _userController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  APIResponse<Perfil> _apiResponsePerfil;
+  Map<String, dynamic> formErrors;
   bool _isLoading = false;
   bool _isLoged;
 
@@ -37,6 +42,7 @@ class _LoginState extends State<LoginPage> {
   initState() {
     super.initState();
     _isLoged = widget._isLoged;
+    formErrors = new Map<String,dynamic>();
   }
 
   sendData() async {
@@ -47,7 +53,13 @@ class _LoginState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    _isLoged = await perfilService.login(username, password);
+    _apiResponsePerfil = await perfilService.login(username, password);
+    if(_apiResponsePerfil.data != null){
+      _isLoged = true;
+    }
+    else{
+      formErrors = json.decode(_apiResponsePerfil.errorMessage);
+    }
 
     setState(() {
       _isLoading = false;
@@ -135,12 +147,12 @@ class _LoginState extends State<LoginPage> {
                       SizedBox(
                         height: 40.0,
                       ),
-                      LoginFormField(userController: _userController),
+                      LoginFormField(userController: _userController, formErrors: formErrors),
                       SizedBox(
                         height: 20.0,
                       ),
                       PasswordFormField(
-                          passwordController: _passwordController),
+                          passwordController: _passwordController, formErrors: formErrors),
                       SizedBox(
                         height: 40.0,
                       ),
@@ -171,14 +183,33 @@ class _LoginState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => RegisterPage()),
+                                  builder: (context) => RegisterPage(
+                                        loged: _isLoged,
+                                        loginCallback: widget._loginCallback,
+                                        pageIdCallback: widget._pageIdCallback,
+                                      )),
                             ).then((value) {
+                              if (value == null) {
+                                value = false;
+                              }
                               setState(() {
-                                //_fetchPerfil();
+                                _isLoged = value;
+                                widget._pageIdCallback(0);
+                                widget._loginCallback(_isLoged);
+                                final snackBar = SnackBar(
+                                  backgroundColor: Colors.white,
+                                    content: Text(
+                                        'Uruario Registrado Correctamente!', style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),));
+
+                                // Find the Scaffold in the widget tree and use it to show a SnackBar.
+                                Scaffold.of(context).showSnackBar(snackBar);
                               });
                             });
                           },
-                          child: Text('Registrate Aquí.', style: TextStyle(fontWeight: FontWeight.bold),)),
+                          child: Text(
+                            'Registrate Aquí.',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
                     ],
                   ),
                 ),
@@ -195,18 +226,22 @@ class LoginFormField extends StatelessWidget {
   const LoginFormField({
     Key key,
     @required TextEditingController userController,
+    @required Map<String, dynamic> formErrors,
   })  : _userController = userController,
+        _formErrors = formErrors,
         super(key: key);
 
   final TextEditingController _userController;
+  final Map<String,dynamic> _formErrors;
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return TextField(
       controller: _userController,
       //textInputAction: TextInputAction.next,
       style: TextStyle(),
       decoration: InputDecoration(
+        errorText: (_formErrors != null) ? (_formErrors["__all__"] != null) ? _formErrors["__all__"][0] : (_formErrors["username"]!= null) ? _formErrors["username"][0] : null : null,
           isDense: true,
           contentPadding:
               EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
@@ -226,12 +261,6 @@ class LoginFormField extends StatelessWidget {
           ),
           filled: true,
           fillColor: Colors.grey[300]),
-      validator: (String value) {
-        if (value.trim().isEmpty) {
-          return 'Password is required';
-        }
-        return value.trim();
-      },
     );
   }
 }
@@ -240,17 +269,22 @@ class PasswordFormField extends StatelessWidget {
   const PasswordFormField({
     Key key,
     @required TextEditingController passwordController,
+    @required Map<String, dynamic> formErrors,
   })  : _passwordController = passwordController,
+        _formErrors = formErrors,
         super(key: key);
 
   final TextEditingController _passwordController;
+  final Map<String,dynamic> _formErrors;
+
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return TextField(
       controller: _passwordController,
       obscureText: true,
       decoration: InputDecoration(
+        errorText: (_formErrors != null) ? (_formErrors["__all__"] != null) ? _formErrors["__all__"][0] : (_formErrors["password"]!= null) ? _formErrors["password"][0] : null : null,
           hintText: "Contraseña",
           isDense: true,
           contentPadding:
@@ -270,12 +304,6 @@ class PasswordFormField extends StatelessWidget {
           ),
           filled: true,
           fillColor: Colors.grey[300]),
-      validator: (String value) {
-        if (value.trim().isEmpty) {
-          return 'Password is required';
-        }
-        return value.trim();
-      },
     );
   }
 }

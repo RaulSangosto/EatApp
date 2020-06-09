@@ -13,7 +13,7 @@ class Perfil(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=200, null=True, blank=True)
     ubicacion = models.CharField(max_length=30, null=True, blank=True)
-    dieta = models.CharField(max_length=1, choices=DIETA, null=True, blank=True)
+    dieta = models.CharField(max_length=1, choices=DIETA)
     kcal_diarias = models.IntegerField(null=True, blank=True)
     foto = models.ImageField(upload_to='perfil', null=True, blank=True)
     fotoBg = models.ImageField(upload_to='perfil/Bg', null=True, blank=True)
