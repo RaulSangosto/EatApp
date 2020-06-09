@@ -90,7 +90,7 @@ class Receta {
       "kcal": kcal,
       "descripcion": descripcion,
       "dieta": dieta,
-      "categoria": categoria.id,
+      "categoria": (categoria != null) ? categoria.id : null,
     };
   }
 }

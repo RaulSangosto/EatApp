@@ -5,6 +5,7 @@ import 'package:eatapp/models/api_response.dart';
 import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/models/receta.dart';
 import 'package:eatapp/perfil_services.dart';
+import 'package:eatapp/widgets/add_instruccion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
@@ -36,7 +37,7 @@ class _RecetaState extends State<RecetaPage> {
   APIResponse<List<Categoria>> _apiResponseCategoria;
   APIResponse<List<Instruccion>> _apiResponseInstrucciones;
   String errorMessage;
-  String formErrors;
+  Map<String, dynamic> formErrors;
 
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _prepController = TextEditingController();
@@ -68,6 +69,7 @@ class _RecetaState extends State<RecetaPage> {
     dietas.add(Choice("Vegana", "n"));
     _fetchDatos();
     _personasController.text = "1";
+    formErrors = new Map<String, dynamic>();
     super.initState();
   }
 
@@ -125,7 +127,7 @@ class _RecetaState extends State<RecetaPage> {
         await service.getInstruccionesReceta(receta, _ingredientes);
     _originalInstrucciones = _apiResponseInstrucciones.data;
     _instrucciones.clear();
-    for (Instruccion i in _originalInstrucciones){
+    for (Instruccion i in _originalInstrucciones) {
       _instrucciones.add(i);
     }
 
@@ -148,103 +150,79 @@ class _RecetaState extends State<RecetaPage> {
   }
 
   sendData() async {
-    print("sendData");
-
     setState(() {
       _isLoading = true;
     });
-    if (categoriaSelected == null ||
-        _prepController.text == null ||
-        _prepController.text == "" ||
-        _kcalController.text == null ||
-        _kcalController.text == "" ||
-        _tituloController.text == null ||
-        _tituloController.text == "" ||
-        _descrController.text == null ||
-        _descrController.text == "" ||
-        dieta == null ||
-        _instrucciones.length <= 0) {
-      formErrors = "Errores: ";
-      if (categoriaSelected == null) {
-        formErrors += "Debes Seleccionar una Categoria\n";
-      }
-      if (_prepController.text == null || _prepController.text == "") {
-        formErrors += "Debes Indicar un Tiempo de Preparacion\n";
-      }
-      if (_kcalController.text == null || _kcalController.text == "") {
-        formErrors += "Debes Indicar las Kilocalorías\n";
-      }
-      if (_tituloController.text == null || _tituloController.text == "") {
-        formErrors += "Debes Indicar un Título\n";
-      }
-      if (_descrController.text == null || _descrController.text == "") {
-        formErrors += "Debes Indicar una Descripción\n";
-      }
-      if (dieta == null) {
-        formErrors += "Debes seleccionar una Dieta\n";
-      }
-      if (_instrucciones.length <= 0) {
-        formErrors += "Debes Añadir algún Ingrediente\n";
-      }
+    formErrors = new Map<String, dynamic>();
+    int minute, kcal;
+    if (_prepController.text == "") {
+      minute = null;
     } else {
-      formErrors = "";
-      final _receta = Receta(
-        titulo: _tituloController.text ?? "titulo",
-        imgUrl: _image != null
-            ? 'data:image/png;base64,' + base64Encode(_image.readAsBytesSync())
-            : null,
-        minutes: int.parse(_prepController.text ?? "20"),
-        kcal: int.parse(_kcalController.text ?? "120"),
-        descripcion: _descrController.text ?? "descripcion",
-        categoria: categoriaSelected,
-        autor_id: perfil.id,
-        dieta: dieta.code,
-        id: widget._recetaId,
-      );
+      minute = int.tryParse(_prepController.text ?? "20");
+    }
+    if (_kcalController.text == "") {
+      kcal = null;
+    } else {
+      kcal = int.tryParse(_kcalController.text ?? "120");
+    }
+    final _receta = Receta(
+      titulo: _tituloController.text ?? "titulo",
+      imgUrl: _image != null
+          ? 'data:image/png;base64,' + base64Encode(_image.readAsBytesSync())
+          : null,
+      minutes: minute,
+      kcal: kcal,
+      descripcion: _descrController.text ?? "descripcion",
+      categoria: categoriaSelected,
+      autor_id: perfil.id,
+      dieta: (dieta != null) ? dieta.code : null,
+      id: widget._recetaId,
+    );
 
-      final result = await service.updateReceta(_receta);
+    final result = await service.updateReceta(_receta);
 
-      if (result.data != null) {
-        Receta _newReceta = result.data;
+    if (result.data != null) {
+      Receta _newReceta = result.data;
 
-        for (var item in _instrucciones) {
-          bool exist = false;
-          for (var oitem in _originalInstrucciones){
-            if (item.id == oitem.id) {
-              exist = true;
-            }
-          }
-          if(!exist){
-            item.receta = _newReceta;
-          print(item.receta);
-          await service.createInstruccion(item);
+      for (var item in _instrucciones) {
+        bool exist = false;
+        for (var oitem in _originalInstrucciones) {
+          if (item.id == oitem.id) {
+            exist = true;
           }
         }
-
-        final titulo = "Modificar Receta";
-        final text = result.error
-            ? (result.errorMessage ?? "Ha ocurrido un error")
-            : "la Receta se ha modificado correctamente";
-
-        showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-                  title: Text(titulo),
-                  content: Text(text),
-                  actions: <Widget>[
-                    FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("Ok"))
-                  ],
-                )).then((data) {
-          setState(() {
-            _isEditing = false;
-            _fetchDatos();
-          });
-        });
+        if (!exist) {
+          item.receta = _newReceta;
+          print(item.receta);
+          await service.createInstruccion(item);
+        }
       }
+
+      final titulo = "Modificar Receta";
+      final text = result.error
+          ? (result.errorMessage ?? "Ha ocurrido un error")
+          : "la Receta se ha modificado correctamente";
+
+      showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+                title: Text(titulo),
+                content: Text(text),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Ok"))
+                ],
+              )).then((data) {
+        setState(() {
+          _isEditing = false;
+          _fetchDatos();
+        });
+      });
+    } else {
+      formErrors = json.decode(result.errorMessage);
     }
 
     setState(() {
@@ -266,15 +244,19 @@ class _RecetaState extends State<RecetaPage> {
                       width: double.infinity,
                       height: 300.0,
                       decoration: BoxDecoration(
-                          color: Colors.black,
-                          image: receta.imgUrl != null
-                              ? DecorationImage(
-                                  image: (_isEditing && _image != null)
-                                      ? new FileImage(_image)
-                                      : new NetworkImage(receta.imgUrl),
-                                  fit: BoxFit.cover,
-                                )
-                              : null),
+                        color: Colors.black,
+                        image: (_isEditing && _image != null)
+                            ? DecorationImage(
+                                image: new FileImage(_image),
+                                fit: BoxFit.cover,
+                              )
+                            : (receta.imgUrl != null)
+                                ? DecorationImage(
+                                    image: new NetworkImage(receta.imgUrl),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                      ),
                       child: _isEditing
                           ? Container(
                               color: Colors.black.withOpacity(0.2),
@@ -477,6 +459,10 @@ class _RecetaState extends State<RecetaPage> {
                                   controller: _tituloController,
                                   maxLength: 100,
                                   decoration: InputDecoration(
+                                    errorText: (formErrors != null &&
+                                            formErrors["titulo"] != null)
+                                        ? formErrors["titulo"][0]
+                                        : null,
                                     hintText: "Nombre del Plato",
                                     isDense: true,
                                   ),
@@ -485,40 +471,31 @@ class _RecetaState extends State<RecetaPage> {
                           SizedBox(
                             height: 10.0,
                           ),
-                          _isEditing
-                              ? TextField(
-                                  style: TextStyle(fontSize: 14.0),
-                                  controller: _descrController,
-                                  maxLength: 500,
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  minLines: 3,
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    hintText: "Añade una descripción...",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                )
-                              : ConstrainedBox(
-                                  constraints: new BoxConstraints(
-                                    minHeight: 50.0,
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Flexible(
-                                        child: Text(
-                                          receta.descripcion,
-                                          style: TextStyle(fontSize: 14.0),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                          TextField(
+                            style: TextStyle(fontSize: 14.0),
+                            controller: _descrController,
+                            maxLength: 500,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            minLines: 3,
+                            readOnly: !_isEditing,
+                            decoration: InputDecoration(
+                              errorText: (formErrors != null &&
+                                      formErrors["descripcion"] != null)
+                                  ? formErrors["descripcion"][0]
+                                  : null,
+                              isDense: true,
+                              hintText: _isEditing
+                                  ? "Añade una descripción..."
+                                  : "No hay descripción.",
+                              hintStyle: TextStyle(
+                                fontSize: 14.0,
+                              ),
+                              border: _isEditing
+                                  ? OutlineInputBorder()
+                                  : InputBorder.none,
+                            ),
+                          ),
                           Row(
                             children: <Widget>[
                               Text(
@@ -605,8 +582,9 @@ class _RecetaState extends State<RecetaPage> {
                                 ? Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 8.0, horizontal: 24.0),
-                                    child: Text(
-                                        "Ningún ingrediente Seleccionado."),
+                                    child: Text(_isEditing
+                                        ? "Ningún ingrediente Seleccionado."
+                                        : "No hay Ingredientes"),
                                   )
                                 : ListView(
                                     //physics: NeverScrollableScrollPhysics(),
@@ -667,6 +645,13 @@ class _RecetaState extends State<RecetaPage> {
                                       maxLength: 3,
                                       readOnly: !_isEditing,
                                       decoration: InputDecoration(
+                                        errorText: (formErrors != null &&
+                                                formErrors[
+                                                        "minutos_preparacion"] !=
+                                                    null)
+                                            ? formErrors["minutos_preparacion"]
+                                                [0]
+                                            : null,
                                         hintText: "000",
                                         counterText: "",
                                         border: InputBorder.none,
@@ -691,6 +676,10 @@ class _RecetaState extends State<RecetaPage> {
                                       maxLength: 4,
                                       readOnly: !_isEditing,
                                       decoration: InputDecoration(
+                                        errorText: (formErrors != null &&
+                                                formErrors["kcal"] != null)
+                                            ? formErrors["kcal"][0]
+                                            : null,
                                         hintText: "0000",
                                         counterText: "",
                                         border: InputBorder.none,
@@ -717,344 +706,5 @@ class _RecetaState extends State<RecetaPage> {
               ),
       ),
     );
-  }
-}
-
-class InstruccionItem extends StatelessWidget {
-  final String icono;
-  final String texto;
-
-  const InstruccionItem({Key key, this.icono, this.texto}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10.0),
-      child: Row(
-        children: <Widget>[
-          Container(
-            width: 25.0,
-            height: 25.0,
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(25.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Image.network(icono),
-            ),
-          ),
-          SizedBox(
-            width: 10.0,
-          ),
-          Text(texto),
-        ],
-      ),
-    );
-  }
-}
-
-class InstruccionDialog extends StatefulWidget {
-  InstruccionDialog(this.addInstruccionCallBack, {Key key}) : super(key: key);
-  final Function addInstruccionCallBack;
-
-  @override
-  _InstruccionDialogState createState() => _InstruccionDialogState();
-}
-
-class _InstruccionDialogState extends State<InstruccionDialog> {
-  RecetasService get service => GetIt.I<RecetasService>();
-  APIResponse<List<Ingrediente>> _apiResponse;
-  Instruccion _instruccion;
-  List<Instruccion> _instrucciones = [];
-  List<Alergeno> _alergenos;
-  Alergeno alergenoSelected;
-  Ingrediente ingredienteSelected;
-  List<Ingrediente> _ingredientes;
-  List<Ingrediente> _filteredIngredientes;
-  TextEditingController _cantidadController = TextEditingController();
-  TextEditingController _filterController = TextEditingController();
-  TextEditingController _nombreIngredienteController = TextEditingController();
-  String contentText = "Añadir Instrucción";
-  String formErrors = "";
-  bool _isLoading = false;
-  bool addIngrediente = false;
-
-  @override
-  void initState() {
-    _fetchIngredientes();
-    super.initState();
-  }
-
-  _isSelected(int index) {
-    if (ingredienteSelected == null) {
-      return false;
-    }
-    return ingredienteSelected.id == _filteredIngredientes[index].id;
-  }
-
-  _searchFilter(data) {
-    print("filter: " + data);
-    setState(() {
-      if (data != null) {
-        _filteredIngredientes = _ingredientes
-            .where((i) => i.nombre
-                .toLowerCase()
-                .contains(_filterController.text.toLowerCase()))
-            .toList();
-        print(_filteredIngredientes.length);
-      } else {
-        _filteredIngredientes = _ingredientes;
-      }
-    });
-  }
-
-  _fetchIngredientes() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    APIResponse<List<Alergeno>> _apiResponseAlergeno;
-    _apiResponseAlergeno = await service.getAlergenos();
-    _alergenos = _apiResponseAlergeno.data;
-    _apiResponse = await service.getIngredientes(_alergenos);
-    _ingredientes = _apiResponse.data;
-    _filteredIngredientes = _ingredientes;
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  _addIngrediente() async {
-    Ingrediente newIngrediente;
-    setState(() {
-      formErrors = "";
-      if (alergenoSelected == null) {
-        formErrors += "Debes seleccionar un Alergeno.";
-      }
-      if (_nombreIngredienteController.text == "" ||
-          _nombreIngredienteController.text == null) {
-        formErrors += "Debes indicar un Nombre.";
-      }
-    });
-    if (formErrors == "") {
-      _isLoading = true;
-      newIngrediente = new Ingrediente(
-          alergeno: alergenoSelected,
-          nombre: _nombreIngredienteController.text);
-      APIResponse<Ingrediente> _apiResponseNewIngrediente =
-          await service.createIngrediente(newIngrediente, _alergenos);
-      newIngrediente == _apiResponseNewIngrediente.data;
-    }
-    setState(() {
-      if (newIngrediente != null) {
-        ingredienteSelected = newIngrediente;
-      }
-      _isLoading = false;
-      _fetchIngredientes();
-      addIngrediente = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return (_isLoading)
-        ? Center(child: CircularProgressIndicator())
-        : AlertDialog(
-            title: Text(contentText),
-            content: Container(
-              width: double.maxFinite,
-              child: addIngrediente
-                  ? Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        Text("Crear un Nuevo Ingrediente."),
-                        SizedBox(
-                          height: 30.0,
-                        ),
-                        DropdownButton<Alergeno>(
-                          hint: Text("Alergeno..."),
-                          isExpanded: true,
-                          value: alergenoSelected,
-                          icon: Icon(Icons.arrow_downward),
-                          iconSize: 24,
-                          elevation: 16,
-                          //style: TextStyle(color: Theme.of(context).accentColor),
-                          underline: Container(
-                            height: 2,
-                            color: Theme.of(context).accentColor,
-                          ),
-                          onChanged: (Alergeno newValue) {
-                            setState(() {
-                              alergenoSelected = newValue;
-                            });
-                          },
-                          items: _alergenos.map<DropdownMenuItem<Alergeno>>(
-                              (Alergeno value) {
-                            return DropdownMenuItem<Alergeno>(
-                              key: UniqueKey(),
-                              value: value,
-                              child: Text(value.nombre),
-                            );
-                          }).toList(),
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        TextField(
-                          controller: _nombreIngredienteController,
-                          decoration:
-                              InputDecoration(hintText: "Nombre Ingrediente"),
-                        ),
-                        SizedBox(
-                          height: 50.0,
-                        ),
-                        RaisedButton(
-                          onPressed: _addIngrediente,
-                          textColor: Colors.white,
-                          color: Theme.of(context).accentColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24.0),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 14.0),
-                          child: Text('Crear Ingrediente',
-                              style: TextStyle(fontSize: 16.0)),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        TextField(
-                          controller: _filterController,
-                          onChanged: (data) {
-                            _searchFilter(data);
-                          },
-                          decoration: InputDecoration(
-                              hintText: "Nombre de Ingrediente..."),
-                        ),
-                        (_filteredIngredientes.length > 0)
-                            ? SizedBox.shrink()
-                            : Expanded(
-                                child: Text(
-                                    "No se han encontrado Ingredientes. Puedes añadir un nuevo Ingrediente")),
-                        Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _filteredIngredientes.length + 1,
-                            itemBuilder: (BuildContext context, int index) {
-                              if (index >= _filteredIngredientes.length) {
-                                return ListTile(
-                                  dense: true,
-                                  title: Text(
-                                    "Añadir Nuevo Ingrediente",
-                                  ),
-                                  leading: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.circular(25.0),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.add,
-                                        size: 18.0,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      //Crear Ingrediente;
-                                      addIngrediente = true;
-                                    });
-                                  },
-                                );
-                              }
-                              return ListTile(
-                                dense: true,
-                                title: Text(_filteredIngredientes[index].nombre,
-                                    style: TextStyle(
-                                        fontWeight: (_isSelected(index))
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        color: _isSelected(index)
-                                            ? Theme.of(context).accentColor
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyText2
-                                                .color)),
-                                onTap: () {
-                                  setState(() {
-                                    ingredienteSelected =
-                                        _filteredIngredientes[index];
-                                    _filterController.text =
-                                        ingredienteSelected.nombre;
-                                    _searchFilter(ingredienteSelected.nombre);
-                                  });
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                        // DropdownButton<Ingrediente>(
-                        //   isExpanded: true,
-                        //   value: ingredienteSelected,
-                        //   icon: Icon(Icons.arrow_downward),
-                        //   iconSize: 24,
-                        //   elevation: 16,
-                        //   //style: TextStyle(color: Theme.of(context).accentColor),
-                        //   underline: Container(
-                        //     height: 2,
-                        //     color: Theme.of(context).accentColor,
-                        //   ),
-                        //   onChanged: (Ingrediente newValue) {
-                        //     setState(() {
-                        //       ingredienteSelected = newValue;
-                        //     });
-                        //   },
-                        //   items: _ingredientes.map<DropdownMenuItem<Ingrediente>>(
-                        //       (Ingrediente value) {
-                        //     return DropdownMenuItem<Ingrediente>(
-                        //       value: value,
-                        //       child: Text(value.nombre),
-                        //     );
-                        //   }).toList(),
-                        // ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextField(
-                            controller: _cantidadController,
-                            maxLength: 100,
-                            decoration: InputDecoration(
-                              hintText: "Cantidad",
-                              isDense: true,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Añadir"),
-                onPressed: () {
-                  _instruccion = new Instruccion(
-                      ingrediente: ingredienteSelected,
-                      cantidad: _cantidadController.text);
-                  setState(() {
-                    widget.addInstruccionCallBack(_instruccion);
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
   }
 }

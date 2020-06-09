@@ -106,7 +106,7 @@ class RecetasService {
           data: null,
           error: true,
           errorMessage:
-              "ERROR " + data.statusCode.toString() + ': An error occurred');
+              data.body);
     }).catchError((_) => APIResponse<Receta>(
             data: null, error: true, errorMessage: 'An error occurred'));
   }
