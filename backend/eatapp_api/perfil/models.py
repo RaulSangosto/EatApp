@@ -20,13 +20,7 @@ class Perfil(models.Model):
 
     fecha_nacimiento = models.DateField(null=True, blank=True)
     sexo = models.CharField(max_length=1, choices=SEXO, null=True, blank=True)
-    favoritos = models.ManyToManyField("receta.Receta", blank=True, null=True,
-                                       related_name="favoritos_usuarios")
+    favoritos = models.ManyToManyField("receta.Receta",related_name="favoritos_usuarios")
     categoriasSemana = models.ManyToManyField("receta.Categoria", blank=True, related_name="dieta_semanal")
 
     #invitacion = models.CharField(max_length=15, null=True, blank=True)
-
-    def avatar(self, alias="avatar"):
-        if self.foto:
-            thumbnailer = get_thumbnailer(self.foto)
-            return thumbnailer[alias].url

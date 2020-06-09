@@ -121,9 +121,6 @@ class _RegisterState extends State<RegisterPage> {
 
     setState(() {
       _isLoading = false;
-      //print(loginResponse.data.nombre);
-      // widget._pageIdCallback(0);
-      // widget._loginCallback(_isLoged);
     });
   }
 

@@ -37,11 +37,11 @@ class PerfilService {
     await http.get(API + "perfil/me", headers: headers).then((data) {
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
-        if (perfil.avatarUrl != null){
+        if (perfil.avatarUrl != null) {
           String url = "http://" + Configuration.localhost + perfil.avatarUrl;
           perfil.avatarUrl = url;
         }
-        if (perfil.fondoUrl != null){
+        if (perfil.fondoUrl != null) {
           String url = "http://" + Configuration.localhost + perfil.fondoUrl;
           perfil.fondoUrl = url;
         }
@@ -50,35 +50,51 @@ class PerfilService {
     return perfil;
   }
 
-  Future<Perfil> updatePerfil({String nombre, String ubicacion, String descripcion, String kcal, String dieta, String imgUrl, String fondoUrl}) async {
-
-    if (token == null){
+  Future<Perfil> updatePerfil(
+      {String nombre,
+      String ubicacion,
+      String descripcion,
+      String kcal,
+      String dieta,
+      String imgUrl,
+      String fondoUrl}) async {
+    if (token == null) {
       await getSharedPrefs();
       token = prefs.getString("token");
     }
 
     var headers = {
+      "Accept": "application/json; charset=UTF-8",
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": "token " + token
     };
+    Perfil newP = new Perfil(
+        nombre: nombre,
+        ubicacion: ubicacion,
+        descripcion: descripcion,
+        kcalDiarias: kcal,
+        dieta: dieta,
+        avatarUrl: imgUrl,
+        fondoUrl: fondoUrl);
 
-    perfil.nombre = nombre?? perfil.nombre;
-    perfil.ubicacion = ubicacion?? perfil.ubicacion;
-    perfil.descripcion = descripcion?? perfil.descripcion;
-    perfil.kcalDiarias = kcal?? perfil.kcalDiarias;
-    perfil.dieta = dieta ?? perfil.dieta;
-    perfil.avatarUrl = imgUrl ?? perfil.avatarUrl;
-    perfil.fondoUrl = fondoUrl ?? perfil.fondoUrl;
-    print(perfil.avatarUrl?? "" + " " + perfil.fondoUrl ?? "");
-    
-    await http.patch(API + "perfil/me", 
-      headers: headers,
-      body: utf8.encode(jsonEncode(perfil.toJson())),
-      encoding: Encoding.getByName("utf-8"))
-      .then((data){
+    await http
+        .patch(API + "perfil/me",
+            headers: headers, body: jsonEncode(newP.toJson(patch: true)))
+        .then((data) {
+      print(data.statusCode);
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
-      } else {}
+        if (perfil.avatarUrl != null) {
+          String url = "http://" + Configuration.localhost + perfil.avatarUrl;
+          perfil.avatarUrl = url;
+        }
+        if (perfil.fondoUrl != null) {
+          String url = "http://" + Configuration.localhost + perfil.fondoUrl;
+          perfil.fondoUrl = url;
+        }
+      } else {
+        print(data.body);
+      }
     });
     return perfil;
   }
@@ -98,7 +114,6 @@ class PerfilService {
           await getSharedPrefs();
           prefs.setString("token", _token);
           token = _token;
-          print(token);
           return true;
         }
       }
@@ -107,37 +122,42 @@ class PerfilService {
     return login;
   }
 
-  Future<APIResponse<Perfil>> register({@required Perfil perfil, @required String username, @required String password, @required String password2}) async {
+  Future<APIResponse<Perfil>> register(
+      {@required Perfil perfil,
+      @required String username,
+      @required String password,
+      @required String password2}) async {
     print("register");
     Map<String, dynamic> body = perfil.toJson();
-    Map<String, dynamic> extra = {"username":username, "password" : password, "password2":password2};
+    Map<String, dynamic> extra = {
+      "username": username,
+      "password": password,
+      "password2": password2
+    };
     body.addAll(extra);
     return await http
-        .post(API + "perfil/register",
-            headers: {
-              "Accept": "application/json; charset=UTF-8",
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            body: jsonEncode(body),)
+        .post(
+      API + "perfil/register",
+      headers: {
+        "Accept": "application/json; charset=UTF-8",
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: jsonEncode(body),
+    )
         .then((data) async {
-          print(data.statusCode);
+      print(data.statusCode);
       if (data.statusCode == 200) {
-        print(data.statusCode);
-        print(data.body);
         String _token = json.decode(data.body)['token'];
         if (_token != null) {
           await getSharedPrefs();
           prefs.setString("token", _token);
           token = _token;
-          print(token);
         }
-        return APIResponse<Perfil>(data:Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes))));
+        return APIResponse<Perfil>(
+            data: Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes))));
       }
       return APIResponse<Perfil>(
-          data: null,
-          error: true,
-          errorMessage:
-              data.body);
+          data: null, error: true, errorMessage: data.body);
     }).catchError((_) => APIResponse<Perfil>(
             data: null, error: true, errorMessage: 'An error occurred'));
   }

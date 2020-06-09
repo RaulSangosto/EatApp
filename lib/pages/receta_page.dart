@@ -187,6 +187,9 @@ class _RecetaState extends State<RecetaPage> {
         formErrors += "Debes Añadir algún Ingrediente\n";
       }
     } else {
+      if(_image!=null){
+        print('data:image/png;base64,' + base64Encode(_image.readAsBytesSync()));
+      }
       formErrors = "";
       final _receta = Receta(
         titulo: _tituloController.text ?? "titulo",

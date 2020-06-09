@@ -59,12 +59,56 @@ class Perfil {
     return p;
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({patch=false}) {
+
     String fecha;
     if(fechaNac!=null){
       fecha = fechaNac.year.toString() + "-" + fechaNac.month.toString() + "-" + fechaNac.day.toString();
     }
-    var response = {
+    if (patch) {
+      Map <String, dynamic> response = new Map<String, dynamic>();
+
+      if(nombre != null){
+        response["nombre"] = nombre;
+      }
+      if(email != null){
+        response["email"] = email;
+      }
+      if(user != null){
+        response["user"] = user;
+      }
+      if(ubicacion != null){
+        response["ubicacion"] = ubicacion;
+      }
+      if(descripcion != null){
+        response["descripcion"] = descripcion;
+      }
+      if(dieta != null){
+        response["dieta"] = dieta;
+      }
+      if(kcalDiarias != null){
+        response["kcal_diarias"] = kcalDiarias;
+      }
+      if(fecha != null){
+        response["fecha_nacimiento"] = fecha;
+      }
+      if(sexo != null){
+        response["sexo"] = sexo;
+      }
+      if(favoritos != null){
+        response["favoritos"] = favoritos;
+      }
+      if(avatarUrl != null){
+        response["foto"] = avatarUrl;
+      }
+      if(fondoUrl != null){
+        response["fotoBg"] = fondoUrl;
+      }
+
+      return response;
+    }
+
+    return {
       "nombre": nombre,
       "email": email,
       "user": user,
@@ -74,19 +118,9 @@ class Perfil {
       "kcal_diarias": kcalDiarias,
       "fecha_nacimiento": fecha,
       "sexo": sexo,
+      "favoritos": favoritos,
+      "foto": avatarUrl,
+      "fotoBg": fondoUrl,
     };
-
-    if(favoritos != null){
-      response["favoritos"] = favoritos;
-    }
-
-    if(avatarUrl != null){
-      response["foto"] = avatarUrl;
-    }
-    if(fondoUrl != null){
-      response["fotoBg"] = fondoUrl;
-    }
-
-    return response;
   }
 }

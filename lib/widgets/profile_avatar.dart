@@ -1,13 +1,16 @@
+import 'dart:io';
+
 import 'package:eatapp/models/perfil.dart';
 import 'package:eatapp/perfil_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class PerfilAvatar extends StatefulWidget {
-  PerfilAvatar(this.radius, {this.color, this.selectedcolor});
+  PerfilAvatar(this.radius, {this.color, this.selectedcolor, this.file});
   final double radius;
   final Color color;
   final Color selectedcolor;
+  final File file;
 
   @override
   State<StatefulWidget> createState() {
@@ -46,14 +49,18 @@ class _PerfilAvatar extends State<PerfilAvatar> {
         : Container(
             width: widget.radius * 2,
             height: widget.radius * 2,
-            padding:
-                EdgeInsets.all((widget.radius * 0.08) <= 2.0 ? 3.0 : (widget.radius * 0.08)),
+            padding: EdgeInsets.all(
+                (widget.radius * 0.08) <= 2.0 ? 3.0 : (widget.radius * 0.08)),
             decoration: BoxDecoration(
-              color: widget.color?? Colors.white, // border color
+              color: widget.color ?? Colors.white, // border color
               shape: BoxShape.circle,
             ),
             child: CircleAvatar(
-              backgroundImage:perfil.avatarUrl == null ? null : NetworkImage(perfil.avatarUrl),
+              backgroundImage: widget.file == null
+                  ? perfil.avatarUrl == null
+                      ? null
+                      : NetworkImage(perfil.avatarUrl)
+                  : FileImage(widget.file),
               backgroundColor: Colors.blueGrey,
               radius: widget.radius,
               child: Text(

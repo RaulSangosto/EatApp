@@ -30,8 +30,9 @@ class PerfilSerializer(serializers.ModelSerializer):
 
 class PerfilSaveSerializer(serializers.ModelSerializer):
     email = serializers.ReadOnlyField(source="user.email")
-    foto = Base64ImageField(required=False)
-    #avatar = serializers.ReadOnlyField()
+    foto=Base64ImageField(required=False)
+    fotoBg=Base64ImageField(required=False)
+
     password_actual = serializers.CharField(required=False, allow_blank=True)
     password = serializers.CharField(required=False, allow_blank=True)
     password2 = serializers.CharField(required=False, allow_blank=True)
@@ -85,7 +86,7 @@ class RegistroSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField()
     sexo = serializers.CharField()
     fecha_nacimiento = serializers.DateField()
-    activo = serializers.BooleanField(default=False)
+    activo = serializers.BooleanField(default=True)
 
     class Meta:
         model = Perfil

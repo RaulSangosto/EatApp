@@ -95,6 +95,26 @@ class _PerfilState extends State<PerfilEditarPage> {
     });
   }
 
+  Future cameraImagePerfil() async {
+    var image = await ImagePicker.pickImage(
+      source: ImageSource.camera,
+    );
+
+    setState(() {
+      _imagePerfil = image;
+    });
+  }
+
+  Future galleryImagePerfil() async {
+    var image = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    setState(() {
+      _imagePerfil = image;
+    });
+  }
+
   logout() async {
     print("logout");
     service.logout();
@@ -124,13 +144,12 @@ class _PerfilState extends State<PerfilEditarPage> {
       perfil.kcalDiarias = kcalDiariasController.text;
 
       String _imgUrl = (_imagePerfil != null)
-              ? 'data:image/png;base64,' +
-                  base64Encode(_imagePerfil.readAsBytesSync())
-              : null;
+          ? 'data:image/png;base64,' +
+              base64Encode(_imagePerfil.readAsBytesSync())
+          : null;
       String _fondoUrl = (_imageBg != null)
-              ? 'data:image/png;base64,' +
-                  base64Encode(_imageBg.readAsBytesSync())
-              : null;
+          ? 'data:image/png;base64,' + base64Encode(_imageBg.readAsBytesSync())
+          : null;
 
       perfil = await service.updatePerfil(
           imgUrl: _imgUrl,
@@ -164,6 +183,7 @@ class _PerfilState extends State<PerfilEditarPage> {
     }
 
     setState(() {
+      print(perfil.fondoUrl);
       _isLoading = false;
     });
   }
@@ -196,14 +216,14 @@ class _PerfilState extends State<PerfilEditarPage> {
                     height: 150.0,
                     decoration: BoxDecoration(
                       color: Colors.pinkAccent,
-                      image: (perfil.fondoUrl != null)
+                      image: (_imageBg != null)
                           ? new DecorationImage(
-                              image: new NetworkImage(perfil.fondoUrl),
+                              image: new FileImage(_imageBg),
                               fit: BoxFit.cover,
                             )
-                          : (_imageBg != null)
+                          : (perfil.fondoUrl != null)
                               ? new DecorationImage(
-                                  image: new FileImage(_imageBg),
+                                  image: new NetworkImage(perfil.fondoUrl),
                                   fit: BoxFit.cover,
                                 )
                               : null,
@@ -248,14 +268,17 @@ class _PerfilState extends State<PerfilEditarPage> {
                           Container(
                             child: Stack(
                               children: <Widget>[
-                                new PerfilAvatar(40),
+                                new PerfilAvatar(40, file: _imagePerfil),
                                 Positioned(
                                   bottom: 0,
                                   right: 0,
-                                  child: Icon(
-                                    Icons.add_a_photo,
-                                    color: Colors.white,
-                                    size: 32.0,
+                                  child: GestureDetector(
+                                    onTap: cameraImagePerfil,
+                                    child: Icon(
+                                      Icons.add_a_photo,
+                                      color: Colors.white,
+                                      size: 32.0,
+                                    ),
                                   ),
                                 ),
                               ],

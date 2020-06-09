@@ -51,7 +51,7 @@ class Receta {
     );
   }
 
-  Map<String, dynamic> toJson({bool patch}) {
+  Map<String, dynamic> toJson({bool patch=false}) {
     if (patch){
       Map <String, dynamic> response = new Map<String, dynamic>();
       if(titulo != null){
