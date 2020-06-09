@@ -304,7 +304,7 @@ class _RecetaState extends State<RecetaPage> {
                           children: <Widget>[
                             BackButton(
                               onPressed: () {
-                                Navigator.pop(context);
+                                Navigator.of(context).pop(_favorito);
                               },
                             ),
                             SizedBox(

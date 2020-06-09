@@ -11,9 +11,8 @@
             -por ingredientes
 
     -Perfil   1 día
-        -mejorar añadir a favoritos ? 
+        -Añadir a favoritos no funciona !!! 
         -Como seleccionar categorias diarias?
-        -Pasar la verificacion al backend !!!
     
     -Añadir Animaciones y Transiciones ???   1 día
     -Comprobar interfaz en diferentes dispositivos !!!

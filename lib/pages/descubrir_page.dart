@@ -71,7 +71,7 @@ class _DescubrirState extends State<DescubrirPage> {
     setState(() {
       recetas = _apiResponse.data;
       gridScrollController.animateTo(150,
-            duration: Duration(milliseconds: 500), curve: Curves.linear);
+          duration: Duration(milliseconds: 500), curve: Curves.linear);
     });
     print(params);
   }
@@ -104,47 +104,49 @@ class _DescubrirState extends State<DescubrirPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Stack(
-        //mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              (_isLoading)
-                  ? Expanded(
-                      child: Container(
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    )
-                  : Expanded(
-                      child: Container(
-                        width: double.maxFinite,
-                        child: Padding(
-                          padding:
-                              EdgeInsets.only(top: _filterOpen ? 60.0 : 0.0),
-                          child: Expanded(
-                            child: _RecetasGrid(
-                              recetas: recetas,
-                              controller: gridScrollController,
-                              refreshDataCallback: _fetchRecetas,
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Stack(
+              //mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    (_isLoading)
+                        ? Expanded(
+                            child: Container(
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                          )
+                        : Expanded(
+                            child: Container(
+                              width: double.maxFinite,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    top: _filterOpen ? 60.0 : 0.0),
+                                child: Expanded(
+                                  child: _RecetasGrid(
+                                    recetas: recetas,
+                                    controller: gridScrollController,
+                                    refreshDataCallback: _fetchRecetas,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-            ],
-          ),
-          new TopCard(
-            openCallBack: _openTopCardCallBack,
-            setCategoriaCallBack: _setCategoriaCallback,
-            searchCallBack: _searchCallback,
-            categorias: categorias,
-          ),
-        ],
-      ),
+                  ],
+                ),
+                new TopCard(
+                  openCallBack: _openTopCardCallBack,
+                  setCategoriaCallBack: _setCategoriaCallback,
+                  searchCallBack: _searchCallback,
+                  categorias: categorias,
+                ),
+              ],
+            ),
       //}
     );
     //);

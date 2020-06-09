@@ -75,7 +75,8 @@ class PerfilService {
         kcalDiarias: kcal,
         dieta: dieta,
         avatarUrl: imgUrl,
-        fondoUrl: fondoUrl);
+        fondoUrl: fondoUrl,
+        favoritos: perfil.favoritos);
 
     await http
         .patch(API + "perfil/me",
