@@ -31,8 +31,6 @@
 .pub-cache/
 .pub/
 /build/
-android
-ios
 pubspec.lock
 
 # Web related
