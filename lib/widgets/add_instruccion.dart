@@ -6,7 +6,6 @@ import 'package:eatapp/receta_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-
 class InstruccionItem extends StatelessWidget {
   final String icono;
   final String texto;
@@ -62,7 +61,6 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
   TextEditingController _cantidadController = TextEditingController();
   TextEditingController _filterController = TextEditingController();
   TextEditingController _nombreIngredienteController = TextEditingController();
-  String contentText = "Añadir Instrucción";
   Map<String, dynamic> formErrors;
   bool _isLoading = false;
   bool addIngrediente = false;
@@ -153,19 +151,14 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
     return (_isLoading)
         ? Center(child: CircularProgressIndicator())
         : AlertDialog(
-            title: Text(contentText),
+            title: Text(addIngrediente
+                ? "Crear un Nuevo Ingrediente"
+                : "Añadir Instrucción"),
             content: Container(
               width: double.maxFinite,
               child: addIngrediente
                   ? Column(
                       children: <Widget>[
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        Text("Crear un Nuevo Ingrediente."),
-                        SizedBox(
-                          height: 30.0,
-                        ),
                         DropdownButton<Alergeno>(
                           hint: Text("Alergeno..."),
                           isExpanded: true,
@@ -226,21 +219,6 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                                 ? formErrors["nombre"][0]
                                 : null,
                           ),
-                        ),
-                        SizedBox(
-                          height: 50.0,
-                        ),
-                        RaisedButton(
-                          onPressed: _addIngrediente,
-                          textColor: Colors.white,
-                          color: Theme.of(context).accentColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24.0),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 14.0),
-                          child: Text('Crear Ingrediente',
-                              style: TextStyle(fontSize: 16.0)),
                         ),
                       ],
                     )
@@ -340,30 +318,37 @@ class _InstruccionDialogState extends State<InstruccionDialog> {
                     ),
             ),
             actions: <Widget>[
-              FlatButton(
-                child: Text("Añadir"),
-                onPressed: () {
-                  formErrors = new Map<String, dynamic>();
-                  if (ingredienteSelected == null) {
-                    formErrors["ingrediente"] = [
-                      "Debes seleccionar un Ingrediente"
-                    ];
-                  }
-                  if (_cantidadController.text == null ||
-                      _cantidadController.text == "") {
-                    formErrors["cantidad"] = ["Debes indicar una cantidad"];
-                  }
-                  if (formErrors.isEmpty) {
-                    _instruccion = new Instruccion(
-                        ingrediente: ingredienteSelected,
-                        cantidad: _cantidadController.text);
-                    setState(() {
-                      widget.addInstruccionCallBack(_instruccion);
-                    });
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
+              addIngrediente
+                  ? FlatButton(
+                      onPressed: _addIngrediente,
+                      child: Text('Crear Ingrediente'),
+                    )
+                  : FlatButton(
+                      child: Text("Añadir"),
+                      onPressed: () {
+                        formErrors = new Map<String, dynamic>();
+                        if (ingredienteSelected == null) {
+                          formErrors["ingrediente"] = [
+                            "Debes seleccionar un Ingrediente"
+                          ];
+                        }
+                        if (_cantidadController.text == null ||
+                            _cantidadController.text == "") {
+                          formErrors["cantidad"] = [
+                            "Debes indicar una cantidad"
+                          ];
+                        }
+                        if (formErrors.isEmpty) {
+                          _instruccion = new Instruccion(
+                              ingrediente: ingredienteSelected,
+                              cantidad: _cantidadController.text);
+                          setState(() {
+                            widget.addInstruccionCallBack(_instruccion);
+                          });
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
             ],
           );
   }

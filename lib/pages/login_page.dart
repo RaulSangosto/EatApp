@@ -42,7 +42,7 @@ class _LoginState extends State<LoginPage> {
   initState() {
     super.initState();
     _isLoged = widget._isLoged;
-    formErrors = new Map<String,dynamic>();
+    formErrors = new Map<String, dynamic>();
   }
 
   sendData() async {
@@ -54,10 +54,9 @@ class _LoginState extends State<LoginPage> {
     });
 
     _apiResponsePerfil = await perfilService.login(username, password);
-    if(_apiResponsePerfil.data != null){
+    if (_apiResponsePerfil.data != null) {
       _isLoged = true;
-    }
-    else{
+    } else {
       formErrors = json.decode(_apiResponsePerfil.errorMessage);
     }
 
@@ -79,11 +78,19 @@ class _LoginState extends State<LoginPage> {
             decoration: BoxDecoration(
               color: Theme.of(context).accentColor.withOpacity(0.5),
               image: DecorationImage(
-                  colorFilter: new ColorFilter.mode(
-                      Theme.of(context).accentColor.withOpacity(0.45),
-                      BlendMode.dstATop),
-                  image: AssetImage("assets/images/guacamole.jpg"),
-                  fit: BoxFit.cover),
+                colorFilter: new ColorFilter.mode(
+                    Theme.of(context).accentColor.withOpacity(0.45),
+                    BlendMode.dstATop),
+                image: AssetImage("assets/images/guacamole.jpg"),
+                fit: BoxFit.cover,
+              ),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    offset: Offset(0.0, 1.0),
+                    blurRadius: 4.0,
+                    spreadRadius: 5.0),
+              ],
             ),
             child: ListView(
               //mainAxisAlignment: MainAxisAlignment.center,
@@ -96,8 +103,19 @@ class _LoginState extends State<LoginPage> {
                     width: 70.0,
                     height: 70.0,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.white),
+                      borderRadius: BorderRadius.circular(20.0),
+                      color: Theme.of(context).accentColor,
+                      image: new DecorationImage(
+                          image: new AssetImage("assets/images/logo.png"),
+                          fit: BoxFit.contain),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            offset: Offset(0.0, 1.0),
+                            blurRadius: 4.0,
+                            spreadRadius: 5.0),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -146,12 +164,15 @@ class _LoginState extends State<LoginPage> {
                       SizedBox(
                         height: 40.0,
                       ),
-                      LoginFormField(userController: _userController, formErrors: formErrors),
+                      LoginFormField(
+                          userController: _userController,
+                          formErrors: formErrors),
                       SizedBox(
                         height: 20.0,
                       ),
                       PasswordFormField(
-                          passwordController: _passwordController, formErrors: formErrors),
+                          passwordController: _passwordController,
+                          formErrors: formErrors),
                       SizedBox(
                         height: 40.0,
                       ),
@@ -173,8 +194,13 @@ class _LoginState extends State<LoginPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    alignment: WrapAlignment.center,
+                    spacing: 20.0,
+                    runSpacing: 5.0,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runAlignment: WrapAlignment.center,
                     children: <Widget>[
                       Text('¿Aún no estás registrado?'),
                       GestureDetector(
@@ -185,7 +211,8 @@ class _LoginState extends State<LoginPage> {
                                   builder: (context) => RegisterPage(
                                         loged: _isLoged,
                                         loginCallback: widget._loginCallback,
-                                        pageIdCallback: widget._pageIdCallback,
+                                        pageIdCallback:
+                                            widget._pageIdCallback,
                                       )),
                             ).then((value) {
                               if (value == null) {
@@ -195,13 +222,21 @@ class _LoginState extends State<LoginPage> {
                                 _isLoged = value;
                                 widget._pageIdCallback(0);
                                 widget._loginCallback(_isLoged);
-                                final snackBar = SnackBar(
-                                  backgroundColor: Colors.white,
-                                    content: Text(
-                                        'Uruario Registrado Correctamente!', style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),));
+                                if (value) {
+                                  final snackBar = SnackBar(
+                                      backgroundColor: Colors.white,
+                                      content: Text(
+                                        'Uruario Registrado Correctamente!',
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2
+                                                .color),
+                                      ));
 
-                                // Find the Scaffold in the widget tree and use it to show a SnackBar.
-                                Scaffold.of(context).showSnackBar(snackBar);
+                                  // Find the Scaffold in the widget tree and use it to show a SnackBar.
+                                  Scaffold.of(context).showSnackBar(snackBar);
+                                }
                               });
                             });
                           },
@@ -231,7 +266,7 @@ class LoginFormField extends StatelessWidget {
         super(key: key);
 
   final TextEditingController _userController;
-  final Map<String,dynamic> _formErrors;
+  final Map<String, dynamic> _formErrors;
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +275,13 @@ class LoginFormField extends StatelessWidget {
       //textInputAction: TextInputAction.next,
       style: TextStyle(),
       decoration: InputDecoration(
-        errorText: (_formErrors != null) ? (_formErrors["__all__"] != null) ? _formErrors["__all__"][0] : (_formErrors["username"]!= null) ? _formErrors["username"][0] : null : null,
+          errorText: (_formErrors != null)
+              ? (_formErrors["__all__"] != null)
+                  ? _formErrors["__all__"][0]
+                  : (_formErrors["username"] != null)
+                      ? _formErrors["username"][0]
+                      : null
+              : null,
           isDense: true,
           contentPadding:
               EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
@@ -274,8 +315,7 @@ class PasswordFormField extends StatelessWidget {
         super(key: key);
 
   final TextEditingController _passwordController;
-  final Map<String,dynamic> _formErrors;
-
+  final Map<String, dynamic> _formErrors;
 
   @override
   Widget build(BuildContext context) {
@@ -283,7 +323,13 @@ class PasswordFormField extends StatelessWidget {
       controller: _passwordController,
       obscureText: true,
       decoration: InputDecoration(
-        errorText: (_formErrors != null) ? (_formErrors["__all__"] != null) ? _formErrors["__all__"][0] : (_formErrors["password"]!= null) ? _formErrors["password"][0] : null : null,
+          errorText: (_formErrors != null)
+              ? (_formErrors["__all__"] != null)
+                  ? _formErrors["__all__"][0]
+                  : (_formErrors["password"] != null)
+                      ? _formErrors["password"][0]
+                      : null
+              : null,
           hintText: "Contraseña",
           isDense: true,
           contentPadding:

@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'EatApp',
       theme: ThemeData(
         brightness: Brightness.light,
@@ -68,10 +69,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if(index == 3){
+      if (index == 3) {
         color = Theme.of(context).accentColor;
-      }
-      else {
+      } else {
         color = Colors.grey;
       }
     });
@@ -120,18 +120,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _fetchPerfil() async {
+    bool timerEnded = false;
+    bool loaded = false;
     setState(() {
       _isLoading = true;
     });
 
+    // print("start delay");
+    // Future.delayed(const Duration(milliseconds: 2000), () {
+    //   print("end delay");
+    //   setState(() {
+    //     timerEnded = true;
+    //     if(timerEnded && loaded){
+    //       _isLoading = false;
+    //     }
+    //   });
+    // });
+
     perfil = await perfilService.getPerfil();
 
     if (perfil != null) {
+      print(perfil.nombre);
       loginCallback(true);
     }
 
     setState(() {
+      // loaded = true;
+      // if (timerEnded && loaded) {
       _isLoading = false;
+      //}
     });
   }
 

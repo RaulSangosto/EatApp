@@ -1,6 +1,6 @@
 class Configuration {
-  static const port = '8000';
-  static const localhost = '10.0.2.2:' + port;
+  static const port = "8000";
+  static const localhost = 'eatapp.o2w.es';
   static const baseUrl = '/api/v1/';
-  static const API = 'http://' + localhost + baseUrl;
+  static const API = 'https://' + localhost + baseUrl;
 }

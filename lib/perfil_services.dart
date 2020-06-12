@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models/perfil.dart';
 
 class PerfilService {
-  static const API = Configuration.API;
+  String api = Configuration.API;
   String token = "";
   Perfil perfil;
   SharedPreferences prefs;
@@ -34,15 +34,15 @@ class PerfilService {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": "token " + token
     };
-    await http.get(API + "perfil/me", headers: headers).then((data) {
+    await http.get(api + "perfil/me", headers: headers).then((data) {
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
         if (perfil.avatarUrl != null) {
-          String url = "http://" + Configuration.localhost + perfil.avatarUrl;
+          String url = "https://" + Configuration.localhost + perfil.avatarUrl;
           perfil.avatarUrl = url;
         }
         if (perfil.fondoUrl != null) {
-          String url = "http://" + Configuration.localhost + perfil.fondoUrl;
+          String url = "https://" + Configuration.localhost + perfil.fondoUrl;
           perfil.fondoUrl = url;
         }
       } else {}
@@ -79,17 +79,17 @@ class PerfilService {
         favoritos: perfil.favoritos);
 
     await http
-        .patch(API + "perfil/me",
+        .patch(api + "perfil/me",
             headers: headers, body: jsonEncode(newP.toJson(patch: true)))
         .then((data) {
       if (data.statusCode == 200) {
         perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
         if (perfil.avatarUrl != null) {
-          String url = "http://" + Configuration.localhost + perfil.avatarUrl;
+          String url = "https://" + Configuration.localhost + perfil.avatarUrl;
           perfil.avatarUrl = url;
         }
         if (perfil.fondoUrl != null) {
-          String url = "http://" + Configuration.localhost + perfil.fondoUrl;
+          String url = "https://" + Configuration.localhost + perfil.fondoUrl;
           perfil.fondoUrl = url;
         }
       }
@@ -99,7 +99,7 @@ class PerfilService {
 
   Future<APIResponse<Perfil>> login(String username, String password) async {
     return await http
-        .post(API + "perfil/login",
+        .post(api + "perfil/login",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
             },
@@ -112,8 +112,9 @@ class PerfilService {
           prefs.setString("token", _token);
           token = _token;
         }
+        perfil = Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes)));
         return APIResponse<Perfil>(
-            data: Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes))));
+            data: perfil);
       }
       return APIResponse<Perfil>(
             data: null, error: true, errorMessage: data.body);
@@ -135,7 +136,7 @@ class PerfilService {
     body.addAll(extra);
     return await http
         .post(
-      API + "perfil/register",
+      api + "perfil/register",
       headers: {
         "Accept": "application/json; charset=UTF-8",
         "Content-Type": "application/json; charset=UTF-8",
@@ -152,6 +153,8 @@ class PerfilService {
         }
         return APIResponse<Perfil>(
             data: Perfil.fromJson(json.decode(utf8.decode(data.bodyBytes))));
+      } else if (data.statusCode == 301){
+        print(data.body);
       }
       return APIResponse<Perfil>(
           data: null, error: true, errorMessage: data.body);
@@ -161,7 +164,7 @@ class PerfilService {
 
   void logout() {
     http.post(
-      API + "perfil/logout",
+      api + "perfil/logout",
       headers: {
         "Content-Type": "application/json; charset=UTF-8",
       },

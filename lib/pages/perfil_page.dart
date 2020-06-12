@@ -133,15 +133,17 @@ class _PerfilState extends State<PerfilPage> {
           _isLoged = false;
           widget._loginCallback(_isLoged);
           final snackBar = SnackBar(
-                                  backgroundColor: Colors.white,
-                                    content: Text(
-                                        'Sesión Cerrada', style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),));
+              backgroundColor: Colors.white,
+              content: Text(
+                'Sesión Cerrada',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyText2.color),
+              ));
 
-                                // Find the Scaffold in the widget tree and use it to show a SnackBar.
-                                Scaffold.of(context).showSnackBar(snackBar);
+          // Find the Scaffold in the widget tree and use it to show a SnackBar.
+          Scaffold.of(context).showSnackBar(snackBar);
         });
-      } else {
-      }
+      } else {}
     });
   }
 
@@ -151,8 +153,8 @@ class _PerfilState extends State<PerfilPage> {
         ? Center(child: CircularProgressIndicator())
         : ListView(children: <Widget>[
             Container(
-              height: 605.0,
-              width: 605.0,
+              //height: 605.0,
+              width: double.maxFinite,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius:
@@ -172,11 +174,13 @@ class _PerfilState extends State<PerfilPage> {
                 Container(
                   height: 200.0,
                   decoration: BoxDecoration(
-                    color: Colors.pinkAccent,
-                     image: (perfil.fondoUrl != null) ? new DecorationImage(
-                      image: new NetworkImage(perfil.fondoUrl),
-                      fit: BoxFit.cover,
-                    ) : null,
+                    color: Colors.blueGrey,
+                    image: (perfil.fondoUrl != null)
+                        ? new DecorationImage(
+                            image: new NetworkImage(perfil.fondoUrl),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
@@ -284,10 +288,14 @@ class _PerfilState extends State<PerfilPage> {
                                 ],
                               ),
                               Container(
-                                margin: EdgeInsets.only(top: 4.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                margin: EdgeInsets.only(top: 10.0),
+                                child: Wrap(
+                                  direction: Axis.horizontal,
+                                  alignment: WrapAlignment.spaceBetween,
+                                  spacing: 20.0,
+                                  runSpacing: 5.0,
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  runAlignment: WrapAlignment.center,
                                   children: <Widget>[
                                     Text(
                                       email,
@@ -309,52 +317,6 @@ class _PerfilState extends State<PerfilPage> {
                                   ],
                                 ),
                               ),
-                              // Container(
-                              //   margin:
-                              //       EdgeInsets.only(top: 25.0, bottom: 10.0),
-                              //   child: Row(
-                              //     mainAxisAlignment: MainAxisAlignment.start,
-                              //     children: <Widget>[
-                              //       Row(
-                              //         children: <Widget>[
-                              //           Text(
-                              //             "12",
-                              //             style: TextStyle(
-                              //                 fontWeight: FontWeight.bold,
-                              //                 fontSize: 16.0),
-                              //           ),
-                              //           SizedBox(
-                              //             width: 5.0,
-                              //           ),
-                              //           Text(
-                              //             "Seguidores",
-                              //             style: TextStyle(fontSize: 16.0),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //       SizedBox(
-                              //         width: 60.0,
-                              //       ),
-                              //       Row(
-                              //         children: <Widget>[
-                              //           Text(
-                              //             "32",
-                              //             style: TextStyle(
-                              //                 fontWeight: FontWeight.bold,
-                              //                 fontSize: 16.0),
-                              //           ),
-                              //           SizedBox(
-                              //             width: 5.0,
-                              //           ),
-                              //           Text(
-                              //             "Seguidos",
-                              //             style: TextStyle(fontSize: 16.0),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
                               SizedBox(
                                 height: 20.0,
                               ),
@@ -410,28 +372,29 @@ class _PerfilState extends State<PerfilPage> {
                                   ],
                                 ),
                               ),
-                              Container(
-                                margin: EdgeInsets.only(top: 5.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Text(
-                                      "Alergias",
-                                      style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    SizedBox(
-                                      width: 60.0,
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        _CircleIcon(),
-                                        _CircleIcon(),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              SizedBox(height: 30.0),
+                              // Container(
+                              //   margin: EdgeInsets.only(top: 5.0),
+                              //   child: Row(
+                              //     children: <Widget>[
+                              //       Text(
+                              //         "Alergias",
+                              //         style: TextStyle(
+                              //             fontSize: 20.0,
+                              //             fontWeight: FontWeight.bold),
+                              //       ),
+                              //       SizedBox(
+                              //         width: 60.0,
+                              //       ),
+                              //       Row(
+                              //         children: <Widget>[
+                              //           _CircleIcon(),
+                              //           _CircleIcon(),
+                              //         ],
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),

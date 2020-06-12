@@ -83,32 +83,16 @@ class _DescubrirState extends State<DescubrirPage> {
   @override
   void initState() {
     _fetchRecetas();
-    _fetchPerfil();
     super.initState();
     gridScrollController =
         new ScrollController(initialScrollOffset: 150, keepScrollOffset: true);
     gridScrollController.addListener(_scrollListener);
   }
 
-  _fetchPerfil() async {
-    setState(() {
-      _isLoading = true;
-    });
-    Perfil getperfil = await perfilService.getPerfil();
-    setState(() {
-      perfil = getperfil;
-      _isLoading = false;
-    });
-  }
-
   _updatePerfilCallback() async {
-    setState(() {
-      _isLoading = true;
-    });
     Perfil getperfil = await perfilService.updatePerfil();
     setState(() {
       perfil = getperfil;
-      _isLoading = false;
     });
   }
 
@@ -123,6 +107,7 @@ class _DescubrirState extends State<DescubrirPage> {
         categoria: searchCategoria,
         search: searchParams);
     recetas = _apiResponse.data;
+    perfil = await perfilService.getPerfil();
     setState(() {
       _isLoading = false;
     });
@@ -460,6 +445,7 @@ class _RecetasGrid extends StatelessWidget {
             (w - 40) / 2,
             perfil,
             refreshDataCallback: refreshDataCallback,
+            updatePerfilCallback: updatePerfilCallback,
           );
         },
       ),

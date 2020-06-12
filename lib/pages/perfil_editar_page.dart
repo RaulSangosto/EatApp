@@ -307,11 +307,9 @@ class _PerfilState extends State<PerfilEditarPage> {
                                             fontSize: 18.0,
                                             fontWeight: FontWeight.bold)),
                                     SizedBox(
-                                      width: 10.0,
+                                      width: 20.0,
                                     ),
-                                    SizedBox(
-                                      width: 200.0,
-                                      height: 50.0,
+                                    Expanded(
                                       child: TextField(
                                         controller: nombreController,
                                         maxLength: 100,
@@ -340,11 +338,9 @@ class _PerfilState extends State<PerfilEditarPage> {
                                                   fontSize: 18.0,
                                                   fontWeight: FontWeight.bold)),
                                           SizedBox(
-                                            width: 10.0,
+                                            width: 20.0,
                                           ),
-                                          SizedBox(
-                                            width: 200.0,
-                                            height: 50.0,
+                                          Expanded(
                                             child: TextField(
                                               controller: emailController,
                                               maxLength: 100,
@@ -367,11 +363,9 @@ class _PerfilState extends State<PerfilEditarPage> {
                                                   fontSize: 18.0,
                                                   fontWeight: FontWeight.bold)),
                                           SizedBox(
-                                            width: 10.0,
+                                            width: 20.0,
                                           ),
-                                          SizedBox(
-                                            width: 200.0,
-                                            height: 50.0,
+                                          Expanded(
                                             child: TextField(
                                               controller: ubicacionController,
                                               maxLength: 100,
@@ -441,10 +435,9 @@ class _PerfilState extends State<PerfilEditarPage> {
                                                   fontSize: 18.0,
                                                   fontWeight: FontWeight.bold)),
                                           SizedBox(
-                                            width: 10.0,
+                                            width: 20.0,
                                           ),
-                                          SizedBox(
-                                            width: 200.0,
+                                          Expanded(
                                             child: DropdownButton<Choice>(
                                               hint: Text("Dieta"),
                                               value: dieta,
@@ -489,11 +482,9 @@ class _PerfilState extends State<PerfilEditarPage> {
                                                   fontSize: 18.0,
                                                   fontWeight: FontWeight.bold)),
                                           SizedBox(
-                                            width: 10.0,
+                                            width: 20.0,
                                           ),
-                                          SizedBox(
-                                            width: 200.0,
-                                            height: 50.0,
+                                          Expanded(
                                             child: TextField(
                                               controller: kcalDiariasController,
                                               maxLength: 100,
@@ -507,33 +498,6 @@ class _PerfilState extends State<PerfilEditarPage> {
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 5.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Text(
-                                        "Alergias",
-                                        style: TextStyle(
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        width: 60.0,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          _CircleIcon(),
-                                          _CircleIcon(),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                formErrors == null || formErrors == ""
-                                    ? SizedBox.shrink()
-                                    : Text(formErrors,
-                                        style:
-                                            TextStyle(color: Colors.redAccent)),
                                 Container(
                                   margin: EdgeInsets.symmetric(vertical: 30.0),
                                   child: RaisedButton(

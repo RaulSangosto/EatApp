@@ -28,6 +28,15 @@ dependencies:
   http: ^0.12.0+4
   image_picker: ^0.6.5
   shared_preferences: ^0.5.7+3
+  flutter_launcher_icons: "^0.7.3"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#62CAE5"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  
 
 dev_dependencies:
   flutter_test:
